@@ -10,104 +10,112 @@
 
 
     const single_agent = [
-        "Nethack [41]",
-        "Gym [67]",
-        "Minigrid [69]",
-        "AIBIRDS [51]",
-        "Mario AI [49]",
-        "ViZDoom [57]",
-        "MineRL [58]",
-        "MineDojo [59]",
-        "DeepMind Lab [78]",
-        "MiniWorld [80]",
+        "Nethack [42]",
+        "Gym [68]",
+        "Minigrid [70]",
+        "AIBIRDS [52]",
+        "Mario AI [50]",
+        "ViZDoom [58]",
+        "MineRL [59]",
+        "MineDojo [60]",
+        "DeepMind Lab [79]",
+        "MiniWorld [81]",
+        "SimCity [41]",
+        "Mario AI [50]",
+        "MsPacMan-vs-Ghosts [51]",
+        "AIBIRDS [52]",
+        "XFC [53]",
+        "Retro [76]",
+        "Procgen [77]",
+
     ]
 
 
     const platform = {
         "Board/Card": [
             [
-                "Blood bowl [27]",
+                "Blood bowl [29]",
                 "ColorShapeLinks [28]",
-                "Mjai [29]",
-                "Mjx [30]",
-                "Diplomacy [31]",
-                "ben [32]",
-                "Sabberstone [33]",
-                "VGC [34]",
-                "Tales of Tributes [35]",
-                "Hanabi [35]",
+                "Mjai [30]",
+                "Mjx [31]",
+                "Diplomacy [32]",
+                "ben [33]",
+                "Sabberstone [34]",
+                "VGC [35]",
+                "Tales of Tributes [36]",
+                "Hanabi [37]",
             ],
             [
-                "GGP [61]",
-                "Botzone [62]",
-                "OpenSpiel [63]",
-                "Ludii [64]",
-                "TAG [65]",
-                "Pgx [66]",
+                "GGP [62]",
+                "Botzone [63]",
+                "OpenSpiel [64]",
+                "Ludii [65]",
+                "TAG [66]",
+                "Pgx [67]",
             ]
         ],
         "Grid-based 2D": [
             [
-                "SimCity [40]",
-                "Nethack [41]",
-                "Snake AI [42]",
-                "microRTS [43]",
-                "Tribe [44]",
-                "Overcooked [45]",
-                "Cuisine World [46]",
-                "Pommerman [47]",
-                "Neural MMO [48]",],
+                "SimCity [41]",
+                "Nethack [42]",
+                "Snake AI [43]",
+                "microRTS [44]",
+                "Tribe [45]",
+                "Overcooked [456",
+                "Cuisine World [47]",
+                "Pommerman [48]",
+                "Neural MMO [49]",],
             [
-                "Gym [67]",
-                "PettingZoo [68]",
-                "Minigrid [69]",
-                "GVGAI [70]",
-                "GVGAI gym [71]",
-                "Stratega [72]",
-                "Griddly [73]",
-                "Melting Pot [74]",
+                "Gym [68]",
+                "PettingZoo [69]",
+                "Minigrid [70]",
+                "GVGAI [71]",
+                "GVGAI gym [72]",
+                "Stratega [73]",
+                "Griddly [74]",
+                "Melting Pot [75]",
             ]
         ],
         "Pixel-based 2D": [
             [
-                "Mario AI [49]",
-                "MsPacMan-vs-Ghosts [50]",
-                "AIBIRDS [51]",
-                "XFC [52]",
-                "Geometry Friends [53]",
-                "AIGD2 [54]",
-                "FightingICE [55]",
-                "Honor of King [56]",
+                "Mario AI [50]",
+                "MsPacMan-vs-Ghosts [51]",
+                "AIBIRDS [52]",
+                "XFC [53]",
+                "Geometry Friends [54]",
+                "AIGD2 [55]",
+                "FightingICE [56]",
+                "Honor of King [57]",
                 "Dota 2 [7]",
                 "StarCraft II [6]",],
             [
-                "Retro [75]",
-                "Procgen [76]",
-                "Olympics-Integrated [77]",
+                "Retro [76]",
+                "Procgen [77]",
+                "Olympics-Integrated [78]",
             ],
 
         ],
         "3D": [
             [
-                "ViZDoom [57]",
-                "MineRL [58]",
-                "MineDojo [59]",
-                "Hide and Seek [60]",],
+                "ViZDoom [58]",
+                "MineRL [59]",
+                "MineDojo [60]",
+                "Hide and Seek [61]",],
 
             [
-                "DeepMind Lab [78]",
-                "ML-agents [79]",
-                "MiniWorld [80]",
+                "DeepMind Lab [79]",
+                "ML-agents [80]",
+                "MiniWorld [81]",
             ]
         ],
         "Social": [
             [
-                "The Chef's Hat [37]",
-                "AI wolf [38]",],
+                "The Chef's Hat [38]",
+                "AI wolf [39]",],
             []
         ],
         "Text": [
-            ["Light [39]"],[]
+            ["Light [40]"],[]
         ]
     }
 
@@ -120,9 +128,15 @@
     const FigHeight = 600
     const FigWidth = 1400
 
+    let font;
+
+    function preload() {
+    font = loadFont('Times-New-Roman.otf');
+    }
+
     function setup() {
         createCanvas(FigWidth, FigHeight);
-
+        // textFont(font);
         textAlign(CENTER, CENTER);
     }
 
@@ -157,6 +171,15 @@
     }
 
     function draw_line(x, y, color){
+
+        push()
+        fill(color)
+
+        rect(x, y, cellWidth, cellHeight)
+
+        pop()
+
+        return
 
         fill('black')
 
@@ -208,13 +231,13 @@
         fill(color2)
         rect(0, (cellHeight + 10) * 1, cellHeight, cellHeight)
 
-        fill(color1)
+        fill(color1_deep)
         rect(0, (cellHeight + 10) * 2, cellHeight, cellHeight)
-        draw_rect_line(0, (cellHeight + 10) * 2, cellHeight, cellHeight, color1_deep)
+        {{/*  draw_rect_line(0, (cellHeight + 10) * 2, cellHeight, cellHeight, color1_deep)  */}}
 
-        fill(color2)
+        fill(color2_deep)
         rect(0, (cellHeight + 10) * 3, cellHeight, cellHeight)
-        draw_rect_line(0, (cellHeight + 10) * 3, cellHeight, cellHeight, color2_deep)
+        {{/*  draw_rect_line(0, (cellHeight + 10) * 3, cellHeight, cellHeight, color2_deep)  */}}
 
         noStroke()
         fill('#000000')
@@ -260,8 +283,19 @@
         pop()
     }
 
-    const game_color = '#f47645'
-    const game_color_deep = '#bb2e3a'
+    // const game_color = '#f47645'
+    // const game_color_deep = '#d94955'
+    // const platform_color = '#86cbd0'
+    // const platform_color_deep = '#479db4'
+
+    // const back_game_color = '#d73027'
+    // const back_game_color_deep = '#660000'
+    // const back_platform_color = '#b1ddf0'
+    // const back_platform_color_deep = '#66b2ff'
+
+
+    const game_color = '#fbb969'
+    const game_color_deep = '#f47645'
     const platform_color = '#86cbd0'
     const platform_color_deep = '#479db4'
 
@@ -280,7 +314,7 @@
 
         textStyle(BOLD);
 
-        textSize(12)
+        textSize(16)
 
 
         for (const [key, value] of Object.entries(platform)) {
@@ -293,54 +327,75 @@
             const x = key_index * (cellWidth + category_gap) + cellWidth
             const y = FigHeight - cellHeight
 
-            textSize(16)
+            textSize(20)
 
             text(key, x, y + cellHeight * 0.5)
 
             const game = value[0]
             const game_platform = value[1]
 
-            const game_and_platform = game.concat(game_platform)
+            {{/*  const game_and_platform = game.concat(game_platform)  */}}
+
+            const game_and_platform = [
+                game_platform.filter(g=>!single_agent.includes(g)),
+                game_platform.filter(g=>single_agent.includes(g)),
+                game.filter(g=>!single_agent.includes(g)), 
+                game.filter(g=>single_agent.includes(g)),
+            ]
+
+            textSize(16)
+
+            let h = 0
+
+            for (let ii = 0; ii < game_and_platform.length; ii++) {
+                    for(let i = game_and_platform[ii].length - 1; i >= 0; i--){
+                    const paper = game_and_platform[ii][i]
 
 
-            textSize(12)
-            for (let i = 0; i < game_and_platform.length; i++) {
-                const paper = game_and_platform[game_and_platform.length - i - 1]
-
-                if(game.includes(paper)){
-                    fill(color(game_color))
-                }else{
-                    fill(color(platform_color))
-                }
-
-
-
-                const x = key_index * (cellWidth + category_gap) + cellWidth
-                const y = FigHeight - cellHeight * i - cellHeight * 2
-
-                rect(x - cellWidth / 2, y + cellHeight / 2, cellWidth, -cellHeight)
-
-
-
-
-                if(single_agent.includes(paper)){
                     if(game.includes(paper)){
-                        draw_line(x, y, game_color_deep)
+                        fill(color(game_color))
                     }else{
-                        draw_line(x, y, platform_color_deep)
+                        fill(color(platform_color))
                     }
-                }
-
-                if(game.includes(paper)){
-                    fill(color('white'))
-                    fill(color('black'))
-                }else{
-                    fill(color('black'))
-                }
 
 
-                text(paper, x, y)
+
+                    const x = key_index * (cellWidth + category_gap) + cellWidth
+                    const y = FigHeight - cellHeight * h - cellHeight * 2
+
+                    rect(x - cellWidth / 2, y + cellHeight / 2, cellWidth, -cellHeight)
+
+
+
+
+                    if(single_agent.includes(paper)){
+                        if(game.includes(paper)){
+                            fill(color(game_color_deep))
+                            rect(x - cellWidth / 2, y + cellHeight / 2, cellWidth, -cellHeight)
+                            {{/*  draw_line(x, y, game_color_deep)
+                            draw_line(x, y, game_color_deep)  */}}
+                        }else{
+                            fill(color(platform_color_deep))
+                            rect(x - cellWidth / 2, y + cellHeight / 2, cellWidth, -cellHeight)
+                            {{/*  draw_line(x, y, game_color_deep)
+                            draw_line(x, y, platform_color_deep) */}}
+                        }
+                    }
+
+                    if(game.includes(paper)){
+                        fill(color('white'))
+                        fill(color('black'))
+                    }else{
+                        fill(color('black'))
+                    }
+
+
+                    text(paper, x, y)
+
+                    h++
             }
+            }
+
 
 
             const stroke_x = key_index * (cellWidth + category_gap) + cellWidth
@@ -362,14 +417,14 @@
         }
 
 
-        legend(900, 100, game_color, game_color_deep, platform_color, platform_color_deep)
+        legend(1100, 100, game_color, game_color_deep, platform_color, platform_color_deep)
 
         draw_arrow(70 , FigHeight - cellHeight * 1.5, 70, FigHeight - cellHeight * 17 - cellHeight * 2)
         draw_arrow(70 , FigHeight - cellHeight * 1.5, key_index * (cellWidth + category_gap) + cellWidth - 50, FigHeight - cellHeight * 1.5)
 
         noStroke()
         fill('black')
-        textSize(16)
+        textSize(20)
 
         textStyle(NORMAL)
 
