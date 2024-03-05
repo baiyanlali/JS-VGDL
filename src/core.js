@@ -1,3 +1,5 @@
+import * as tools from "./tools";
+
 class Node{
     constructor(content, indent, parent = null){
         this.children = []
@@ -49,13 +51,28 @@ function indentTreeParser(s = '', tabsize = 8){
     return root
 }
 
+function _eval (estr) {
+    if(estr === "True")
+        return true
+    if(estr === "False")
+        return false
+    return eval(estr)
+}
+
 class VGDLParser{
+    game = null
+    images = ['error.png']
+    ignore_colors = ['wall', 'avatar']
     constructor() {
     }
 
     parseGame = (tree)=> {
-        tree = indentTreeParser(tree)
+
+        if(!(tree instanceof Node))
+            tree = indentTreeParser(tree)
         const root = tree.children[0]
+        const [sclass, args] = this.parseArgs(root.content)
+        this.game = new sclass(args)
 
         // Parse Parameter Set first
         for (const c of root.children) {
@@ -67,6 +84,7 @@ class VGDLParser{
         for (const c of root.children) {
             switch (c.content) {
                 case "SpriteSet":
+                    this.parseSprites(c.children)
                     break
                 case "InteractionSet":
                     break
@@ -78,18 +96,75 @@ class VGDLParser{
         }
     }
 
-    parseSprites = ()=>{
-
+    parseTermination = (tnodes)=>{
+        tnodes.forEach(t=>{
+            const [sclass, args] = this.parseArgs(t.content)
+            console.debug(`Adding: ${sclass} ${args}`)
+            this.game.terminations.push(new sclass(args))
+        })
     }
 
-    parseArgs = (s, sclass = null, args = null) => {
-        if(!args)
-            args = {}
-        const sparts = s.split(' ').filter(c=>c.length>0).map(c=>c.trimStart())
+    parseSprites = (snodes, parentClass = null, parentargs = {}, parenttypes = [])=>{
+        snodes.forEach(s => {
+            console.assert(s.content.indexOf('>') !== -1)
+            const [key, sdef] = s.content.split('>').map(function (s) {
+                return s.trim()
+            })
+            let [sclass, args] = this.parseArgs(sdef, parentClass, Object.assign({}, parentargs))
+
+            if ('image' in args) {
+                this.images.push(args.image)
+            }
+
+            const stypes = parenttypes.concat(key);
+            if ('singleton' in args) {
+                if (args['singleton'] === true)
+                    this.game.singletons.push(key)
+                args = tools.clone(args)
+                delete args['singleton']
+            }
+
+            if (s.children.length === 0) {
+
+                console.debug(`Defining: ${key} ${sclass} ${args} ${stypes}`)
+                this.game.sprite_constr[key] = [sclass, args, stypes]
+
+                if (args.color && !('color' in parentargs) && !(this.ignore_colors.contains(key))) {
+                    var_colors[key] = args.color
+                }
+
+                if (parser.game.sprite_order.contains(key))
+                this.game.sprite_order.remove(key)
+                this.game.sprite_order.push(key)
+            } else {
+                this.parseSprites(s.children, sclass, args, stypes)
+            }
+        })
+    }
+
+    parseArgs = (s, sclass = {}, args = {}) => {
+        let sparts = s.split(' ').filter(c=>c.length>0).map(c=>c.trim())
         if(sparts.length === 0)
             return [sclass, args]
 
+        if(sparts[0].indexOf('=') === -1){
+            sclass = _eval(sparts[0])
+            sparts = sparts.slice(1)
+        }
+
+        sparts.forEach(spart => {
+            const [k, val] = spart.split('=')
+
+            try {
+                args[k] = _eval(val)
+            }catch (e) {
+                args[k] = val
+            }
+        })
+        return [sclass, args]
     }
+
+
 
 }
 
