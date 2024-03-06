@@ -72,7 +72,6 @@ export class BasicGame{
     EOS = new EOS();
     sprite_bonus_granted_on_timestep = -1; // to ensure you only grant bonus once per timestep (since you check _isDone() multiple times)
     timeout_bonus_granted_on_timestep = -1; // to ensure you only grant bonus once per timestep (since you check _isDone() multiple times)
-    reset();
 
     constructor(displayHook, args) {
         this.displayHook = displayHook
@@ -81,6 +80,8 @@ export class BasicGame{
         for (const argsKey in args) {
             this[argsKey] = args[argsKey]
         }
+
+        this.reset()
     }
 
     reset = ()=>{
@@ -93,6 +94,10 @@ export class BasicGame{
         this.num_sprites = 0
         this.kill_list = []
         this.all_killed = []
+    }
+
+    buildLevel = (lstr) => {
+        
     }
 
 

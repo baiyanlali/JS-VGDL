@@ -1,6 +1,8 @@
+import {VGDLParser} from "./core.js"
 
-aliens_game = `
-BasicGame
+
+const aliens_game = 
+`BasicGame
     SpriteSet
         base    > Immovable    color=WHITE
         avatar  > FlakAvatar   stype=sam
@@ -30,7 +32,7 @@ BasicGame
         alien  sam   > killSprite   
 `
 
-aliens_map = `
+const aliens_map = `
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 w                              w
 w1                             w
@@ -46,3 +48,5 @@ w   0   0    00    00   00000  w
 w                A             w
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 `
+
+export const game = new VGDLParser().parseGame(aliens_game)
