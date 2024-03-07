@@ -1,7 +1,7 @@
 import {BASEDIRS, DOWN, GREEN, LEFT, RIGHT, UP, WHITE} from "./constants.js";
 import {SpriteProducer, VGDLSprite} from "./vgdl-sprite.js";
 
-export class Avatar {
+export class Avatar extends VGDLSprite {
     actions = []
     constructor() {
         this.actions = this.declare_possible_actions()
@@ -13,14 +13,15 @@ export class Avatar {
     }
 }
 
-export class MovingAvatar extends Avatar{
+export class MovingAvatar extends VGDLSprite{
     constructor(pos, size, args) {
-        super();
         args.color = args.color || WHITE
+        super(pos, size, args);
+        this.actions = this.declare_possible_actions()
+        this.shrinkfactor = 0.15
         this.speed = 1
         this.is_avatar = true
         this.alternate_keys = false
-        this.sprite = new VGDLSprite(pos, size, args)
     }
 
     declare_possible_actions = function () {

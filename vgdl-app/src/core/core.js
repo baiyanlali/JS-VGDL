@@ -96,8 +96,7 @@ export class VGDLParser{
     images = ['error.png']
     ignore_colors = ['wall', 'avatar']
     var_colors = {}
-    constructor() {
-    }
+    
 
     parseGame = (tree, seed=null)=> {
 

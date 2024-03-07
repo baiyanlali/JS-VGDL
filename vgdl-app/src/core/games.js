@@ -19,8 +19,6 @@ export class BasicGame{
     disableContinuousKeyPress = true
     image_dir = '../sprites'
 
-    //用于显示游戏画面，这样做可以解耦游戏核心和显示部分
-    displayHook = []
     args = {}
 
     score = 0
@@ -106,8 +104,7 @@ export class BasicGame{
         'gamejs'
     ];
 
-    constructor(displayHook, args) {
-        this.displayHook = displayHook
+    constructor(args) {
         this.args = args
 
         for (const argsKey in args) {
@@ -117,7 +114,7 @@ export class BasicGame{
         this.reset()
     }
 
-    reset = ()=>{
+    reset = () =>{
         this.score = 0
         this.bonus_score = 0
         this.real_start_time = 0
@@ -170,7 +167,7 @@ export class BasicGame{
 
 		// create sprites
 		lines.forEach( (line, row) => {
-			for (let col in line) {
+			for (const col in line) {
 				let c = line[col];
 				if (c in this.char_mapping) {
 					let pos = [col*this.block_size, row*this.block_size];

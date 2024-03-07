@@ -1,6 +1,7 @@
 // RendererBase is from https://github.com/Bam4d/Griddly/blob/develop/js/griddlyjs-app/src/renderer/Sprite2DRenderer.js
 
 
+import { random } from "../core/tools";
 import RendererBase from "./RendererBase";
 import Phaser from "phaser";
 
@@ -175,64 +176,52 @@ class Sprite2DRenderer extends RendererBase {
     };
 
     loadTemplates = (objects) => {
-        this.scene.load.baseURL = "resources/images/";
+        this.scene.load.baseURL = "sprites/";
 
         if ("BackgroundTile" in this.renderConfig) {
             this.loadImage("__background__", this.renderConfig.BackgroundTile);
         }
 
         objects.forEach((object) => {
-            const sprite2DConfig = object.Observers[this.rendererName];
-
-            for (let idx = 0; idx < sprite2DConfig.length; idx++) {
-                const config = sprite2DConfig[idx];
-
-                if (Array.isArray(config.Image)) {
-                    const objectTemplate = {
-                        name: object.Name,
-                        id: object.Name + idx,
-                        internal: object.Internal ? true : false,
-                        tilingMode: config.TilingMode || "NONE",
-                        scale: config.Scale || 1.0,
-                        color: config.Color
-                            ? {
-                                r: config.Color[0],
-                                g: config.Color[1],
-                                b: config.Color[2],
-                            }
-                            : { r: 1, g: 1, b: 1 },
-                        zIdx: object.Z || 0,
-                    };
-
-                    for (let t = 0; t < config.Image.length; t++) {
-                        this.loadImage(objectTemplate.id + t, config.Image[t]);
-                    }
-
-                    this.objectTemplates[objectTemplate.id] = objectTemplate;
-                } else {
-                    const objectTemplate = {
-                        name: object.Name,
-                        id: object.Name + idx,
-                        internal: object.Internal ? true : false,
-                        tilingMode: "NONE",
-                        scale: config.Scale || 1.0,
-                        color: config.Color
-                            ? {
-                                r: config.Color[0],
-                                g: config.Color[1],
-                                b: config.Color[2],
-                            }
-                            : { r: 1, g: 1, b: 1 },
-                        zIdx: object.Z || 0,
-                    };
-
-                    this.loadImage(objectTemplate.id, config.Image);
-
-                    this.objectTemplates[objectTemplate.id] = objectTemplate;
-                }
+            const objectTemplate = {
+                name: object.name,
+                id: object.name + object.ID,
+                internal: object.Internal ? true : false,
+                tilingMode: "NONE",
+                scale: object.shrinkfactor === 0 ? 1.0 : object.shrinkfactor,
+                color: object.color ?? { r: 1, g: 1, b: 1 },
+                zIdx: object.Z || 0,
+            };
+            if(object.image){
+                //if have image
+                this.loadImage(objectTemplate.id, object.image);
+            }else{
+                //if not
+                this.loadImage(objectTemplate.id, 
+                    this.getShapeImage(random.choice(['circle, triangle, square'])));
             }
+
+            this.objectTemplates[objectTemplate.id] = objectTemplate;
         });
     };
+
+    getShapeImage = (shape) => {
+        switch (shape) {
+          case "circle":
+            return "block_shapes/circle.png";
+          case "triangle":
+            return "block_shapes/triangle.png";
+          case "square":
+            return "block_shapes/square.png";
+          case "pentagon":
+            return "block_shapes/pentagon.png";
+          case "hexagon":
+            return "block_shapes/hexagon.png";
+          default:
+            console.warn("Cannot find image for BLOCK_2D shape " + shape);
+            return "block_shapes/square.png";
+        }
+      }
 
     getTilingImage = (objectTemplate, x, y) => {
         if (objectTemplate.tilingMode === "WALL_16") {

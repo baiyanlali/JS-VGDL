@@ -29,11 +29,12 @@ export class VGDLSprite{
 	color = '#8c148c';
 	orientation = [0,0]
 	ID = 0
+	location = {x:0, y:0}
 
 	constructor(pos, size, args= {}) {
 		args = args ?? {}
 		this.name = args.key || null;
-		this.location = pos ?? this.location
+		this.location = pos ? {x: pos[0], y: pos[1]} : this.location
 		this.size = size ?? this.size
 		this.lastlocation = clone(this.location)
 		this.physicstype = args.physicstype || this.physicstype || GridPhysics;

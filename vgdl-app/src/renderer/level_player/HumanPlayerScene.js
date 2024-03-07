@@ -9,7 +9,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
     init = (data) => {
         this.rendererName = data.rendererName
-        this.renderConfig = data.renderConfig
+        this.renderConfig = data.rendererConfig
         this.avatarObject = data.avatarObject
         this.grenderer = new Sprite2DRenderer(this, this.rendererName, this.renderConfig, this.avatarObject)
         this.vgdl = data.vgdl
@@ -83,7 +83,26 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
 
     preload = ()=> {
-
+      this.input.mouse.disableContextMenu();
+  
+      this.loadingText = this.add.text(
+        this.cameras.main.width / 2,
+        this.cameras.main.height / 2,
+        "Loading assets for VGDL",
+        {
+          fontFamily: "Droid Sans Mono",
+          font: "32px",
+          fill: 'WHITE',
+          align: "center",
+        }
+      );
+  
+      this.loadingText.setX(this.cameras.main.width / 2);
+      this.loadingText.setY(this.cameras.main.height / 2);
+      this.loadingText.setOrigin(0.5, 0.5);
+      if (this.grenderer) {
+        this.grenderer.loadTemplates(this.vgdl.getFullState()['objects']);
+      }
     }
 
     create = () => {

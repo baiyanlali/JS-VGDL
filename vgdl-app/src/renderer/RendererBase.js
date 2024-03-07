@@ -65,6 +65,24 @@ class RendererBase {
         this.scene.load.image(image, imagePath);
     };
 
+    getShapeImage = (shape) => {
+        switch (shape) {
+          case "circle":
+            return "block_shapes/circle.png";
+          case "triangle":
+            return "block_shapes/triangle.png";
+          case "square":
+            return "block_shapes/square.png";
+          case "pentagon":
+            return "block_shapes/pentagon.png";
+          case "hexagon":
+            return "block_shapes/hexagon.png";
+          default:
+            console.warn("Cannot find image for BLOCK_2D shape " + shape);
+            return "block_shapes/square.png";
+        }
+      }
+
     getTilingImage = (objectTemplate, x, y) => {
         return objectTemplate.id;
     };

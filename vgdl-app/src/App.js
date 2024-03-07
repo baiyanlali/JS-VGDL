@@ -30,6 +30,10 @@ class App extends Component{
       gdyString: "",
       levelId: 0,
       rendererName: "",
+      rendererConfig: {
+          TileSize: 10,
+          RotateAvatarImage: true
+      },
       messages: {},
       selectedLevelId: 0,
       trajectories: [],
