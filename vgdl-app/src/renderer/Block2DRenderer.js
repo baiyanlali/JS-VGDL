@@ -1,8 +1,8 @@
 // RendererBase is from https://github.com/Bam4d/Griddly/blob/develop/js/griddlyjs-app/src/renderer/Block2DRenderer.js
 
 
-import Phaser from "phaser";
 import RendererBase from "./RendererBase";
+import Phaser from "phaser"
 
 class Block2DRenderer extends RendererBase {
     constructor(scene, rendererName, renderConfig, avatarObject, centerObjects) {

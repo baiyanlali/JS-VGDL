@@ -2,6 +2,7 @@
 
 
 import RendererBase from "./RendererBase";
+import Phaser from "phaser";
 
 class Sprite2DRenderer extends RendererBase {
     constructor(scene, rendererName, renderConfig, avatarObject, centerObjects) {
@@ -19,6 +20,7 @@ class Sprite2DRenderer extends RendererBase {
     }
 
     updateBackgroundTiling = (state) => {
+        return
         if ("BackgroundTile" in this.renderConfig) {
             if (this.backgroundSprite) {
                 this.backgroundSprite.destroy();
@@ -79,6 +81,9 @@ class Sprite2DRenderer extends RendererBase {
     };
 
     addObject = (objectName, objectTemplateName, x, y, orientation) => {
+
+        console.log(`[Sprite2DRenderer] Add Sprite ${objectName}`)
+
         if (objectName === "background") {
             return;
         }

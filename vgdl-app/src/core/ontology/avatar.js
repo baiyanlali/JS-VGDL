@@ -1,6 +1,5 @@
 import {BASEDIRS, DOWN, GREEN, LEFT, RIGHT, UP, WHITE} from "./constants.js";
-import {VGDLSprite} from "../core.js";
-import {SpriteProducer} from "./vgdl-sprite.js";
+import {SpriteProducer, VGDLSprite} from "./vgdl-sprite.js";
 
 export class Avatar {
     actions = []

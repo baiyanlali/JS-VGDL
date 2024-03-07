@@ -259,3 +259,21 @@ export const permute_pairs = function (array, m) {
 
 }
 
+export const random = {
+    choice: (arr)=> {
+        return arr[Math.floor(Math.random() * arr.length)]
+    },
+    random: ()=> {
+        return Math.random()
+    }
+}
+
+export const initializeDistribution = function (sprite_types) {
+	let catch_all_prior = .000001;
+	const initial_distribution = {"OTHER": catch_all_prior};
+
+	sprite_types.forEach(sprite_type => {
+		initial_distribution[sprite_type] = (1.0-catch_all_prior)/(sprite_types.length);
+	});
+	return initial_distribution;
+}

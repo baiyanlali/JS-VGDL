@@ -33,7 +33,7 @@ const aliens_game =
         alien  sam   > killSprite   
 `
 
-const aliens_map = `
+export const aliens_map = `
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 w                              w
 w1                             w
@@ -50,4 +50,4 @@ w                A             w
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 `
 
-export const game: BasicGame = new VGDLParser().parseGame(aliens_game)
+export const game = new VGDLParser().parseGame(aliens_game)

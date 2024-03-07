@@ -1,4 +1,9 @@
-import {colorDict} from "./constants.js";
+import {colorDict, DOWN} from "./constants.js";
+import {OrientedSprite} from "./vgdl-sprite.js";
+import * as tools from "../tools.js";
+import {oncePerStep, unitVector} from "../tools.js";
+import {Resource} from "./resource.js";
+import {ContinuousPhysics} from "./physics.js";
 
 export function getColor(sprite) {
 	try {
@@ -41,11 +46,12 @@ export function cloneSprite (sprite, partner, game, kwargs) {
 
 export function transformTo (sprite, partner, game, kwargs) {
 	let hasID = partner.ID in sprite.transformedBy;
+	let validTime;
 	if (hasID) {
 		if (game.time > sprite.transformedBy[partner.ID] + 3) {
-			let validTime = true;
+			validTime = true;
 		} else {
-			let validTime = false;
+			validTime = false;
 		}
 	}
 	if (!(hasID) || validTime) {
@@ -184,7 +190,7 @@ export function bounceDirection(sprite, partner, game, kwargs) {
 }
 
 export function wallBounce(sprite, partner, game, kwargs) {
-
+	let friction = kwargs.friction || 0;
     if (!(oncePerStep(sprite, game, 'lastbounce'))) return;
     sprite.speed *= (1. - friction)
     stepBack(sprite, partner, game)
@@ -216,6 +222,7 @@ export function wallStop(sprite, partner, game, kwargs) {
 }
 
 export function killIfSlow(sprite, partner, game, kwargs) {
+	let limitspeed = kwargs.limitspeed ?? 1000
 	let relspeed = 0;
 	if (sprite.is_static)
 		relspeed = partner.speed;
@@ -351,10 +358,11 @@ export function killSpriteOnLanding(sprite, partner, game, kwargs) {
 }
 
 export function teleportToExit(sprite, partner, game, kwargs) {
+	let rand_sprite;
 	try {
-		let rand_sprite = game.sprite_groups[partner.stype].randomElement();
+		rand_sprite = game.sprite_groups[partner.stype].randomElement();
 	} catch (error) {
-		let rand_sprite = game.sprite_groups['goal'].randomElement();
+		rand_sprite = game.sprite_groups['goal'].randomElement();
 	}
 
 	sprite.rect = rand_sprite.rect.copy();

@@ -1,4 +1,4 @@
-import {clone, defaultDict, new_id, triPoints, unitVector} from "../tools.js";
+import {clone, defaultDict, new_id, random, triPoints, unitVector} from "../tools.js";
 
 import {ContinuousPhysics, GridPhysics} from "./physics.js";
 import {BASEDIRS, BLACK, BLUE, GRAY, ORANGE, PURPLE, RED, RIGHT} from "./constants.js";
@@ -20,10 +20,6 @@ export class VGDLSprite{
 	shrinkfactor = 0;
 	dirtyrects = [];
 	size = [10, 10];
-	pos = [0, 0]
-	rect = [];
-	x = 0;
-	y = 0;
 	lastrect = null;
 	physicstype = GridPhysics;
 	speed = 0;
@@ -37,12 +33,9 @@ export class VGDLSprite{
 	constructor(pos, size, args= {}) {
 		args = args ?? {}
 		this.name = args.key || null;
-		this.pos = pos ?? this.pos
+		this.location = pos ?? this.location
 		this.size = size ?? this.size
-		this.x = this.pos[0]
-		this.y = this.pos[1]
-		this.rect = [this.pos, size]
-		this.lastrect = clone(this.rect)
+		this.lastlocation = clone(this.location)
 		this.physicstype = args.physicstype || this.physicstype || GridPhysics;
 		this.physics = new this.physicstype();
 		this.physics.gridsize = size;
@@ -75,12 +68,6 @@ export class VGDLSprite{
 
 
 	update = (game) => {
-		this.x = this.rect.x;
-		this.y = this.rect.y;
-
-		this.lastrect = this.rect.clone();
-
-
 		this.lastmove += 1;
 		if (!(this.is_static) && !(this.only_active)) {
 			// console.log('trying to do passive movement')
@@ -93,8 +80,10 @@ export class VGDLSprite{
 			speed = this.speed;
 
 		if (!(this.cooldown > this.lastmove) || Math.abs(orientation[0]) + Math.abs(orientation[1]) === 0) {
-			// this.rect = this.rect.move(orientation[0] * speed, orientation[1] * speed);
-			this.rect.moveIp(orientation[0] * speed, orientation[1] * speed);
+			this.location = {
+				x: this.location.x + orientation[0] * speed,
+				y: this.location.y + orientation[0] * speed,
+			}
 			this.lastmove = 0;
 		}
 
@@ -108,75 +97,23 @@ export class VGDLSprite{
 	}
 
 	lastdirection = () => {
-		return [this.rect.x-this.lastrect.x, this.rect.y-this.lastrect.y];
+		return [this.location.x-this.lastlocation.x, this.location.y-this.lastlocation.y];
 	}
 
 	_draw = (game) => {
 
-		if (this.image) {
-			// console.log(this.image);
-			// console.log(game.screen);
-
-			game.screen.blit(game.image_dict[this.image], this.rect);
-		}
-		else {
-			this.gamejs.graphics.rect(game.screen, this.color, this.rect);
-		}
-
-		if (Object.keys(this.resources).length)  {
-			this._drawResources(game, game.screen, this.rect);
-		}
 
 	}
 
-	_drawResources = (game, screen, rect) => {
-		// import BLACK
-		// console.log('drawing resource');
-		var BLACK = '#000';
-		var RCOLOR = '#FFF';
-		var tot = Object.keys(this.resources).length;
-		Object.keys(this.resources).forEach(r => {
-			if (r !== 'get') {
-				if (game.sprite_constr[r][1].color) {
-					RCOLOR = game.sprite_constr[r][1].color;
-				}
-			}
-		})
-
-
-		var barheight = rect.height /3.5/ tot;
-		var offset = rect.top + 2*rect.height/3;
-		var that = this;
-		Object.keys(this.resources).sort().forEach(function (r) {
-			var wiggle = rect.width/10;
-			var prop = Math.max(0, Math.min(1, that.resources[r] / game.resources_limits[r]));
-			var filled = new that.gamejs.Rect(rect.left+wiggle/2, offset, prop*(rect.width-wiggle), barheight);
-			var rest = new that.gamejs.Rect(rect.left+wiggle/2+prop*(rect.width-wiggle), offset, (1-prop)*(rect.width-wiggle), barheight);
-
-			that.gamejs.graphics.rect(screen, BLACK, rest);
-			// console.log(game.resources_colors[r])
-			that.gamejs.graphics.rect(screen, RCOLOR, filled);
-			// screen.fill(game.resources_colors[r], filled);
-			// screen.fill(BLACK, rest);
-			offset += barheight;
-		});
+	_drawResources = (game, screen, location) => {
 	}
 
 	_clear = (screen, background, double=null) => {
-		var r = screen.blit(background, this.rect, this.rect);
-		VGDLSprite.dirtyrects.push(r);
-		if (double) {
-			r = screen.blit(background, this.lastrect, this.lastrect);
-			VGDLSprite.dirtyrects.push(r);
-		}
-	}
 
-	inspect = () => {
-		return `${this.name} at (${this.rect.left}, ${this.rect.top})`;
 	}
 
 	toString = () => {
-		return `${this.name} at (${this.rect.left}, ${this.rect.top})`;
+		return `${this.name} at (${this.location.x}, ${this.location.y})`;
 	}
 }
 
@@ -259,12 +196,12 @@ export class SpawnPoint extends SpriteProducer{
 	}
 
 	update = (game) => {
-		const random = this.gamejs.math.random
+		const random = random
 		// console.log(this.prob, this.cooldown)
 		const rnd = random.random()
 		// console.log(game.time, this.cooldown)
 		if (game.time % this.cooldown === 0 && rnd < this.prob) {
-			game._createSprite([this.stype], [this.rect.left, this.rect.top]);
+			game._createSprite([this.stype], [this.location.x, this.location.y]);
 			this.counter ++;
 		}
 
@@ -284,7 +221,7 @@ export class RandomNPC extends VGDLSprite{
 
 	update = (game)=> {
 		super.update(this, game);
-		this.direction = this.gamejs.math.random.choose(BASEDIRS);
+		this.direction = random.choice(BASEDIRS);
 		this.physics.activeMovement(this, this.direction);
 	}
 }
@@ -299,8 +236,9 @@ export class OrientedSprite extends VGDLSprite{
 	_draw = (game) => {
 		super._draw(this, game);
 		if (this.draw_arrow) {
-			const col = (self.color[0], 255 - this.color[1], this.color[2]);
-			this.gamejs.draw.polygon(game.screen, col, triPoints(this.rect, unitVector(this.orientation)))
+			//TODO: Draw OrientedSprite
+			const col = (this.color[0], 255 - this.color[1], this.color[2]);
+			// this.gamejs.draw.polygon(game.screen, col, triPoints(this.rect, unitVector(this.orientation)))
 		}
 }
 }
@@ -346,8 +284,6 @@ export class OrientedFlicker extends OrientedSprite{
 }
 
 
-OrientedFlicker.prototype._drawResources = function () {};
-OrientedFlicker.prototype._updatePos = function () {};
 
 export class Walker extends Missile{
 	constructor(pos, size, args) {
@@ -365,7 +301,7 @@ export class Walker extends Missile{
 			else if (this.orientation[0] < 0)
 				d = -1;
 			else
-				d = this.gamejs.random.choice([-1, 1]);
+				d = random.choice([-1, 1]);
 			this.physics.activeMovement(this, [d, 0]);
 		}
 		super.update(game)
@@ -423,8 +359,8 @@ export class EraticMissile extends Missile{
 
 	update = (game)=> {
 		super.update(game)
-		if (this.gamejs.random.random() < this.prob)
-			this.orientation = gamejs.random.choice(BASEDIRS);
+		if (random.random() < this.prob)
+			this.orientation = random.choice(BASEDIRS);
 	}
 }
 

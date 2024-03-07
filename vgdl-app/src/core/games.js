@@ -1,9 +1,9 @@
-import {defaultDict} from "./tools.js";
+import {clone, defaultDict, initializeDistribution} from "./tools.js";
 import {colorDict, DARKGRAY, GOLD} from "./ontology/constants.js";
 import {Immovable, EOS} from "./ontology/vgdl-sprite.js";
 import {Avatar, MovingAvatar} from "./ontology/avatar.js";
 import {Termination} from "./ontology/termination.js";
-import {stochastic_effects} from "./ontology/effect.js";
+import {scoreChange, stochastic_effects} from "./ontology/effect.js";
 import {Resource} from "./ontology/resource";
 
 const MAX_SPRITES = 10000
@@ -286,7 +286,7 @@ export class BasicGame{
         //TODO: Change position
         const obj_list = {};
         const fs = this.getFullState();
-        const obs = Object.copy(fs['objects']);
+        const obs = Object.copy(fs['objects_cur']);
 
         for (let obj_type in obs) {
             this.getSprites(obj_type).forEach((obj) => {
@@ -304,128 +304,20 @@ export class BasicGame{
 
         return obj_list;
     }
-    getFirstState = () => {
-        let ias = this.ignoredattributes;
-        let obs = {};
-        let killed = {};
-        let actions = Object.keys(this.keystate).filter(key => {
-            return this.keystate[key]
-        })
-        this.steps += actions.length;
-        for (let key in this.sprite_groups) {
-            if (!(this.sprite_groups.hasOwnProperty(key))) break;
-            let ss = {};
-            this.getSprites(key).forEach((s) => {
-
-                let attrs = {};
-                Object.keys(s).forEach((a) => {
-                    let val = s[a];
-                    if (ias.indexOf(a) === -1) {
-                        attrs[a] = val;
-                    }
-                });
-                if (s.resources) {
-                    attrs['resources'] = s.resources; // Should be object
-                }
-
-                ss[s.ID] = Object.copy(attrs)
-            });
-            obs[key] = Object.copy(ss);
-        };
-
-        const object_cur = Object.copy(obs);
-        const object_data = Object.copy(obs);
-
-        function notEmpty(data) {
-            if(typeof(data) == 'number' || typeof(data) == 'boolean') {
-                return true;
-            }
-
-            if(typeof(data) == 'undefined' || data === null) {
-                return false;
-            }
-
-            if(typeof(data.length) != 'undefined') {
-                return data.length !== 0;
-            }
-
-            let count = 0;
-
-            for(let i in data) {
-                if(data.hasOwnProperty(i)) {
-                    count ++;
-                }
-            }
-
-            return count !== 0;
-        }
-
-        for (let sprite_type in object_cur) {
-            if (sprite_type === 'avatar') {
-                //for (instance in object_cur[sprite_type]) {
-                //	object_data[sprite_type] = {};
-                //	object_data[sprite_type][instance] = {};
-                //	object_data[sprite_type][instance]['x'] = object_cur[sprite_type][instance]['x'];
-                //	object_data[sprite_type][instance]['y'] = object_cur[sprite_type][instance]['y'];
-                //	object_data[sprite_type][instance]['resources'] = object_cur[sprite_type][instance]['resources'];
-                //	object_data[sprite_type][instance]['direction'] = object_cur[sprite_type][instance]['direction'];
-                //}
-                //object_data[sprite_type] = object_cur[sprite_type];
-                continue;
-            }
-            // Else sprite type is not 'avatar'
-            let sprite_info = object_cur[sprite_type];
-            for (let index in sprite_info) {
-                let one_sprite = sprite_info[index];
-                let updated_info = {};
-                if ('resources' in one_sprite) {
-                    if (notEmpty(one_sprite['resources'])) {
-                        //Object.keys(one_sprite['resources']).length > 0) {
-                        updated_info['resources'] = one_sprite['resources'];
-                        updated_info['x'] = one_sprite['x'];
-                        updated_info['y'] = one_sprite['y'];
-                        object_data[sprite_type][index] = updated_info;
-                    } else {
-                        updated_info['x'] = one_sprite['x'];
-                        updated_info['y'] = one_sprite['y'];
-                        object_data[sprite_type][index] = updated_info;
-                    }
-                } else {
-                    updated_info['x'] = one_sprite['x'];
-                    updated_info['y'] = one_sprite['y'];
-                    object_data[sprite_type][index] = updated_info;
-                }
-            }
-        }
-
-
-        return {'frame': this.time,
-            'score': this.bonus_score,
-            //'bonus_score': this.bonus_score,
-            'ended': this.ended,
-            'win'  : this.win,
-            'objects': object_data,
-            //Object.copy(obs),
-            'killed': killed,
-            'actions': actions,
-            'events': this.effectList,
-            'real_time': this.real_time,
-        };
-    }
-
     getFullState = () => {
-        let ias = this.ignoredattributes;
-        let obs = {};
-        let killed = {};
-        let actions = Object.keys(this.keystate).filter(key => {
+        const ias = this.ignoredattributes;
+        const obs = {};
+        const killed = {};
+        const objects = []
+        const actions = Object.keys(this.keystate).filter(key => {
             return this.keystate[key]
         })
         this.steps += actions.length;
-        for (let key in this.sprite_groups) {
-            if (!(this.sprite_groups.hasOwnProperty(key))) break;
+
+        for (const key in this.sprite_groups) {
+            if (!(this.sprite_groups.hasOwnProperty(key))) continue;
             let ss = {};
             this.getSprites(key).forEach((s) => {
-
                 let attrs = {};
                 Object.keys(s).forEach((a) => {
                     let val = s[a];
@@ -438,91 +330,22 @@ export class BasicGame{
                 }
 
                 ss[s.ID] = Object.copy(attrs)
+                objects.push(s)
             });
             obs[key] = Object.copy(ss);
-        };
-
-        const object_cur = Object.copy(obs);
-        const object_data = Object.copy(obs);
-
-        function notEmpty(data) {
-            if(typeof(data) == 'number' || typeof(data) == 'boolean') {
-                return true;
-            }
-
-            if(typeof(data) == 'undefined' || data === null) {
-                return false;
-            }
-
-            if(typeof(data.length) != 'undefined') {
-                return data.length !== 0;
-            }
-
-            let count = 0;
-
-            for(let i in data) {
-                if(data.hasOwnProperty(i)) {
-                    count ++;
-                }
-            }
-
-            return count !== 0;
         }
 
-        for (let sprite_type in object_cur) {
+        const object_cur = Object.copy(obs);
 
-            if (sprite_type === 'wall') {
-                continue;
-            }
 
-            if (sprite_type === 'avatar') {
-                for (let instance in object_cur[sprite_type]) {
-                    object_data[sprite_type] = {};
-                    object_data[sprite_type][instance] = {};
-                    object_data[sprite_type][instance]['x'] = object_cur[sprite_type][instance]['x'];
-                    object_data[sprite_type][instance]['y'] = object_cur[sprite_type][instance]['y'];
-                    object_data[sprite_type][instance]['resources'] = object_cur[sprite_type][instance]['resources'];
-                    object_data[sprite_type][instance]['direction'] = object_cur[sprite_type][instance]['direction'];
-                }
-                //object_data[sprite_type] = object_cur[sprite_type];
-                continue;
-            }
-
-            let sprite_info = object_cur[sprite_type];
-            for (let index in sprite_info) {
-                let updated_info = {};
-                let one_sprite = sprite_info[index];
-                if ('resources' in one_sprite) {
-                    if (notEmpty(one_sprite['resources'])) {
-                        //Object.keys(one_sprite['resources']).length > 0) {
-                        updated_info['resources'] = one_sprite['resources'];
-                        updated_info['x'] = one_sprite['x'];
-                        updated_info['y'] = one_sprite['y'];
-                        object_data[sprite_type][index] = updated_info;
-                    } else {
-                        updated_info['x'] = one_sprite['x'];
-                        updated_info['y'] = one_sprite['y'];
-                        object_data[sprite_type][index] = updated_info;
-                    }
-                } else {
-                    updated_info['x'] = one_sprite['x'];
-                    updated_info['y'] = one_sprite['y'];
-                    object_data[sprite_type][index] = updated_info;
-                }
-            }
-        };
-
-        delete object_data["wall"];
 
         return {'frame': this.time,
             'score': this.bonus_score,
-            //'bonus_score': this.bonus_score,
             'ended': this.ended,
             'win'  : this.win,
-            'objects': object_cur,
-            //object_data
+            'objects': objects,
+            'objects_cur': object_cur,
             'killed': killed,
-            //Object.copy(obs),
             'actions': actions,
             'events': this.effectList,
             'real_time': this.real_time,
@@ -654,12 +477,12 @@ export class BasicGame{
                 if (class2 === 'EOS') {
                     let ss1 = this.lastcollisions[class1];
                     ss1.forEach((s1) => {
-                        if (!(new gamejs.Rect([0, 0], this.screensize).collideRect(s1.rect))) {
-                            let e = effect(s1, this.EOS, this, kwargs);
-                            if (e !== null) {
-                                this.effectList.push(e);
-                            }
-                        }
+                        // if (!(new gamejs.Rect([0, 0], this.screensize).collideRect(s1.rect))) {
+                        //     let e = effect(s1, this.EOS, this, kwargs);
+                        //     if (e !== null) {
+                        //         this.effectList.push(e);
+                        //     }
+                        // }
                     });
 
                     return;
@@ -713,10 +536,11 @@ export class BasicGame{
                         if ('applyto' in kwargs) {
                             let stype = kwargs['applyto'];
 
-                            let kwargs_use = deepcopy(kwargs);
+                            let kwargs_use = clone(kwargs);
                             delete kwargs_use['applyto'];
+                            let e;
                             this.getSprites(stype).forEach((sC) => {
-                                let e = effect(sC, sprite1, self, kwargs_use);
+                                e = effect(sC, sprite1, this, kwargs_use);
                             });
                             this.effectList.push(e);
                             return;
@@ -730,9 +554,9 @@ export class BasicGame{
                             });
 
                             spritesFiltered.forEach((sC) => {
+                                let e;
                                 if (!(sprite1 in dead)) {
-
-                                    let e = effect(sprite1, sC, this, kwargs);
+                                    e = effect(sprite1, sC, this, kwargs);
                                 }
                                 this.effectList.push(e);
                             });

@@ -1,5 +1,6 @@
 import {Component} from "react";
 import HumanPlayerScene from "./HumanPlayerScene.js";
+import Phaser from "phaser";
 export default class Player extends Component{
 
     updateCanvasSize = ()=> {
@@ -7,6 +8,7 @@ export default class Player extends Component{
     }
 
     componentDidMount() {
+        console.trace("[Player] did mount")
         const config = {
             type: Phaser.AUTO,
             parent: this.divElement,
@@ -23,14 +25,13 @@ export default class Player extends Component{
             rendererConfig: this.props.rendererConfig,
             rendererName: this.props.rendererName,
             vgdl: this.props.vgdl,
-            onDisplayMessage: this.props.onDisplayMessage,
-            onTrajectoryComplete: this.props.onTrajectoryComplete,
         })
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.updateCanvasSize()
 
+        console.log("[Player] Did update")
     }
 
     render() {
@@ -38,7 +39,6 @@ export default class Player extends Component{
             <div
                 ref={(divElement)=> {
                     this.divElement = divElement}}>
-
             </div>
         )
     }

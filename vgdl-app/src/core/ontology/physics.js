@@ -19,7 +19,7 @@ export class GridPhysics{
 			speed = sprite.speed;
 		if (speed !== 0 && 'orientation' in sprite) {
 			const orientation = sprite.orientation;
-			speed = speed * self.gridsize[0];
+			speed = speed * this.gridsize[0];
 			if (!(sprite.cooldown > sprite.lastmove + 1 || Math.abs(orientation[0]) + Math.abs(orientation[1]) === 0)) {
 				var pos = sprite.rect.move((orientation[0] * speed, orientation[1]*speed));
 				return [pos.left, pos.top];
