@@ -1,4 +1,29 @@
 import * as tools from "./tools.js";
+import * as Games from "./games.js";
+import * as Sprite from "./ontology/vgdl-sprite.js";
+import * as Constants from "./ontology/constants.js";
+import * as Avatars from "./ontology/avatar.js";
+import * as Termination from "./ontology/termination.js";
+import * as Condition from "./ontology/conditional.js";
+import * as Effect from "./ontology/effect.js";
+import * as Physics from "./ontology/physics.js";
+import * as Resource from "./ontology/resource.js";
+
+
+
+const EVALS = {
+    True: true,
+    False: false
+}
+
+for (const x of [tools, Games, Sprite, Constants, Avatars, Termination, Condition, Effect, Physics, Resource]) {
+    const constantKeys = Object.keys(x);
+
+    // 遍历属性并添加到字典中
+    constantKeys.forEach(key => {
+        EVALS[key] = x[key];
+    });
+}
 
 export class Node{
     constructor(content, indent, parent = null){
@@ -56,123 +81,25 @@ function _eval (estr) {
         return true
     if(estr === "False")
         return false
-    return eval(estr)
+    try{
+        return eval(estr)
+    }catch (e) {
+        if(!EVALS.hasOwnProperty(estr))
+            console.error(`Do not have ${estr}`)
+        return eval(`EVALS.${estr}`)
+    }
 }
 
-
-// var parse = {
-//     // parseInteractions
-//     'InteractionSet' : function (inodes) {
-//         inodes.forEach(function (inode) {
-//             if (inode.content.indexOf('>') != -1) {
-//                 var [pair, edef] = inode.content.split('>').map(function (s) {
-//                     return s.trim();
-//                 });
-//                 var [eclass, args] = _parseArgs(edef);
-//                 parser.game.collision_eff.push(
-//                     pair.split(' ').map(s => {
-//                         return s.trim();
-//                     }).filter(s => {return s}).concat([eclass, args])
-//                 );
-//                 if (verbose) {
-//                     console.log('Collision', pair, 'has effect:', edef);
-//                 }
-//             }
-//         });
-
-//     },
-//     //parseSprites
-//     'SpriteSet' : function (snodes, parentClass = null, parentargs = {}, parenttypes = []) {
-//         snodes.forEach(function (snode) {
-//             console.assert(snode.content.indexOf('>') != -1);
-//             var [key, sdef] = snode.content.split('>').map(function (s) {
-//                 return s.trim();
-//             });
-//             var [sclass, args] = _parseArgs(sdef, parentClass, Object.assign({}, parentargs));
-
-//             if ('image' in args) {
-//                 images.push(args.image)
-//             }
-//             var stypes = parenttypes.concat(key);
-//             if ('singleton' in args) {
-//                 if (args['singleton'] == true) 
-//                     parser.game.singletons.push(key);
-//                 args = tools.clone(args);
-//                 delete args['singleton'];
-//             }
-
-//             if (snode.children.length == 0) {
-//                 if (verbose) 
-//                     console.log('Defining:', key, sclass, args, stypes);
-//                 parser.game.sprite_constr[key] = [sclass, args, stypes];
-
-//                 if (args.color && !('color' in parentargs) && !(ignore_colors.contains(key))) {
-//                     var_colors[key] = args.color;
-//                 }
-
-//                 if (parser.game.sprite_order.contains(key)); 
-//                     parser.game.sprite_order.remove(key)
-//                 parser.game.sprite_order.push(key);
-//             } else {
-//                 parse['SpriteSet'](snode.children, sclass, args, stypes);
-//             }
-//         })
-//     },
-//     //parseTerminations
-//     'TerminationSet' : function (tnodes) {
-//         tnodes.forEach(function (tnode) {
-//             var [sclass, args] = _parseArgs(tnode.content);
-//             if (verbose)
-//                 console.log('Adding:', sclass, args);
-//             parser.game.terminations.push(new sclass(args));
-//         });
-//     },
-//     //parseConditions
-//     'ConditionalSet' : function (cnodes) {
-//         cnodes.forEach(function (cnode) {
-//             if (cnode.content.indexOf('>') != -1) {
-//                 var [conditional, interaction] = cnode.content.split('>').map(function (s) {
-//                     return s.trim();
-//                 });
-
-//                 var [cclass, cargs] = _parseArgs(conditional);
-//                 var [eclass, eargs] = _parseArgs(interaction);
-
-//                 parser.game.conditions.push([new cclass(cargs), [eclass, eargs]]);
-//             }
-//         });
-
-//     },
-
-//     //parseMapping
-//     'LevelMapping' : function (mnodes) {
-//         mnodes.forEach(function (mnode) {
-//             var [c, val] = mnode.content.split('>').map(function (x) {
-//                 return x.trim();
-//             });
-
-//             console.assert(c.length == 1, "Only single character mappings allowed");
-
-//             var keys = val.split(' ').map(function (x) {
-//                 return x.trim();
-//             });
-
-//             if (verbose) 
-//                 console.log("Mapping", c, keys);
-
-//             parser.game.char_mapping[c] = keys;
-//         });			
-//     }
-// }
 
 export class VGDLParser{
     game = null
     images = ['error.png']
     ignore_colors = ['wall', 'avatar']
+    var_colors = {}
     constructor() {
     }
 
-    parseGame = (tree)=> {
+    parseGame = (tree, seed=null)=> {
 
         if(!(tree instanceof Node))
             tree = indentTreeParser(tree)
@@ -190,9 +117,11 @@ export class VGDLParser{
         for (const c of root.children) {
             switch (c.content) {
                 case "SpriteSet":
+                    this.parseSprites(c.children)
                     // this.parseSprites(c.children)
                     break
                 case "InteractionSet":
+                    this.parseInteraction(c.children)
                     break
                 case "LevelMapping":
                     break
@@ -200,32 +129,69 @@ export class VGDLParser{
                     this.parseTermination(c.children)
                     break
                 case "ConditionSet":
+                    this.parseCondition(c.children)
                     break
                 default:
+                    console.error(`Unknown content: ${c.content}`)
                     break
             }
         }
+
+        const keys = []
+        let colors = []
+
+        for (const key in this.var_colors) {
+            keys.push(key)
+            colors.push(this.game.sprite_constr[key][1].color)
+        }
+
+        if(seed){
+            colors = colors.shuffled(seed)
+            let index = 0
+            colors.forEach(c=>{
+                this.game.sprite_constr[keys[index]][1].color = c
+                index ++
+            })
+        }
+
+        this.game.images = this.images.slice()
+        return this.game
+    }
+
+    parseCondition = (cnodes)=>{
+        cnodes.forEach(c=>{
+            if(c.content.indexOf('>') !== -1){
+                const [conditional, interaction] = c.content.split('>').map(s=>s.trim())
+
+                const [cclass, cargs] = this.parseArgs(conditional)
+                const [eclass, eargs] = this.parseArgs(conditional)
+
+                console.debug(`Adding Condition ${conditional}  ${interaction}`)
+
+                this.game.conditions.push([new cclass(cargs), [eclass, eargs]])
+            }
+        })
     }
 
     parseTermination = (tnodes)=>{
         tnodes.forEach(t=>{
             const [sclass, args] = this.parseArgs(t.content)
-            console.debug(`Adding: ${sclass} ${args}`)
+            console.debug(`Adding Termination: ${sclass} ${args}`)
             this.game.terminations.push(new sclass(args))
         })
     }
 
     parseInteraction = (inodes)=> {
         inodes.forEach(i=> {
-            if(i.content.indexOf('>') != -1){
+            if(i.content.indexOf('>') !== -1){
                 const [pair, edef] = i.content.split('>').map(s=>s.trim())
-                var [eclass, args] = this.parseArgs(edef)
+                const [eclass, args] = this.parseArgs(edef);
 
                 this.game.collision_eff.push(
                     pair.split(' ').map(s=>s.trim()).filter(s=>s).concat([eclass, args])
                 )
 
-                console.debug(`Collision ${pair} has effect: ${edef}`)
+                console.debug(`Adding Collision ${pair} has effect: ${edef}`)
             }
         })
     }
@@ -233,9 +199,7 @@ export class VGDLParser{
     parseSprites = (snodes, parentClass = null, parentargs = {}, parenttypes = [])=>{
         snodes.forEach(s => {
             console.assert(s.content.indexOf('>') !== -1)
-            const [key, sdef] = s.content.split('>').map(function (s) {
-                return s.trim()
-            })
+            const [key, sdef] = s.content.split('>').map(s => s.trim())
             let [sclass, args] = this.parseArgs(sdef, parentClass, Object.assign({}, parentargs))
 
             if ('image' in args) {
@@ -251,7 +215,6 @@ export class VGDLParser{
             }
 
             if (s.children.length === 0) {
-
                 console.debug(`Defining: ${key} ${sclass} ${args} ${stypes}`)
                 this.game.sprite_constr[key] = [sclass, args, stypes]
 
@@ -294,47 +257,3 @@ export class VGDLParser{
 
 }
 
-
-export class VGDLSprite{
-    name = ""
-    COLOR_DISC = [20,80,140,200]
-    dirtyrects = []
-
-    is_static= false
-    only_active =false
-    is_avatar= false
-    is_stochastic = false
-    color    = null
-    cooldown = 0 // pause ticks in-between two moves
-    speed    = null
-    mass     = 1
-    physicstype=null
-    shrinkfactor=0
-
-    lastmove = 0
-    constructor(pos, size=[10, 10], color = null,
-                speed = null, cooldown=null, physicstype=null) {
-        this.pos = pos
-        this.size = size
-        this.physicstype = physicstype
-        this.physics = new this.physicstype()
-        this.speed = speed ?? this.speed
-        this.cooldown = cooldown ?? this.cooldown
-        this.color = color ?? this.cooldown
-    }
-
-    update = ()=>{
-        this.lastmove += 1
-        if(this.is_static === false && this.only_active){
-            // this.physics
-        }
-    }
-
-    updatePosition = (orientation, speed = null)=>{
-        speed = speed ?? this.speed
-        if(!(this.cooldown > this.lastmove || Math.abs(orientation[0]) + Math.abs(orientation[1]) === 0 )){
-
-            this.lastmove = 0
-        }
-    }
-}

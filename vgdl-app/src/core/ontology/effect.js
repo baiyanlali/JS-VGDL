@@ -1,6 +1,6 @@
 import {colorDict} from "./constants.js";
 
-function getColor(sprite) {
+export function getColor(sprite) {
 	try {
 		let color = sprite.color;
 		try {
@@ -15,7 +15,7 @@ function getColor(sprite) {
 	}
 }
 
-function scoreChange(sprite, partner, game, kwargs) {
+export function scoreChange(sprite, partner, game, kwargs) {
 	game.score += kwargs.score || kwargs.value;
 	game.bonus_score += kwargs.score || kwargs.value;
 
@@ -24,22 +24,22 @@ function scoreChange(sprite, partner, game, kwargs) {
 
 export let changeScore = scoreChange;
 
-function nothing (sprite, partner, game, kwargs) {
+export function nothing (sprite, partner, game, kwargs) {
 	return ['nothing', sprite.ID || sprite, partner.ID || partner]
 }
 
-function killSprite (sprite, partner, game, kwargs) {
+export function killSprite (sprite, partner, game, kwargs) {
 
 	game.kill_list.push(sprite);
 	return ['killSprite', sprite.ID || sprite, partner.ID || partner];
 }
 
-function cloneSprite (sprite, partner, game, kwargs) {
+export function cloneSprite (sprite, partner, game, kwargs) {
 	game._createSprite([sprite.name], [sprite.rect.left, sprite.rect.top]);
 	return ['cloneSprite', sprite.ID || sprite, partner.ID || partner];
 }
 
-function transformTo (sprite, partner, game, kwargs) {
+export function transformTo (sprite, partner, game, kwargs) {
 	let hasID = partner.ID in sprite.transformedBy;
 	if (hasID) {
 		if (game.time > sprite.transformedBy[partner.ID] + 3) {
@@ -70,27 +70,27 @@ function transformTo (sprite, partner, game, kwargs) {
 	}
 }
 
-function transformToOnLanding (sprite, partner, game, kwargs) {
+export function transformToOnLanding (sprite, partner, game, kwargs) {
 	let stype = kwargs.stype;
 }
 
-function triggerOnLading (sprite, partner, game, kwargs) {
+export function triggerOnLading (sprite, partner, game, kwargs) {
 	let strigger = kwargs.strigger;
 }
 
-function stepBack (sprite, partner, game, kwargs) {
+export function stepBack (sprite, partner, game, kwargs) {
 	sprite.rect = sprite.lastrect.clone();
 	return ['stepBack', sprite.ID || sprite, partner.ID || partner];
 }
 
-function bounceForward(sprite, partner, game, kwargs) {
+export function bounceForward(sprite, partner, game, kwargs) {
 	sprite.physics.activeMovement(sprite, tools.unitVector(partner.lastdirection()));
 	game._updateCollisionDict(sprite);
 	return ['bounceForward', sprite.ID || sprite, partner.ID || partner]
 
 }
 
-function conveySprite(sprite, partner, game, kwargs) {
+export function conveySprite(sprite, partner, game, kwargs) {
 	let sprite_lastrect = sprite.lastrect.copy();
 	let vect = tools.unitVector(partner.orientation);
 	sprite.physics.activeMovement(sprite, vect, partner.strength);
@@ -99,7 +99,7 @@ function conveySprite(sprite, partner, game, kwargs) {
 	return ['conveySprite', sprite.ID || sprite, partner.ID || partner]
 }
 
-function windGust(sprite, partner, game, kwargs) {
+export function windGust(sprite, partner, game, kwargs) {
 	let s = partner.strength-[0, 1, -1].randomElement();
 	if (s != 0) {
 		let sprite_lastrect = sprite.lastrect.copy();
@@ -112,7 +112,7 @@ function windGust(sprite, partner, game, kwargs) {
 	return ['windGust', sprite.ID || sprite, partner.ID || partner]
 }
 
-function slipForward(sprite, partner, game, kwargs) {
+export function slipForward(sprite, partner, game, kwargs) {
 	if (kwargs.prob > Math.random()) {
 		let sprite_lastrect = sprite.lastrect.copy();
 		let vect = tools.unitVector(partner.orientation);
@@ -124,10 +124,10 @@ function slipForward(sprite, partner, game, kwargs) {
 	return ['slipForward', sprite.ID || sprite, partner.ID || partner]
 }
 
-function undoAll () {
+export function undoAll () {
 	return
 }
-function attractGaze(sprite, partner, game, kwargs) {
+export function attractGaze(sprite, partner, game, kwargs) {
 	if (kwargs.prob > Math.random()) {
 		sprite.orientation = partner.orientation;
 	}
@@ -135,7 +135,7 @@ function attractGaze(sprite, partner, game, kwargs) {
 	return ['attractGaze', sprite.ID || sprite, partner.ID || partner]
 }
 
-function turnAround(sprite, partner, game, kwargs) {
+export function turnAround(sprite, partner, game, kwargs) {
 	sprite.rect = sprite.lastrect;
 	sprite.lastmove = sprite.cooldown;
 	sprite.physics.activeMovement(sprite, DOWN);
@@ -147,29 +147,29 @@ function turnAround(sprite, partner, game, kwargs) {
 
 }
 
-function reverseDirection(sprite, partner, game, kwargs) {
+export function reverseDirection(sprite, partner, game, kwargs) {
 	sprite.orientation = [-sprite.orientation[0], -sprite.orientation[1]];
 	return ['reverseDirection', sprite.ID || sprite, partner.ID || partner]
 
 }
 
-function reverseFlowIfActivated(sprite, partner, game, kwargs) {
+export function reverseFlowIfActivated(sprite, partner, game, kwargs) {
 
 }
 
-function trigger(sprite, partner, game, kwargs) {
+export function trigger(sprite, partner, game, kwargs) {
 
 }
 
-function detrigger(sprite, partner, game, kwargs) {
+export function detrigger(sprite, partner, game, kwargs) {
 
 }
 
-function flipDirection(sprite, partner, game, kwargs) {
+export function flipDirection(sprite, partner, game, kwargs) {
 
 }
 
-function bounceDirection(sprite, partner, game, kwargs) {
+export function bounceDirection(sprite, partner, game, kwargs) {
 	let friction = kwargs.friction || 0;
 
 	stepBack(sprite, partner, game);
@@ -183,7 +183,7 @@ function bounceDirection(sprite, partner, game, kwargs) {
     return ['bounceDirection', sprite.ID || sprite, partner.ID || partner]
 }
 
-function wallBounce(sprite, partner, game, kwargs) {
+export function wallBounce(sprite, partner, game, kwargs) {
 
     if (!(oncePerStep(sprite, game, 'lastbounce'))) return;
     sprite.speed *= (1. - friction)
@@ -198,7 +198,7 @@ function wallBounce(sprite, partner, game, kwargs) {
     return ['wallBounce', sprite.ID || sprite, partner.ID || partner]
 }
 
-function wallStop(sprite, partner, game, kwargs) {
+export function wallStop(sprite, partner, game, kwargs) {
 	if (!(tools.oncePerStep(sprite, game, 'laststop'))) return;
 
 	stepBack(sprite, partner, game, kwargs);
@@ -215,7 +215,7 @@ function wallStop(sprite, partner, game, kwargs) {
 	return ['wallStop', sprite.ID || sprite, partner.ID || partner]
 }
 
-function killIfSlow(sprite, partner, game, kwargs) {
+export function killIfSlow(sprite, partner, game, kwargs) {
 	let relspeed = 0;
 	if (sprite.is_static)
 		relspeed = partner.speed;
@@ -230,7 +230,7 @@ function killIfSlow(sprite, partner, game, kwargs) {
 	}
 }
 
-function killIfFromAbove(sprite, partner, game, kwargs) {
+export function killIfFromAbove(sprite, partner, game, kwargs) {
 	if (sprite.lastrect.top > partner.lastrect.top &&
 			partner.rect.top > partner.lastrect.top) {
 		killSprite(sprite, partner, game)
@@ -239,14 +239,14 @@ function killIfFromAbove(sprite, partner, game, kwargs) {
 
 }
 
-function killIfAlive(sprite, partner, game, kwargs) {
+export function killIfAlive(sprite, partner, game, kwargs) {
 	if (!(game.kill_list.contains(partner))) {
 		killSprite(sprite, partner, game);
 		return ['killIfAlive', sprite.ID || sprite, partner.ID || partner]
 	}
 }
 
-function collectResource(sprite, partner, game, kwargs) {
+export function collectResource(sprite, partner, game, kwargs) {
 	console.assert(sprite instanceof Resource)
 	let resource_type = sprite.name;
 	partner.resources[resource_type] = Math.max(-1,
@@ -255,7 +255,7 @@ function collectResource(sprite, partner, game, kwargs) {
 	return ['collectResource', sprite.ID || sprite, partner.ID || partner]
 }
 
-function changeResource(sprite, partner, resourceColor, game, kwargs) {
+export function changeResource(sprite, partner, resourceColor, game, kwargs) {
 	let resource = kwargs.resource;
 	let value = kwargs.value || 1;
 	let sprite_resource = sprite.resources[resource] || 0;
@@ -264,7 +264,7 @@ function changeResource(sprite, partner, resourceColor, game, kwargs) {
 	return ['changeResource', sprite.ID || sprite, partner.ID || partner]
 }
 
-function spawnIfHasMore(sprite, partner, game, kwargs) {
+export function spawnIfHasMore(sprite, partner, game, kwargs) {
 	const resource = kwargs.resource;
 	const stype = kwargs.stype;
 	let limit = kwargs.limit || 1;
@@ -275,7 +275,7 @@ function spawnIfHasMore(sprite, partner, game, kwargs) {
 
 }
 
-function killIfHasMore(sprite, partner, game, kwargs) {
+export function killIfHasMore(sprite, partner, game, kwargs) {
 	let limit = kwargs.limit;
 	let resource = kwargs.resource;
 	if (sprite.resources[resource] === undefined)
@@ -287,7 +287,7 @@ function killIfHasMore(sprite, partner, game, kwargs) {
 
 }
 
-function killIfHasLess(sprite, partner, game, kwargs) {
+export function killIfHasLess(sprite, partner, game, kwargs) {
 	let resource = kwargs.resource;
 	let limit = kwargs.limit;
 	if (sprite.resources[resource] === undefined)
@@ -298,7 +298,7 @@ function killIfHasLess(sprite, partner, game, kwargs) {
 	}
 }
 
-function killIfOtherHasMore(sprite, partner, game, kwargs) {
+export function killIfOtherHasMore(sprite, partner, game, kwargs) {
 	let resource = kwargs.resource;
 	let limit = kwargs.limit;
 	if (sprite.resources[resource] === undefined) {
@@ -310,11 +310,11 @@ function killIfOtherHasMore(sprite, partner, game, kwargs) {
 	}
 }
 
-function killIfOtherHasLess(sprite, partner, game, kwargs) {
+export function killIfOtherHasLess(sprite, partner, game, kwargs) {
 
 }
 
-function wrapAround(sprite, partner, game, kwargs) {
+export function wrapAround(sprite, partner, game, kwargs) {
 	let offset = kwargs.offset || 0;
 
     if (sprite.orientation[0] > 0)
@@ -329,7 +329,7 @@ function wrapAround(sprite, partner, game, kwargs) {
     return ['wrapAround', sprite.ID || sprite, partner.ID || partner]
 }
 
-function pullWithIt(sprite, partner, game, kwargs) {
+export function pullWithIt(sprite, partner, game, kwargs) {
     if (!(tools.oncePerStep(sprite, game, 'lastpull'))) return;
     let tmp = sprite.lastrect.copy();
     let v = tools.unitVector(partner.lastdirection())
@@ -342,15 +342,15 @@ function pullWithIt(sprite, partner, game, kwargs) {
     sprite.lastrect = tmp.copy()
 }
 
-function collideFromAbove(sprite, partner, game, kwargs) {
+export function collideFromAbove(sprite, partner, game, kwargs) {
 
 }
 
-function killSpriteOnLanding(sprite, partner, game, kwargs) {
+export function killSpriteOnLanding(sprite, partner, game, kwargs) {
 
 }
 
-function teleportToExit(sprite, partner, game, kwargs) {
+export function teleportToExit(sprite, partner, game, kwargs) {
 	try {
 		let rand_sprite = game.sprite_groups[partner.stype].randomElement();
 	} catch (error) {
@@ -365,11 +365,11 @@ function teleportToExit(sprite, partner, game, kwargs) {
 export const stochastic_effects = [teleportToExit, windGust, slipForward, attractGaze, flipDirection];
 export const kill_effects = [killSprite, killIfSlow, transformTo, killIfOtherHasLess, killIfOtherHasMore, killIfHasMore, killIfHasLess, killIfFromAbove, killIfAlive];
 
-function canActivateSwitch(sprite, partner, game, kwargs) {
+export function canActivateSwitch(sprite, partner, game, kwargs) {
 
 }
 
-function cannotActivateSwitch(sprite, partner, game, kwargs) {
+export function cannotActivateSwitch(sprite, partner, game, kwargs) {
 
 }
 

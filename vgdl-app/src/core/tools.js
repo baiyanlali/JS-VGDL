@@ -242,14 +242,14 @@ export const permutation = function(array, n){
 };
 
 // Generates some pairwise permutation ordering (modulo the lenght of the permutations)
-export const permute_pairs = function (array, permutation) {
-	let perms = permute(array);
-	let perm = permutation % perms.length
-	return perms[perm].map((value, index) => {
-		return [value, array[index]]
-	})
-
-}
+// export const permute_pairs = function (array, permutation) {
+// 	let perms = permute(array);
+// 	let perm = permutation % perms.length
+// 	return perms[perm].map((value, index) => {
+// 		return [value, array[index]]
+// 	})
+//
+// }
 // Generates some pairwise permutation ordering (modulo the lenght of the permutations)
 export const permute_pairs = function (array, m) {
 	let perm = permutation(array, m)

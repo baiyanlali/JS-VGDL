@@ -1,4 +1,6 @@
-var Resource = function (gamejs, pos, size, args) {
+import {VGDLSprite} from "./vgdl-sprite.js";
+
+const Resource = function (gamejs, pos, size, args) {
 	var that = this;
 	VGDLSprite.call(this, gamejs, pos, size, args);
 	this.value = args.value || 1;
@@ -6,7 +8,7 @@ var Resource = function (gamejs, pos, size, args) {
 	this.res_type = args.res_type || null;
 	// console.log(this.rect);
 	// return that
-}
+};
 Resource.prototype = Object.create(VGDLSprite.prototype);
 
 Resource.prototype.resourceType = function () {

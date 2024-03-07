@@ -1,5 +1,8 @@
-import {GOLD, Termination} from "./ontology";
-import {defaultDict} from "./tools";
+import {defaultDict} from "./tools.js";
+import {DARKGRAY, GOLD} from "./ontology/constants.js";
+import {Immovable, EOS} from "./ontology/vgdl-sprite.js";
+import {MovingAvatar} from "./ontology/avatar.js";
+import {Termination} from "./ontology/termination.js";
 
 const MAX_SPRITS = 10000
 

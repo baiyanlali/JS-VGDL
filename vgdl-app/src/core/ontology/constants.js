@@ -182,7 +182,7 @@ export const DOWN = [0, 1]
 export const LEFT = [-1, 0]
 export const RIGHT = [1, 0]
 
-export const BASEDIRS = [this.UP, this.LEFT, this.DOWN, this.RIGHT]
+export const BASEDIRS = [UP, LEFT, DOWN, RIGHT]
 
 export const colorDict = {
     '#f83236' : 'UUWSWF',
