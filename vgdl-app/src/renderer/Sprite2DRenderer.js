@@ -107,14 +107,14 @@ class Sprite2DRenderer extends RendererBase {
             );
             //sprite.setOrigin(0, 0);
             
-            sprite.setTint(objectTemplate.color instanceof String?
-                Phaser.Display.Color.HexStringToColor(objectTemplate.color):
-                Phaser.Display.Color.GetColor(
-                    objectTemplate.color.r * 255,
-                    objectTemplate.color.g * 255,
-                    objectTemplate.color.b * 255
-                )
-            );
+            // sprite.setTint(typeof(objectTemplate.color) === 'string'?
+            //     Phaser.Display.Color.HexStringToColor(objectTemplate.color):
+            //     Phaser.Display.Color.GetColor(
+            //         objectTemplate.color.r * 255,
+            //         objectTemplate.color.g * 255,
+            //         objectTemplate.color.b * 255
+            //     )
+            // );
 
             if (this.avatarObject !== objectName) {
                 sprite.setRotation(this.getOrientationAngleRads(orientation));
@@ -142,6 +142,8 @@ class Sprite2DRenderer extends RendererBase {
         return sprite;
     };
 
+    done = false
+
     updateObject = (
         sprite,
         objectName,
@@ -150,11 +152,46 @@ class Sprite2DRenderer extends RendererBase {
         y,
         orientation
     ) => {
+
+        
+
         // console.log("[Sprite2D Renderer] Update")
         if (!sprite) {
             return;
         }
         const objectTemplate = this.objectTemplates[objectTemplateName];
+
+        if(!this.done){
+            console.log("Generate Additional image")
+            const sprite2 = this.scene.add.sprite(
+            this.getCenteredX('5'), this.getCenteredY(0),
+            "alien"
+            );
+            this.done = true
+
+            sprite2.setTexture(this.getTilingImage(objectTemplate, x, y));
+
+            sprite2.setDisplaySize(
+                this.renderConfig.TileSize * objectTemplate.scale,
+                this.renderConfig.TileSize * objectTemplate.scale
+            );
+
+            // sprite2.setTint(
+            //     typeof(objectTemplate.color) === 'string'?
+            //     Phaser.Display.Color.HexStringToColor(objectTemplate.color):
+            //     Phaser.Display.Color.GetColor(
+            //         objectTemplate.color.r * 255,
+            //         objectTemplate.color.g * 255,
+            //         objectTemplate.color.b * 255
+            //     )
+            // );
+
+            if (this.avatarObject !== objectName) {
+                sprite2.setRotation(this.getOrientationAngleRads(orientation));
+            } else if (this.renderConfig.RotateAvatarImage) {
+                sprite2.setRotation(this.getOrientationAngleRads(orientation));
+            }
+        }
 
         sprite.setPosition(this.getCenteredX(x), this.getCenteredY(y));
         // sprite.setPosition(300, 200);
@@ -165,15 +202,15 @@ class Sprite2DRenderer extends RendererBase {
             this.renderConfig.TileSize * objectTemplate.scale
         );
 
-        sprite.setTint(
-            objectTemplate.color instanceof String?
-            Phaser.Display.Color.HexStringToColor(objectTemplate.color):
-            Phaser.Display.Color.GetColor(
-                objectTemplate.color.r * 255,
-                objectTemplate.color.g * 255,
-                objectTemplate.color.b * 255
-            )
-        );
+        // sprite.setTint(
+        //     typeof(objectTemplate.color) === 'string'?
+        //     Phaser.Display.Color.HexStringToColor(objectTemplate.color):
+        //     Phaser.Display.Color.GetColor(
+        //         objectTemplate.color.r * 255,
+        //         objectTemplate.color.g * 255,
+        //         objectTemplate.color.b * 255
+        //     )
+        // );
 
         if (this.avatarObject !== objectName) {
             sprite.setRotation(this.getOrientationAngleRads(orientation));
@@ -190,11 +227,13 @@ class Sprite2DRenderer extends RendererBase {
             this.loadImage("__background__", this.renderConfig.BackgroundTile);
         }
 
+        const unknown_object_shape = {}
+
         objects.forEach((object) => {
             const objectTemplate = {
                 name: object.name,
-                id: object.name + object.ID,
-                internal: object.Internal ? true : false,
+                id: object.name,
+                internal: !!object.Internal,
                 tilingMode: "NONE",
                 scale: object.shrinkfactor === 0 ? 1.0 : object.shrinkfactor,
                 color: object.color ?? { r: 1, g: 1, b: 1 },
@@ -205,19 +244,19 @@ class Sprite2DRenderer extends RendererBase {
                 this.loadImage(objectTemplate.id, object.image);
             }else{
                 //if not
-                this.loadImage(objectTemplate.id, 
-                    this.getShapeImage(random.choice(['circle', 'triangle', 'square'])));
+                if(unknown_object_shape.hasOwnProperty(object.id)){
+
+                }else{
+                    const shape = random.choice(['circle', 'triangle', 'square'])
+                    unknown_object_shape[object.id] = shape
+                    this.loadImage(objectTemplate.id, this.getShapeImage(shape));
+                }
             }
 
             this.objectTemplates[objectTemplate.id] = objectTemplate;
         });
 
-        this.scene.load.image("alien", "oryx/alien1.png");
-        const sprite = this.scene.add.sprite(
-            200,
-            300,
-            "aline"
-        );
+
     };
 
     getShapeImage = (shape) => {

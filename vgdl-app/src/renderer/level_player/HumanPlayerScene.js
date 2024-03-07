@@ -43,7 +43,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
         this.grenderer.beginUpdate(state.objects)
 
         state.objects.forEach((object) => {
-            const objectTemplateName = object.name + object.ID;
+            const objectTemplateName = object.name;
             if (object.ID in this.renderData.objects) {
                 const currentObjectData = this.renderData.objects[object.ID];
                 this.grenderer.updateObject(
@@ -102,6 +102,9 @@ export default class HumanPlayerScene extends Phaser.Scene{
       // this.loadingText.setX(this.cameras.main.width / 2);
       // this.loadingText.setY(this.cameras.main.height / 2);
       // this.loadingText.setOrigin(0.5, 0.5);
+
+        this.load.image("alien", "./block_shapes/circle.png")
+
       if (this.grenderer) {
         this.grenderer.loadTemplates(this.vgdl.getFullState()['objects']);
       }

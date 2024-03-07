@@ -33,7 +33,7 @@ class RendererBase {
     }
 
     getCenteredX = (x) => {
-        const scaledX =
+        const scaledX = 
             (x - this.gridWidth / 2.0 + 0.5) * this.renderConfig.TileSize;
         if (this.centerObjects) {
             return scaledX + this.scene.cameras.main.centerX;
