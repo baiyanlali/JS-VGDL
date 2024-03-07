@@ -12,7 +12,7 @@ export const clone = (obj)=> {
  * @return {number}
  * @param vector
  */
-export const vectNorm = function (vector) {
+export const vectNorm = (vector) => {
     return Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
 }
 
@@ -20,7 +20,7 @@ export const vectNorm = function (vector) {
  * @return {[type]}
  * @param vector
  */
-export const unitVector = function (vector) {
+export const unitVector = (vector) => {
     var norm = vectNorm(vector);
 
     if (norm > 0)
@@ -35,7 +35,7 @@ export const unitVector = function (vector) {
  * @param game
  * @param name
  */
-export const oncePerStep = function (sprite, game, name) {
+export const oncePerStep = (sprite, game, name) => {
     name = '_'+name;
 
     if (sprite[name])
@@ -50,7 +50,7 @@ export const oncePerStep = function (sprite, game, name) {
  * @param rect
  * @param orientation
  */
-export const triPoints = function (rect, orientation) {
+export const triPoints = (rect, orientation) => {
     const p1 = [rect.center[0] + orientation[0]*rect.w/3,
               rect.center[1] + orientation[1]*rect.h/3];
     const p2 = [rect.center[0] + orientation[0]*rect.w/4,
@@ -60,14 +60,14 @@ export const triPoints = function (rect, orientation) {
                p2[1]-orthdir[1]*rect.h/6];
     const p2b = [p2[0]+orthdir[0]*rect.w/6,
                p2[1]+orthdir[1]*rect.h/6];
-    return [p1, p2a, p2b].map(function (p) {return [p[0], p[1]]});
+    return [p1, p2a, p2b].map((p) => {return [p[0], p[1]]});
 }
 
 /**
  * @return {[type]}
  * @param rect
  */
-export const roundedPoints = function (rect) {
+export const roundedPoints = (rect) => {
     return [[rect.x, rect.y],
             [rect.x+rect.width, rect.y],
             [rect.x, rect.y+rect.height],
@@ -80,11 +80,11 @@ export const roundedPoints = function (rect) {
  * @param center
  * @param size
  */
-export const squarePoints = function (center, size) {
+export const squarePoints = (center, size) => {
 
 }
 
-export const listRotate = function (list, n) {
+export const listRotate = (list, n) => {
 		return list.slice(n).concat(list.slice(0, n));
 }
 
@@ -154,11 +154,11 @@ Array.prototype.contains = function (element) {
 	return (index > -1);
 }
 
-export const new_id = (function () {
+export const new_id = (() => {
 
 	let id_number = 0;
 
-	let generate_id = function () {
+	let generate_id = () => {
 		id_number ++;
 		return id_number;
 	}
@@ -167,12 +167,12 @@ export const new_id = (function () {
 })();
 
 
-Object.copy = function (obj) {
+Object.copy = (obj) => {
 	return Object.assign({}, obj);
 }
 
-Math.RNG = function (seed) {
-	let seeded = function (min, max) {
+Math.RNG = (seed) => {
+	let seeded = (min, max) => {
 		max = max || 1;
 		min = min || 0
 
@@ -185,7 +185,7 @@ Math.RNG = function (seed) {
 	return seeded
 }
 
-Array.prototype.shuffled = function (seed) {
+Array.prototype.shuffled = (seed) => {
 	let rnd = Math.random;
 	if (seed) {
 		rnd = Math.RNG(seed);
@@ -222,7 +222,7 @@ String.prototype.expandTabs = function(tabSize) {
   });
 };
 
-export const factorial = function (n) {
+export const factorial = (n) => {
     if (n === 0) return 1;
     return n*factorial(n-1);
 }
@@ -242,7 +242,7 @@ export const permutation = function(array, n){
 };
 
 // Generates some pairwise permutation ordering (modulo the lenght of the permutations)
-// export const permute_pairs = function (array, permutation) {
+// export const permute_pairs = (array, permutation) => {
 // 	let perms = permute(array);
 // 	let perm = permutation % perms.length
 // 	return perms[perm].map((value, index) => {
@@ -251,7 +251,7 @@ export const permutation = function(array, n){
 //
 // }
 // Generates some pairwise permutation ordering (modulo the lenght of the permutations)
-export const permute_pairs = function (array, m) {
+export const permute_pairs = (array, m) => {
 	let perm = permutation(array, m)
 	return perm.map((value, index) => {
 		return [value, array[index]]
@@ -268,7 +268,7 @@ export const random = {
     }
 }
 
-export const initializeDistribution = function (sprite_types) {
+export const initializeDistribution = (sprite_types) => {
 	let catch_all_prior = .000001;
 	const initial_distribution = {"OTHER": catch_all_prior};
 

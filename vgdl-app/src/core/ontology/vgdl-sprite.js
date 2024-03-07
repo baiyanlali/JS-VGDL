@@ -50,7 +50,7 @@ export class VGDLSprite{
 			// iterate over kwargs
 		// this.extend(args);
 		if (args) {
-			Object.keys(args).forEach(function (name) {
+			Object.keys(args).forEach((name) => {
 				const value = args[name];
 				try {
 					this[name] = value;
@@ -197,7 +197,6 @@ export class SpawnPoint extends SpriteProducer{
 	}
 
 	update = (game) => {
-		const random = random
 		// console.log(this.prob, this.cooldown)
 		const rnd = random.random()
 		// console.log(game.time, this.cooldown)
@@ -388,7 +387,7 @@ export class Bomber extends SpawnPoint{
 // }
 // Chaser.prototype = Object.create(RandomNPC.prototype);
 //
-// Chaser.prototype._closestTargets = function (game) {
+// Chaser.prototype._closestTargets = (game) => {
 // 	var bestd = 1e100;
 // 	var res = [];
 // 	var that = this;
@@ -415,7 +414,7 @@ export class Bomber extends SpawnPoint{
 // 	BASEDIRS.forEach(a => {
 // 		// console.log(a)
 // 		var r = that.rect.copy();
-// 		r = r.move(a.map(function (v) {return 2*v}));
+// 		r = r.move(a.map((v) => {return 2*v}));
 // 		var newdist = that.physics.distance(r, target.rect);
 // 		// console.log(a, basedist,  newdist);
 // 		if (that.fleeing && basedist < newdist) {
@@ -429,7 +428,7 @@ export class Bomber extends SpawnPoint{
 // 	return res;
 // }
 //
-// Chaser.prototype.update = function (game) {
+// Chaser.prototype.update = (game) => {
 // 	VGDLSprite.prototype.update.call(this, game);
 //
 // 	options = [];
@@ -462,7 +461,7 @@ export class Bomber extends SpawnPoint{
 // }
 // AStarChaser.prototype = Object.create(RandomNPC.prototype);
 //
-// AStarChaser.prototype._movesToward = function (game, target) {
+// AStarChaser.prototype._movesToward = (game, target) => {
 // 	var res = [];
 // 	var basedist = this.physics.distance(this.rect, target.rect);
 // 	var that = this;
@@ -478,7 +477,7 @@ export class Bomber extends SpawnPoint{
 // 	return res;
 // }
 //
-// AStarChaser.prototype._draw = function (game) {
+// AStarChaser.prototype._draw = (game) => {
 // 	RandomNPC.prototype._draw.call(this, game);
 // 	if (this.walableTiles) {
 // 		var col = this.gamejs.Color(0, 0, 255, 100);
@@ -506,7 +505,7 @@ export class Bomber extends SpawnPoint{
 // }
 //
 //
-// AStarChaser.prototype._setDebugVariables = function (world, path) {
+// AStarChaser.prototype._setDebugVariables = (world, path) => {
 // 	var path_sprites = path.map(node => {return node.sprite});
 //
 // 	this.walableTiles = world.get_walkable_tiles();
@@ -514,6 +513,6 @@ export class Bomber extends SpawnPoint{
 // 	this.drawpath = path_sprits;
 // }
 //
-// AStarChaser.prototype.update = function (game) {
+// AStarChaser.prototype.update = (game) => {
 // 	VGDLSprite.prototype.update.call(this, game);
 // }

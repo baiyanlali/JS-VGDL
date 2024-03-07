@@ -137,13 +137,6 @@ export class BasicGame{
 
 		console.assert(this.width > 1 && this.height > 1, 'Level too small');
 
-		// rescale pixels per block to adapt to the level
-		let window_width = window.innerWidth/1.5;
-		let window_height = window.innerHeight/2;
-
-		this.block_size =parseInt(Math.min(window_height/this.height, window_width/this.width));
-		this.screensize = [this.width*this.block_size, this.height*this.block_size];
-
 		//Set up resources
 		for (let res_type in this.sprite_constr) {
 		   if (!(this.sprite_constr.hasOwnProperty(res_type))) continue;
@@ -170,10 +163,10 @@ export class BasicGame{
 			for (const col in line) {
 				let c = line[col];
 				if (c in this.char_mapping) {
-					let pos = [col*this.block_size, row*this.block_size];
+					const pos = [col, row];
 					this._createSprite(this.char_mapping[c], pos);
 				} else if (c in this.default_mapping) {
-					let pos = [col*this.block_size, row*this.block_size];
+					const pos = [col, row];
 					this._createSprite(this.default_mapping[c], pos);
 				}
 			}

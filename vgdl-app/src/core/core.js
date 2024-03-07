@@ -159,13 +159,13 @@ export class VGDLParser{
 
     parseLevel = (mnodes) => {
         mnodes.forEach((mnode) => {
-            const [c, val] = mnode.content.split('>').map(function (x) {
+            const [c, val] = mnode.content.split('>').map((x) => {
                 return x.trim();
             });
 
             console.assert(c.length === 1, "Only single character mappings allowed");
 
-            const keys = val.split(' ').map(function (x) {
+            const keys = val.split(' ').map((x) => {
                 return x.trim();
             });
 

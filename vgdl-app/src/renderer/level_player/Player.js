@@ -8,7 +8,7 @@ export default class Player extends Component{
     }
 
     componentDidMount() {
-        console.trace("[Player] did mount")
+        console.log("[Player] did mount")
         const config = {
             type: Phaser.AUTO,
             parent: this.divElement,
@@ -36,9 +36,11 @@ export default class Player extends Component{
 
     render() {
         return (
-            <div
+            <div id="Player"
                 ref={(divElement)=> {
-                    this.divElement = divElement}}>
+                    this.divElement = divElement;
+                    }}
+                    >
             </div>
         )
     }

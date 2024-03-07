@@ -88,23 +88,27 @@ class Sprite2DRenderer extends RendererBase {
         if (objectName === "background") {
             return;
         }
+
         const objectTemplate = this.objectTemplates[objectTemplateName];
 
         let sprite;
         if(objectTemplate) {
-
+            console.log(`[Sprite2D Renderer] ${this.getCenteredX(x)},${this.getCenteredY(y)}`)
             sprite = this.scene.add.sprite(
                 this.getCenteredX(x),
                 this.getCenteredY(y),
                 this.getTilingImage(objectTemplate, x, y)
             );
 
+
             sprite.setDisplaySize(
                 this.renderConfig.TileSize * objectTemplate.scale,
                 this.renderConfig.TileSize * objectTemplate.scale
             );
             //sprite.setOrigin(0, 0);
-            sprite.setTint(
+            
+            sprite.setTint(objectTemplate.color instanceof String?
+                Phaser.Display.Color.HexStringToColor(objectTemplate.color):
                 Phaser.Display.Color.GetColor(
                     objectTemplate.color.r * 255,
                     objectTemplate.color.g * 255,
@@ -146,12 +150,14 @@ class Sprite2DRenderer extends RendererBase {
         y,
         orientation
     ) => {
+        console.log("[Sprite2D Renderer] Update")
         if (!sprite) {
             return;
         }
         const objectTemplate = this.objectTemplates[objectTemplateName];
 
-        sprite.setPosition(this.getCenteredX(x), this.getCenteredY(y));
+        // sprite.setPosition(this.getCenteredX(x), this.getCenteredY(y));
+        sprite.setPosition(300, 200);
         sprite.setTexture(this.getTilingImage(objectTemplate, x, y));
 
         sprite.setDisplaySize(
@@ -160,6 +166,8 @@ class Sprite2DRenderer extends RendererBase {
         );
 
         sprite.setTint(
+            objectTemplate.color instanceof String?
+            Phaser.Display.Color.HexStringToColor(objectTemplate.color):
             Phaser.Display.Color.GetColor(
                 objectTemplate.color.r * 255,
                 objectTemplate.color.g * 255,
@@ -198,7 +206,7 @@ class Sprite2DRenderer extends RendererBase {
             }else{
                 //if not
                 this.loadImage(objectTemplate.id, 
-                    this.getShapeImage(random.choice(['circle, triangle, square'])));
+                    this.getShapeImage(random.choice(['circle', 'triangle', 'square'])));
             }
 
             this.objectTemplates[objectTemplate.id] = objectTemplate;

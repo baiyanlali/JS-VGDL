@@ -3,6 +3,7 @@ import './App.css';
 import {aliens_map, game} from './core/aliens';
 import Player from "./renderer/level_player/Player";
 import {Component} from "react";
+import Phaser from 'phaser';
 
 class App extends Component{
 
@@ -31,7 +32,7 @@ class App extends Component{
       levelId: 0,
       rendererName: "",
       rendererConfig: {
-          TileSize: 10,
+          TileSize: 24,
           RotateAvatarImage: true
       },
       messages: {},
@@ -68,10 +69,11 @@ class App extends Component{
                 selectedLevelId={this.state.selectedLevelId}
                 onTrajectoryComplete={this.onTrajectoryComplete}
 
-                width = {400}
-                height = {500}
+                width = {600}
+                height = {400}
                 vgdl = {this.game}
-            />
+            >
+            </Player>
           </header>
         </div>
     );

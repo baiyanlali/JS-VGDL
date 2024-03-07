@@ -13,6 +13,8 @@ export default class HumanPlayerScene extends Phaser.Scene{
         this.avatarObject = data.avatarObject
         this.grenderer = new Sprite2DRenderer(this, this.rendererName, this.renderConfig, this.avatarObject)
         this.vgdl = data.vgdl
+        this.gridHeight = data.vgdl.height
+        this.gridWidth = data.vgdl.width
 
         this.renderData = {
           objects: {},
@@ -35,15 +37,15 @@ export default class HumanPlayerScene extends Phaser.Scene{
          */
         // console.log(state)
 
-        const newObjectIds = state.objects.map(o=>o.id)
+        const newObjectIds = state.objects.map(o=>o.ID)
 
         // this.grenderer.recenter()
         this.grenderer.beginUpdate(state.objects)
 
         state.objects.forEach((object) => {
-            const objectTemplateName = object.name + object.renderTileId;
-            if (object.id in this.renderData.objects) {
-                const currentObjectData = this.renderData.objects[object.id];
+            const objectTemplateName = object.name + object.ID;
+            if (object.ID in this.renderData.objects) {
+                const currentObjectData = this.renderData.objects[object.ID];
                 this.grenderer.updateObject(
                   currentObjectData.sprite,
                   object.name,
@@ -53,7 +55,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
                   object.orientation
                 );
 
-                this.renderData.objects[object.id] = {
+                this.renderData.objects[object.ID] = {
                   ...currentObjectData,
                   object,
                 };
@@ -66,7 +68,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
                   object.orientation
                 );
 
-            this.renderData.objects[object.id] = {
+            this.renderData.objects[object.ID] = {
               object,
               sprite,
             };
@@ -74,7 +76,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
     });
 
     for (const k in this.renderData.objects) {
-          const id = this.renderData.objects[k].object.id;
+          const id = this.renderData.objects[k].object.ID;
           if (!newObjectIds.includes(id)) {
             this.renderData.objects[k].sprite.destroy();
             delete this.renderData.objects[k];
@@ -83,23 +85,23 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
 
     preload = ()=> {
-      this.input.mouse.disableContextMenu();
+      // this.input.mouse.disableContextMenu();
   
-      this.loadingText = this.add.text(
-        this.cameras.main.width / 2,
-        this.cameras.main.height / 2,
-        "Loading assets for VGDL",
-        {
-          fontFamily: "Droid Sans Mono",
-          font: "32px",
-          fill: 'WHITE',
-          align: "center",
-        }
-      );
+      // this.loadingText = this.add.text(
+      //   this.cameras.main.width / 2,
+      //   this.cameras.main.height / 2,
+      //   "Loading assets for VGDL",
+      //   {
+      //     fontFamily: "Droid Sans Mono",
+      //     font: "32px",
+      //     fill: 'WHITE',
+      //     align: "center",
+      //   }
+      // );
   
-      this.loadingText.setX(this.cameras.main.width / 2);
-      this.loadingText.setY(this.cameras.main.height / 2);
-      this.loadingText.setOrigin(0.5, 0.5);
+      // this.loadingText.setX(this.cameras.main.width / 2);
+      // this.loadingText.setY(this.cameras.main.height / 2);
+      // this.loadingText.setOrigin(0.5, 0.5);
       if (this.grenderer) {
         this.grenderer.loadTemplates(this.vgdl.getFullState()['objects']);
       }

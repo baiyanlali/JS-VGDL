@@ -24,7 +24,7 @@ export class MovingAvatar extends VGDLSprite{
         this.alternate_keys = false
     }
 
-    declare_possible_actions = function () {
+    declare_possible_actions = () => {
         // var event = this.gamejs.event;
         // var actions = {};
         // actions["UP"] = event.K_UP;
@@ -35,7 +35,7 @@ export class MovingAvatar extends VGDLSprite{
         return {}
     }
 
-    _readMultiActions = function (game) {
+    _readMultiActions = (game) => {
         var event = this.gamejs.event;
         var [UP, LEFT, DOWN, RIGHT] = BASEDIRS;
         const res = [];
@@ -56,7 +56,7 @@ export class MovingAvatar extends VGDLSprite{
         return res;
     }
 
-    _readAction = function (game) {
+    _readAction = (game) => {
         var actions = this._readMultiActions(game);
         // console.log('actions read', actions);
         if (actions.length)
@@ -65,7 +65,7 @@ export class MovingAvatar extends VGDLSprite{
             return null;
     }
 
-    update = function (game) {
+    update = (game) => {
         VGDLSprite.prototype.update.call(this, game);
         var action = this._readAction(game);
         // console.log(action);
@@ -81,7 +81,7 @@ export class HorizontalAvatar extends MovingAvatar{
         super(pos, size, args);
     }
 
-    declare_possible_actions = function () {
+    declare_possible_actions = () => {
         var event = this.gamejs.event;
         var actions = {};
         actions['LEFT'] = event.K_LEFT;
@@ -89,7 +89,7 @@ export class HorizontalAvatar extends MovingAvatar{
         return actions;
     }
 
-    update = function (game) {
+    update = (game) => {
         VGDLSprite.prototype.update.call(this, game);
         var action = this._readAction(game);
         // console.log(this.physics.activeMovement);
@@ -105,7 +105,7 @@ export class VerticalAvatar extends MovingAvatar{
         super(pos, size, args);
     }
 
-    declare_possible_actions = function () {
+    declare_possible_actions = () => {
         var event = this.gamejs.event;
         var actions = {};
         actions["UP"] = event.K_UP
@@ -113,7 +113,7 @@ export class VerticalAvatar extends MovingAvatar{
         return actions;
     }
 
-    update = function (game) {
+    update = (game) => {
         VGDLSprite.prototype.update.call(this, game);
         var action = this._readAction(game);
         // console.log(this.physics.activeMovement);
@@ -158,7 +158,7 @@ export class FlakAvatar extends HorizontalAvatar{
 // OrientedAvatar.prototype = Object.create(MovingAvatar.prototype);
 // OrientedFlicker.prototype._draw = OrientedSprite.prototype._draw;
 //
-// OrientedAvatar.prototype.update = function (game) {
+// OrientedAvatar.prototype.update = (game) => {
 //
 //
 //     var tmp = this.orientation.slice();
@@ -186,7 +186,7 @@ export class FlakAvatar extends HorizontalAvatar{
 // RotatingAvatar.prototype = Object.create(MovingAvatar.prototype);
 // RotatingAvatar.prototype._draw = OrientedSprite.prototype._draw;
 //
-// RotatingAvatar.prototype.update = function (game) {
+// RotatingAvatar.prototype.update = (game) => {
 //     var actions = this._readMultiActions(game);
 //     if (UP in actions)
 //         this.speed = 1;
@@ -210,7 +210,7 @@ export class FlakAvatar extends HorizontalAvatar{
 // }
 // RotatingFlippingAvatar.prototype = Object.create(RotatingAvatar.prototype);
 //
-// RotatingFlippingAvatar.prototype.update = function (game) {
+// RotatingFlippingAvatar.prototype.update = (game) => {
 //     var actions = this._readMultiActions(game)
 //     if (actions.length > 0 && this.noiseLevel > 0) {
 //         // pick a random one instead
@@ -235,7 +235,7 @@ export class FlakAvatar extends HorizontalAvatar{
 //     this.speed = 0
 // }
 //
-// RotatingFlippingAvatar.prototype.is_stochastic = function () {
+// RotatingFlippingAvatar.prototype.is_stochastic = () => {
 //     return this.noiseLevel > 0;
 // }
 //
@@ -253,14 +253,14 @@ export class FlakAvatar extends HorizontalAvatar{
 // }
 // ShootAvatar.prototype = Object.create(OrientedAvatar.prototype);
 //
-// ShootAvatar.prototype.update = function (game) {
+// ShootAvatar.prototype.update = (game) => {
 //     OrientedAvatar.prototype.update.call(this, game);
 //     if (this._hasAmmo()) {
 //         this._shoot(game);
 //     }
 // }
 //
-// ShootAvatar.prototype._hasAmmo = function (game) {
+// ShootAvatar.prototype._hasAmmo = (game) => {
 //     // console.log('resources', this.resources)
 //     if (!(this.ammo))
 //         return true;
@@ -269,12 +269,12 @@ export class FlakAvatar extends HorizontalAvatar{
 //     return false;
 // }
 //
-// ShootAvatar.prototype._reduceAmmo = function () {
+// ShootAvatar.prototype._reduceAmmo = () => {
 //     if (this.ammo && this.ammo in this.resources)
 //         this.resources[this.ammo] --;
 // }
 //
-// ShootAvatar.prototype._shoot = function (game) {
+// ShootAvatar.prototype._shoot = (game) => {
 //     var K_SPACE = this.gamejs.event.K_SPACE;
 //     if (this.stype && game.keystate[K_SPACE]) {
 //         var u = tools.unitVector(this.orientation);
