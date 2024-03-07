@@ -1,4 +1,5 @@
 import {VGDLParser} from "./core.js"
+import {BasicGame} from "./games";
 
 
 const aliens_game = 
@@ -49,4 +50,4 @@ w                A             w
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 `
 
-export const game = new VGDLParser().parseGame(aliens_game)
+export const game: BasicGame = new VGDLParser().parseGame(aliens_game)

@@ -1,6 +1,6 @@
 import {VGDLSprite} from "./vgdl-sprite.js";
 
-const Resource = function (gamejs, pos, size, args) {
+export const Resource = function (gamejs, pos, size, args) {
 	var that = this;
 	VGDLSprite.call(this, gamejs, pos, size, args);
 	this.value = args.value || 1;
@@ -20,7 +20,7 @@ Resource.prototype.resourceType = function () {
 
 
 
-function ResourcePack (gamejs, pos, size, args) {
+export function ResourcePack (gamejs, pos, size, args) {
 	Resource.call(this, gamejs, pos, size, args);
 	this.is_static = true;
 }

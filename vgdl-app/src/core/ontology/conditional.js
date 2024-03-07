@@ -1,4 +1,3 @@
-
 export class Conditional{
     condition = (game) => {
         return false

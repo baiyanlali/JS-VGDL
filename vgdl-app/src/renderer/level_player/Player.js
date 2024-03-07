@@ -1,5 +1,4 @@
 import {Component} from "react";
-import Phaser from "Phaser"
 import HumanPlayerScene from "./HumanPlayerScene.js";
 export default class Player extends Component{
 
@@ -19,6 +18,19 @@ export default class Player extends Component{
         }
         this.game = new Phaser.Game(config)
         this.updateCanvasSize()
+
+        this.game.scene.start("HumanPlayerScene", {
+            rendererConfig: this.props.rendererConfig,
+            rendererName: this.props.rendererName,
+            vgdl: this.props.vgdl,
+            onDisplayMessage: this.props.onDisplayMessage,
+            onTrajectoryComplete: this.props.onTrajectoryComplete,
+        })
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.updateCanvasSize()
+
     }
 
     render() {

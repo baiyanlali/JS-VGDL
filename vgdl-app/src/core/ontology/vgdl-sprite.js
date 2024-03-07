@@ -2,6 +2,7 @@ import {clone, defaultDict, new_id, triPoints, unitVector} from "../tools.js";
 
 import {ContinuousPhysics, GridPhysics} from "./physics.js";
 import {BASEDIRS, BLACK, BLUE, GRAY, ORANGE, PURPLE, RED, RIGHT} from "./constants.js";
+import {killSprite} from "./effect";
 
 export class VGDLSprite{
 
