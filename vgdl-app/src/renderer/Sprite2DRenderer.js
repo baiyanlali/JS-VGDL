@@ -121,7 +121,7 @@ class Sprite2DRenderer extends RendererBase {
             } else if (this.renderConfig.RotateAvatarImage) {
                 sprite.setRotation(this.getOrientationAngleRads(orientation));
             }
-            sprite.setDepth(objectTemplate.zIdx);
+            // sprite.setDepth(objectTemplate.zIdx);
 
             if (this.container) {
                 this.container.add(sprite);
@@ -150,14 +150,14 @@ class Sprite2DRenderer extends RendererBase {
         y,
         orientation
     ) => {
-        console.log("[Sprite2D Renderer] Update")
+        // console.log("[Sprite2D Renderer] Update")
         if (!sprite) {
             return;
         }
         const objectTemplate = this.objectTemplates[objectTemplateName];
 
-        // sprite.setPosition(this.getCenteredX(x), this.getCenteredY(y));
-        sprite.setPosition(300, 200);
+        sprite.setPosition(this.getCenteredX(x), this.getCenteredY(y));
+        // sprite.setPosition(300, 200);
         sprite.setTexture(this.getTilingImage(objectTemplate, x, y));
 
         sprite.setDisplaySize(
@@ -180,7 +180,7 @@ class Sprite2DRenderer extends RendererBase {
         } else if (this.renderConfig.RotateAvatarImage) {
             sprite.setRotation(this.getOrientationAngleRads(orientation));
         }
-        sprite.setDepth(objectTemplate.zIdx);
+        // sprite.setDepth(objectTemplate.zIdx);
     };
 
     loadTemplates = (objects) => {
@@ -211,6 +211,13 @@ class Sprite2DRenderer extends RendererBase {
 
             this.objectTemplates[objectTemplate.id] = objectTemplate;
         });
+
+        this.scene.load.image("alien", "oryx/alien1.png");
+        const sprite = this.scene.add.sprite(
+            200,
+            300,
+            "aline"
+        );
     };
 
     getShapeImage = (shape) => {
