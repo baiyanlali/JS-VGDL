@@ -35,7 +35,7 @@ export function nothing (sprite, partner, game, kwargs) {
 
 export function killSprite (sprite, partner, game, kwargs) {
 	game.kill_list.push(sprite);
-	return ['killSprite', sprite.ID || sprite, partner.ID || partner];
+	return ['killSprite', sprite.ID || sprite, partner ? (partner.ID || partner): null];
 }
 
 export function cloneSprite (sprite, partner, game, kwargs) {

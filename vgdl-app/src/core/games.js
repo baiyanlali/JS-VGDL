@@ -350,17 +350,17 @@ export class BasicGame{
 
     _updateAll = () => {
         this._iterAll().forEach(sprite => {
-            try {
+            // try {
                 if (!(sprite.crashed))
                     sprite.update(this);
-            } catch (err) {
-                if ((!sprite.crashed)) {
-                    console.error('could not update', sprite.name)
-                    console.error(err);
-                    sprite.crashed = true;
-                }
+            // } catch (err) {
+            //     if ((!sprite.crashed)) {
+            //         console.error('could not update', sprite.name)
+            //         throw err
+            //         sprite.crashed = true;
+            //     }
 
-            }
+            // }
         })
 
     }
@@ -465,7 +465,17 @@ export class BasicGame{
             const stypes1 = collision[0].stypes
             const stypes2 = collision[1].stypes
 
-            const effects = get_effect(stypes1, stypes2)
+            let effects;
+            if(collision[1] === 'EOS'){
+                this.collision_eff.forEach(eff=>{
+                    const class1 = eff[0]
+                    const class2 = eff[1]
+                    if(stypes1.includes(class1) && class2 === 'EOS')
+                        effects = [{reverse: false, effect: eff[2], kwargs: eff[3]}]
+                })
+            }else{
+                effects = get_effect(stypes1, stypes2)
+            }
 
             if(effects.length === 0) continue
 
@@ -706,6 +716,11 @@ export class BasicGame{
 
         for (let i = 0; i < allSprites.length; i++) {
             const sprite1 = allSprites[i];
+
+            if(sprite1.location.x < 0 || sprite1.location.x > this.width || sprite1.location.y < 0 || sprite1.location.y > this.height){
+                this.collision_set.push([sprite1, 'EOS'])
+            }
+
             for (let j = i + 1; j < allSprites.length; j++) {
                 const sprite2 = allSprites[j];
                 const dist = distance(sprite1, sprite2)

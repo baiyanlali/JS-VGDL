@@ -118,7 +118,7 @@ export class FlakAvatar extends HorizontalAvatar{
     }
 
     update (game) {
-        super.update(this, game);
+        super.update(game);
         this._shoot(game);
     }
 

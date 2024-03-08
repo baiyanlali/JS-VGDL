@@ -229,7 +229,7 @@ export class OrientedSprite extends VGDLSprite{
 	constructor(pos, size, args) {
 		super(pos, size, args);
 		this.draw_arrow = false;
-		this.orientation = RIGHT;
+		this.orientation = args.orientation || RIGHT;
 	}
 
 	_draw (game) {
@@ -364,17 +364,44 @@ export class EraticMissile extends Missile{
 	}
 }
 
-export class Bomber extends SpawnPoint{
+export class Bomber extends Missile{
 	constructor(pos, size, args) {
 		// Missile
 		args.color = args.color || ORANGE;
 		args.is_static = args.is_static || false;
 		super(pos, size, args);
+
+		if (args.prob !== undefined) {
+			this.prob = args.prob
+		} else {
+			this.prob = 1
+		}
+
+		this.is_stochastic = this.prob > 0 && this.prob < 1;
+
+		if (args.cooldown !== undefined) {
+			this.cooldown = args.cooldown;
+		} else {
+			this.cooldown = 1;
+		}
+
+		if (args.total !== undefined) this.total = args.total;
+
+		this.counter = 0;
 	}
 
 	update (game) {
-		Missile.prototype.update.call(this, game);
-		SpawnPoint.prototype.update.call(this, game);
+		super.update(game)
+		
+
+		if(game.time % this.cooldown === 0 && random.random() < this.prob){
+			game._createSprite([this.stype], [this.location.x, this.location.y])
+			this.counter ++
+		}
+
+		if(this.total && this.counter >= this.total){
+			killSprite(this, undefined, game)
+		}
 	}
 }
 
