@@ -3,7 +3,6 @@
 
 import { random } from "../core/tools";
 import RendererBase from "./RendererBase";
-import Phaser from "phaser";
 
 class Sprite2DRenderer extends RendererBase {
     constructor(scene, rendererName, renderConfig, avatarObject, centerObjects) {
@@ -83,7 +82,7 @@ class Sprite2DRenderer extends RendererBase {
 
     addObject = (objectName, objectTemplateName, x, y, orientation) => {
 
-        console.log(`[Sprite2DRenderer] Add Sprite ${objectName}`)
+        // console.log(`[Sprite2D Renderer] Add Sprite ${objectName}`)
 
         if (objectName === "background") {
             return;
@@ -93,7 +92,11 @@ class Sprite2DRenderer extends RendererBase {
 
         let sprite;
         if(objectTemplate) {
-            console.log(`[Sprite2D Renderer] ${this.getCenteredX(x)},${this.getCenteredY(y)}`)
+            // console.info(`[Sprite2D Renderer] ${objectName}
+            // Position: ${this.getCenteredX(x)},${this.getCenteredY(y)}
+            // Scale: ${this.renderConfig.TileSize * objectTemplate.scale}, ${this.renderConfig.TileSize * objectTemplate.scale}`)
+
+
             sprite = this.scene.add.sprite(
                 this.getCenteredX(x),
                 this.getCenteredY(y),
@@ -142,7 +145,6 @@ class Sprite2DRenderer extends RendererBase {
         return sprite;
     };
 
-    done = false
 
     updateObject = (
         sprite,
@@ -160,38 +162,6 @@ class Sprite2DRenderer extends RendererBase {
             return;
         }
         const objectTemplate = this.objectTemplates[objectTemplateName];
-
-        if(!this.done){
-            console.log("Generate Additional image")
-            const sprite2 = this.scene.add.sprite(
-            this.getCenteredX('5'), this.getCenteredY(0),
-            "alien"
-            );
-            this.done = true
-
-            sprite2.setTexture(this.getTilingImage(objectTemplate, x, y));
-
-            sprite2.setDisplaySize(
-                this.renderConfig.TileSize * objectTemplate.scale,
-                this.renderConfig.TileSize * objectTemplate.scale
-            );
-
-            // sprite2.setTint(
-            //     typeof(objectTemplate.color) === 'string'?
-            //     Phaser.Display.Color.HexStringToColor(objectTemplate.color):
-            //     Phaser.Display.Color.GetColor(
-            //         objectTemplate.color.r * 255,
-            //         objectTemplate.color.g * 255,
-            //         objectTemplate.color.b * 255
-            //     )
-            // );
-
-            if (this.avatarObject !== objectName) {
-                sprite2.setRotation(this.getOrientationAngleRads(orientation));
-            } else if (this.renderConfig.RotateAvatarImage) {
-                sprite2.setRotation(this.getOrientationAngleRads(orientation));
-            }
-        }
 
         sprite.setPosition(this.getCenteredX(x), this.getCenteredY(y));
         // sprite.setPosition(300, 200);
@@ -239,16 +209,21 @@ class Sprite2DRenderer extends RendererBase {
                 color: object.color ?? { r: 1, g: 1, b: 1 },
                 zIdx: object.Z || 0,
             };
-            if(object.image){
+            if(object.img){
+                if(object.img.indexOf('.png') === -1){
+                    object.img = `${object.img}.png`
+                }
                 //if have image
-                this.loadImage(objectTemplate.id, object.image);
+                // console.info(`[Sprite2D Renderer] Add sprite ${objectTemplate.name} ${object.img}`)
+                this.loadImage(objectTemplate.id, object.img);
             }else{
                 //if not
-                if(unknown_object_shape.hasOwnProperty(object.id)){
+                if(unknown_object_shape.hasOwnProperty(objectTemplate.id)){
 
                 }else{
-                    const shape = random.choice(['circle', 'triangle', 'square'])
-                    unknown_object_shape[object.id] = shape
+                    const shape = random.choice(['circle', 'triangle', 'square', "pentagon", "hexagon"])
+                    // console.info(`[Sprite2D Renderer] Add sprite ${objectTemplate.name} ${shape}`)
+                    unknown_object_shape[objectTemplate.id] = shape
                     this.loadImage(objectTemplate.id, this.getShapeImage(shape));
                 }
             }

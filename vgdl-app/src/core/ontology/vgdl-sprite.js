@@ -68,10 +68,9 @@ export class VGDLSprite{
 	}
 
 
-	update = (game) => {
+	update (game) {
 		this.lastmove += 1;
 		if (!(this.is_static) && !(this.only_active)) {
-			// console.log('trying to do passive movement')
 			this.physics.passiveMovement(this);
 		}
 	}
@@ -80,40 +79,42 @@ export class VGDLSprite{
 		if (speed === null)
 			speed = this.speed;
 
-		if (!(this.cooldown > this.lastmove) || Math.abs(orientation[0]) + Math.abs(orientation[1]) === 0) {
+		if (this.cooldown > this.lastmove || Math.abs(orientation[0]) + Math.abs(orientation[1]) !== 0) {
+			this.lastlocation = {x: this.location.x, y: this.location.y}
 			this.location = {
 				x: this.location.x + orientation[0] * speed,
-				y: this.location.y + orientation[0] * speed,
+				y: this.location.y + orientation[1] * speed,
 			}
 			this.lastmove = 0;
 		}
 
 	}
 
-	_velocity = () => {
+	_velocity () {
 		if (this.speed === null || this.speed === 0 || !('orientation' in this))
 			return [0, 0];
 		else
 			return [this.orientation[0] * this.speed, this.orientation[1]*this.speed];
 	}
 
-	lastdirection = () => {
+	lastdirection () {
 		return [this.location.x-this.lastlocation.x, this.location.y-this.lastlocation.y];
 	}
 
-	_draw = (game) => {
+	_draw (game) {
 
 
 	}
 
 	_drawResources = (game, screen, location) => {
+
 	}
 
 	_clear = (screen, background, double=null) => {
 
 	}
 
-	toString = () => {
+	toString () {
 		return `${this.name} at (${this.location.x}, ${this.location.y})`;
 	}
 }
@@ -149,7 +150,7 @@ export class Flicker extends VGDLSprite{
 		this.limit = 1;
 	}
 
-	update = (game) => {
+	update (game) {
 		this.update(game)
 		if (this._age > this.limit)
 			killSprite(this, null, game);
@@ -196,7 +197,7 @@ export class SpawnPoint extends SpriteProducer{
 		this.counter = 0;
 	}
 
-	update = (game) => {
+	update (game) {
 		// console.log(this.prob, this.cooldown)
 		const rnd = random.random()
 		// console.log(game.time, this.cooldown)
@@ -213,15 +214,14 @@ export class SpawnPoint extends SpriteProducer{
 
 export class RandomNPC extends VGDLSprite{
 	constructor(pos, size, args) {
-
 		args.speed = args.speed || 1;
 		args.is_stochastic = args.is_stochastic || true;
 		super(pos, size, args)
 	}
 
-	update = (game)=> {
-		super.update(this, game);
+	update (game) {
 		this.direction = random.choice(BASEDIRS);
+		super.update(game);
 		this.physics.activeMovement(this, this.direction);
 	}
 }
@@ -233,7 +233,7 @@ export class OrientedSprite extends VGDLSprite{
 		this.orientation = RIGHT;
 	}
 
-	_draw = (game) => {
+	_draw (game) {
 		super._draw(this, game);
 		if (this.draw_arrow) {
 			//TODO: Draw OrientedSprite
@@ -293,7 +293,7 @@ export class Walker extends Missile{
 		this.is_stochastic = true;
 	}
 
-	update = (game)=> {
+	update (game) {
 		if (this.airsteering || this.lastdirection()[0] === 0) {
 			let d = 0
 			if (this.orientation[0] > 0)
@@ -317,7 +317,7 @@ export class WalkJumper extends Walker{
 		this.strength = 10;
 	}
 
-	update = (game) => {
+	update (game) {
 		if (this.lastdirection()[0] === 0) {
 		if (this.prob < random.random())
 			this.physics.activeMovement(this, (0, -this.strength));
@@ -325,13 +325,6 @@ export class WalkJumper extends Walker{
 		super.update(game)
 	}
 }
-
-export class xxx extends RandomNPC{
-	constructor(pos, size, args) {
-		super(pos, size, args);
-	}
-}
-
 
 
 export class RandomInertial extends RandomNPC{
@@ -357,7 +350,7 @@ export class EraticMissile extends Missile{
 		this.is_stochastic = (this.prob > 0 && this.prob < 1);
 	}
 
-	update = (game)=> {
+	update (game) {
 		super.update(game)
 		if (random.random() < this.prob)
 			this.orientation = random.choice(BASEDIRS);
@@ -372,7 +365,7 @@ export class Bomber extends SpawnPoint{
 		super(pos, size, args);
 	}
 
-	update = (game)=> {
+	update (game) {
 		Missile.prototype.update.call(this, game);
 		SpawnPoint.prototype.update.call(this, game);
 	}
@@ -387,7 +380,7 @@ export class Bomber extends SpawnPoint{
 // }
 // Chaser.prototype = Object.create(RandomNPC.prototype);
 //
-// Chaser.prototype._closestTargets = (game) => {
+// Chaser.prototype._closestTargets (game) {
 // 	var bestd = 1e100;
 // 	var res = [];
 // 	var that = this;
@@ -428,7 +421,7 @@ export class Bomber extends SpawnPoint{
 // 	return res;
 // }
 //
-// Chaser.prototype.update = (game) => {
+// Chaser.prototype.update (game) {
 // 	VGDLSprite.prototype.update.call(this, game);
 //
 // 	options = [];
@@ -477,7 +470,7 @@ export class Bomber extends SpawnPoint{
 // 	return res;
 // }
 //
-// AStarChaser.prototype._draw = (game) => {
+// AStarChaser.prototype._draw (game) {
 // 	RandomNPC.prototype._draw.call(this, game);
 // 	if (this.walableTiles) {
 // 		var col = this.gamejs.Color(0, 0, 255, 100);
@@ -513,6 +506,6 @@ export class Bomber extends SpawnPoint{
 // 	this.drawpath = path_sprits;
 // }
 //
-// AStarChaser.prototype.update = (game) => {
+// AStarChaser.prototype.update (game) {
 // 	VGDLSprite.prototype.update.call(this, game);
 // }

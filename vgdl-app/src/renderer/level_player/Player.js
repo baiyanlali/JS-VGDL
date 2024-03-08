@@ -16,9 +16,16 @@ export default class Player extends Component{
             scale:{
                 expandParent: false
             },
+            physics:{
+                default: 'arcade',
+                arcade: {
+                    gravity: {y: 0}
+                }
+            },
             scene: [HumanPlayerScene]
         }
         this.game = new Phaser.Game(config)
+        
         this.updateCanvasSize()
 
         this.game.scene.start("HumanPlayerScene", {

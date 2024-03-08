@@ -23,12 +23,12 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
     updateState = (state)=> {
         /**
-         * return {
+         * state {
          *              'frame': this.time,
          *             'score': this.bonus_score,
          *             'ended': this.ended,
          *             'win'  : this.win,
-         *             'objects': object_cur,
+         *             'objects': objects,
          *             'killed': killed,
          *             'actions': actions,
          *             'events': this.effectList,
@@ -85,45 +85,73 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
 
     preload = ()=> {
-      // this.input.mouse.disableContextMenu();
-  
-      // this.loadingText = this.add.text(
-      //   this.cameras.main.width / 2,
-      //   this.cameras.main.height / 2,
-      //   "Loading assets for VGDL",
-      //   {
-      //     fontFamily: "Droid Sans Mono",
-      //     font: "32px",
-      //     fill: 'WHITE',
-      //     align: "center",
-      //   }
-      // );
-  
-      // this.loadingText.setX(this.cameras.main.width / 2);
-      // this.loadingText.setY(this.cameras.main.height / 2);
-      // this.loadingText.setOrigin(0.5, 0.5);
-
-        this.load.image("alien", "./block_shapes/circle.png")
-
       if (this.grenderer) {
         this.grenderer.loadTemplates(this.vgdl.getFullState()['objects']);
       }
     }
 
+    initCollision = ()=> {
+        this.physics.add()
+    }
+
+    initInput = () => {
+        this.A = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
+        this.D = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+        this.W = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W)
+        this.S = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S)
+        this.SPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+
+        this.inputMap = {}
+
+        this.inputMap[this.A.keyCode] = "LEFT"
+        this.inputMap[this.D.keyCode] = "RIGHT"
+        this.inputMap[this.W.keyCode] = "UP"
+        this.inputMap[this.S.keyCode] = "DOWN"
+        this.inputMap[this.SPACE.keyCode] = "SPACE"
+    }
+
+    handleInput = () =>{
+      // console.log('[HumanPlayerScene] Handle Input')
+      for (const key of [this.A, this.D, this.W, this.S, this.SPACE]) {
+        if(Phaser.Input.Keyboard.JustDown(key)){
+            console.log(`[HumanPlayerScene] Press ${this.inputMap[key.keyCode]}`)
+            this.vgdl.presskey(this.inputMap[key.keyCode])
+        }else if(Phaser.Input.Keyboard.JustUp(key)){
+            console.log(`[HumanPlayerScene] PressUp ${this.inputMap[key.keyCode]}`)
+            this.vgdl.presskeyUp(this.inputMap[key.keyCode])
+        }
+      }
+    }
+
     create = () => {
+
+      this.initInput()
+
+      // this.game.input.keyboard.onKeyDown = k => {if(this.inputMap[k]) this.vgdl.presskey(this.inputMap[k])}
+      // this.game.input.keyboard.onKeyUp = k => {if(this.inputMap[k]) this.vgdl.pressKeyUp(this.inputMap[k])}
+      
         if(this.grenderer){
             this.grenderer.init(this.gridWidth, this.gridHeight)
             this.updateState(this.vgdl.getFullState())
         }
+      
+        if(this.vgdl){
+          this.vgdl.startGame()
+        }
     }
 
     update = (time, delta)=> {
-        if(this.grenderer){
-            this.currentState = this.vgdl.getFullState()
-            if(this.currentState)
-                this.updateState(this.currentState)
-        }
-
+      // console.log("[HumanPlayerScene] Update")
+      if(this.vgdl){
+        this.handleInput()
+        // console.log("[HumanPlayerScene] Update")
+        this.vgdl.update(delta)
+      }
+      if(this.grenderer){
+          this.currentState = this.vgdl.getFullState()
+          if(this.currentState)
+              this.updateState(this.currentState)
+      }
     }
 
 }

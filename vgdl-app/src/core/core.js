@@ -85,7 +85,7 @@ function _eval (estr) {
         return eval(estr)
     }catch (e) {
         if(!EVALS.hasOwnProperty(estr))
-            console.error(`Do not have ${estr}`)
+            throw e
         return eval(`EVALS.${estr}`)
     }
 }
@@ -123,6 +123,7 @@ export class VGDLParser{
                     this.parseInteraction(c.children)
                     break
                 case "LevelMapping":
+                    this.parseLevel(c.children)
                     break
                 case "TerminationSet":
                     this.parseTermination(c.children)

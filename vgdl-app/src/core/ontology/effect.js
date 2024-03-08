@@ -34,7 +34,6 @@ export function nothing (sprite, partner, game, kwargs) {
 }
 
 export function killSprite (sprite, partner, game, kwargs) {
-
 	game.kill_list.push(sprite);
 	return ['killSprite', sprite.ID || sprite, partner.ID || partner];
 }
@@ -252,6 +251,15 @@ export function killIfAlive(sprite, partner, game, kwargs) {
 		return ['killIfAlive', sprite.ID || sprite, partner.ID || partner]
 	}
 }
+
+export function killBoth(sprite, partner, game, kwargs) {
+	if (!(game.kill_list.contains(partner))) {
+		killSprite(sprite, partner, game);
+		killSprite(partner, sprite, game);
+		return ['killBoth', sprite.ID || sprite, partner.ID || partner]
+	}
+}
+
 
 export function collectResource(sprite, partner, game, kwargs) {
 	console.assert(sprite instanceof Resource)

@@ -76,6 +76,8 @@ export class BasicGame{
     sprite_bonus_granted_on_timestep = -1; // to ensure you only grant bonus once per timestep (since you check _isDone() multiple times)
     timeout_bonus_granted_on_timestep = -1; // to ensure you only grant bonus once per timestep (since you check _isDone() multiple times)
 
+    paused = true
+
     ignoredattributes = ['stypes',
         'name',
         'lastmove',
@@ -124,6 +126,7 @@ export class BasicGame{
         this.num_sprites = 0
         this.kill_list = []
         this.all_killed = []
+        this.paused = true
     }
 
     buildLevel = (lstr) => {
@@ -163,10 +166,10 @@ export class BasicGame{
 			for (const col in line) {
 				let c = line[col];
 				if (c in this.char_mapping) {
-					const pos = [col, row];
+					const pos = [parseInt(col), row];
 					this._createSprite(this.char_mapping[c], pos);
 				} else if (c in this.default_mapping) {
-					const pos = [col, row];
+					const pos = [parseInt(col), row];
 					this._createSprite(this.default_mapping[c], pos);
 				}
 			}
@@ -281,12 +284,12 @@ export class BasicGame{
         for (let obj_type in obs) {
             this.getSprites(obj_type).forEach((obj) => {
                 const features = {'color': colorDict[obj.color.toString()],
-                    'row': [obj.rect.top]};
+                    'row': [obj.location.y]};
                 const type_vector = {'color': colorDict[obj.color.toString()],
-                    'row': [obj.rect.top]};
+                    'row': [obj.location.y]};
                 const sprite = obj;
                 obj_list[obj.ID] = {'sprite': sprite,
-                    'position': [obj.rect.left, obj.rect.top],
+                    'position': [obj.location.x, obj.location.y],
                     'features': features,
                     'type': type_vector};
             });
@@ -358,6 +361,15 @@ export class BasicGame{
             }
         })
 
+    }
+
+    _clearAll = (onscreen = true) => {
+        this.kill_list.forEach(s=>{
+            this.all_killed.push(s)
+            this.sprite_groups[s.name].remove(s)
+        })
+
+        this.kill_list = []
     }
 
     _updateCollisionDict =  (changedsprite) => {
@@ -433,8 +445,8 @@ export class BasicGame{
 
         this.effectList = [];
 
-        let push_effect = 'bounceForward';
-        let back_effect = 'stepBack';
+        const push_effect = 'bounceForward';
+        const back_effect = 'stepBack';
 
         // list of objects sets
         let force_collisions = [];
@@ -487,7 +499,7 @@ export class BasicGame{
                 if ('scoreChange' in kwargs) {
                     kwargs = Object.assign({}, kwargs);
                     kwargs.score = kwargs['scoreChange'];
-                    let effect = this._multi_effect(effect, scoreChange)
+                    effect = this._multi_effect(effect, scoreChange)
                     delete kwargs['scoreChange'];
                 }
                 let dim = null;
@@ -499,6 +511,7 @@ export class BasicGame{
 
                 sprite_array1.forEach(sprite1 => {
                     let rects = sprite_array2.map(os => {return os.rect});
+                    return
                     if (sprite1.rect.collidelistall(rects) === -1) return ;
                     sprite1.rect.collidelistall(rects).forEach((ci) => {
                         let sprite2 = sprite_array2[ci];
@@ -616,11 +629,54 @@ export class BasicGame{
         return this.startGame;
     }
 
+    presskey = (keyCode)=> {
+        this.keystate[keyCode] = true
+    }
+
+    presskeyUp = (keyCode) => {
+        this.key_to_clean.push(keyCode)
+        this.update(0, true)
+    }
+
+
+    updateTime = 1000
+    currentTime = 0 
+
+    update = (delta, now = false) => {
+        if(!now){
+            this.currentTime += delta
+            if(this.currentTime<this.updateTime)return
+            this.currentTime %= this.updateTime
+        }
+        
+
+        // console.log(`[BasicGame] update paused: ${this.paused}, ended: ${this.ended}`)
+        // if(this.paused) return 'paused'
+        if(this.ended){
+            this.on_game_end?.call()
+            return this.win
+        }
+        // console.log("[BasicGame] update2")
+        // this._terminationHandling()
+        this._eventHandling()
+
+        this._clearAll()
+        this._updateAll()
+
+        for (const keycode of this.key_to_clean) {
+            this.keystate[keycode] = false
+        }
+
+        this.key_to_clean = []
+
+    }
+
     startGame =  () => {
+        
         this.reset();
-        // let clock = gamejs.time.Clock();
-        // if (this.playback_actions)
-        // 		this.frame_rate = 5;
+        this.paused = false
+
+        this.key_to_clean = []
 
         let win = false;
         let i = 0;

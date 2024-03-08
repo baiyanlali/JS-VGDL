@@ -68,7 +68,6 @@ class App extends Component{
                 rendererConfig={this.state.rendererConfig}
                 selectedLevelId={this.state.selectedLevelId}
                 onTrajectoryComplete={this.onTrajectoryComplete}
-
                 width = {this.state.rendererConfig.TileSize * 32}
                 height = {this.state.rendererConfig.TileSize * 32}
                 vgdl = {this.game}
