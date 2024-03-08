@@ -65,14 +65,17 @@ export default class HumanPlayerScene extends Phaser.Scene{
                   objectTemplateName,
                   object.location.x,
                   object.location.y,
-                  object.orientation
+                  object.orientation,
+                  object.ID
                 );
 
-            this.renderData.objects[object.ID] = {
-              object,
-              sprite,
-            };
-      }
+                // sprite.object_id = object.ID
+
+                this.renderData.objects[object.ID] = {
+                  object,
+                  sprite,
+                };
+              }
     });
 
     for (const k in this.renderData.objects) {
@@ -86,13 +89,15 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
     preload = ()=> {
       if (this.grenderer) {
-        this.grenderer.loadTemplates(this.vgdl.getFullState()['objects']);
+        const sprites = [...Object.keys(this.vgdl.sprite_constr)]
+        
+        const objects = sprites.map(s=>{
+            return {name: s, shrinkfactor: 1.0, img: this.vgdl.sprite_constr[s][1]['img']}
+        })
+        this.grenderer.loadTemplates(objects);
       }
     }
 
-    initCollision = ()=> {
-        this.physics.add()
-    }
 
     initInput = () => {
         this.A = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
@@ -131,7 +136,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
       // this.game.input.keyboard.onKeyUp = k => {if(this.inputMap[k]) this.vgdl.pressKeyUp(this.inputMap[k])}
       
         if(this.grenderer){
-            this.grenderer.init(this.gridWidth, this.gridHeight)
+            this.grenderer.init(this.gridWidth, this.gridHeight, undefined, this.handlecollision)
             this.updateState(this.vgdl.getFullState())
         }
       
@@ -140,18 +145,29 @@ export default class HumanPlayerScene extends Phaser.Scene{
         }
     }
 
+    handlecollision = (a, b)=> {
+        this.vgdl.addCollisions(this.renderData.objects[a].object,
+          this.renderData.objects[b].object)
+    }
+
     update = (time, delta)=> {
       // console.log("[HumanPlayerScene] Update")
+      
       if(this.vgdl){
         this.handleInput()
         // console.log("[HumanPlayerScene] Update")
         this.vgdl.update(delta)
       }
+
       if(this.grenderer){
           this.currentState = this.vgdl.getFullState()
           if(this.currentState)
-              this.updateState(this.currentState)
+          {
+            this.updateState(this.currentState)
+          }
       }
+
+      
     }
 
 }

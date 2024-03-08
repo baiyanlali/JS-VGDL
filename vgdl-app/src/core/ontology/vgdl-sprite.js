@@ -24,11 +24,10 @@ export class VGDLSprite{
 	physicstype = GridPhysics;
 	speed = 0;
 	cooldown = 0;
-	ID = new_id();
+	ID = 0
 	direction = null;
 	color = '#8c148c';
 	orientation = [0,0]
-	ID = 0
 	location = {x:0, y:0}
 
 	constructor(pos, size, args= {}) {
@@ -36,7 +35,7 @@ export class VGDLSprite{
 		this.name = args.key || null;
 		this.location = pos ? {x: pos[0], y: pos[1]} : this.location
 		this.size = size ?? this.size
-		this.lastlocation = clone(this.location)
+		this.lastlocation = {x: this.location.y, y: this.location.y}
 		this.physicstype = args.physicstype || this.physicstype || GridPhysics;
 		this.physics = new this.physicstype();
 		this.physics.gridsize = size;
@@ -147,7 +146,7 @@ export class Flicker extends VGDLSprite{
 		args.color = args.color || RED;
 		super(pos, size, args)
 		this._age = 0;
-		this.limit = 1;
+		this.limit = args.limit || 1;
 	}
 
 	update (game) {
@@ -278,9 +277,17 @@ export class OrientedFlicker extends OrientedSprite{
 		super(pos, size, args);
 		this.draw_arrow = true;
 		this.speed = 0;
+		this._age = 0;
+		this.limit = args.limit || 1;
 	}
 
-	_draw = super._draw
+	update (game) {
+		super.update(game)
+		if (this._age > this.limit)
+			killSprite(this, null, game);
+
+		this._age ++;
+	}
 }
 
 

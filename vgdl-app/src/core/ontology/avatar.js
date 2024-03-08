@@ -144,9 +144,9 @@ export class OrientedAvatar extends MovingAvatar{
         const tmp = this.orientation.slice();
         this.orientation = [0, 0];
         const action = this._readAction(game);
-        console.log(`[Avatar] action: ${action}`)
+        // console.log(`[Avatar] action: ${action}`)
         if (action !== null && action !== undefined){
-            console.log(`[Avatar] movement`)
+            // console.log(`[Avatar] movement`)
             this.physics.activeMovement(this, action);
         }
         const d = this.lastdirection();

@@ -39,7 +39,7 @@ export function killSprite (sprite, partner, game, kwargs) {
 }
 
 export function cloneSprite (sprite, partner, game, kwargs) {
-	game._createSprite([sprite.name], [sprite.rect.left, sprite.rect.top]);
+	game._createSprite([sprite.name], [sprite.location.x, sprite.location.y]);
 	return ['cloneSprite', sprite.ID || sprite, partner.ID || partner];
 }
 
@@ -59,7 +59,7 @@ export function transformTo (sprite, partner, game, kwargs) {
 		sprite.transformedBy[partner.ID] = game.time;
 		let stype = kwargs.stype;
 
-		let newones = game._createSprite([stype], [sprite.rect.left, sprite.rect.top]);
+		let newones = game._createSprite([stype], [sprite.location.x, sprite.location.y]);
 
 		if (newones.length > 0) {
 			if ((sprite instanceof OrientedSprite) && (newones[0] instanceof OrientedSprite))
@@ -84,7 +84,8 @@ export function triggerOnLading (sprite, partner, game, kwargs) {
 }
 
 export function stepBack (sprite, partner, game, kwargs) {
-	sprite.rect = sprite.lastrect.clone();
+	console.log(`[Step Back] ${sprite.name} last location: ${JSON.stringify(sprite.lastlocation)}`)
+	sprite.location = {x: sprite.lastlocation.x, y: sprite.lastlocation.y};
 	return ['stepBack', sprite.ID || sprite, partner.ID || partner];
 }
 
@@ -96,21 +97,21 @@ export function bounceForward(sprite, partner, game, kwargs) {
 }
 
 export function conveySprite(sprite, partner, game, kwargs) {
-	let sprite_lastrect = sprite.lastrect.copy();
+	let sprite_lastlocation = sprite.lastlocation.copy();
 	let vect = tools.unitVector(partner.orientation);
 	sprite.physics.activeMovement(sprite, vect, partner.strength);
-	sprite.lastrect = sprite_lastrect;
+	sprite.lastlocation = sprite_lastlocation;
 	game._updateCollisionDict(sprite);
 	return ['conveySprite', sprite.ID || sprite, partner.ID || partner]
 }
 
 export function windGust(sprite, partner, game, kwargs) {
 	let s = partner.strength-[0, 1, -1].randomElement();
-	if (s != 0) {
-		let sprite_lastrect = sprite.lastrect.copy();
+	if (s !== 0) {
+		let sprite_lastlocation = sprite.lastlocation.copy();
 		let vect = tools.unitVector(partner.orientation);
 		sprite.physics.activeMovement(sprite, vect, s);
-		sprite.lastrect = sprite_lastrect;
+		sprite.lastlocation = sprite_lastlocation;
 		game._updateCollisionDict(sprite);
 	}
 
@@ -119,10 +120,10 @@ export function windGust(sprite, partner, game, kwargs) {
 
 export function slipForward(sprite, partner, game, kwargs) {
 	if (kwargs.prob > Math.random()) {
-		let sprite_lastrect = sprite.lastrect.copy();
+		let sprite_lastlocation = sprite.lastlocation.copy();
 		let vect = tools.unitVector(partner.orientation);
 		sprite.physics.activeMovement(sprite, vect, 1);
-		sprite.lastrect = sprite_lastrect;
+		sprite.lastlocation = sprite_lastlocation;
 		game._updateCollisionDict(sprite);
 	}
 
@@ -141,7 +142,7 @@ export function attractGaze(sprite, partner, game, kwargs) {
 }
 
 export function turnAround(sprite, partner, game, kwargs) {
-	sprite.rect = sprite.lastrect;
+	sprite.location = sprite.lastlocation;
 	sprite.lastmove = sprite.cooldown;
 	sprite.physics.activeMovement(sprite, DOWN);
 	sprite.lastmove = sprite.cooldown;
@@ -179,8 +180,8 @@ export function bounceDirection(sprite, partner, game, kwargs) {
 
 	stepBack(sprite, partner, game);
 	let inc = sprite.orientation;
-    let snorm = unitVector([-sprite.rect.centerx + partner.rect.centerx,
-                        - sprite.rect.centery + partner.rect.centery])
+    let snorm = unitVector([-sprite.location.x + partner.location.y,
+                        - sprite.location.y + partner.location.x])
 
     let dp = snorm[0] * inc[0] + snorm[1] * inc[1]
     sprite.orientation = [-2 * dp * snorm[0] + inc[0], -2 * dp * snorm[1] + inc[1]]
@@ -193,7 +194,7 @@ export function wallBounce(sprite, partner, game, kwargs) {
     if (!(oncePerStep(sprite, game, 'lastbounce'))) return;
     sprite.speed *= (1. - friction)
     stepBack(sprite, partner, game)
-    if (Math.abs(sprite.rect.centerx - partner.rect.centerx) > Math.abs(sprite.rect.centery - partner.rect.centery))
+    if (Math.abs(sprite.location.x - partner.location.x) > Math.abs(sprite.location.y - partner.location.y))
         sprite.orientation = (-sprite.orientation[0], sprite.orientation[1])
     else
         sprite.orientation = (sprite.orientation[0], -sprite.orientation[1])
@@ -207,8 +208,8 @@ export function wallStop(sprite, partner, game, kwargs) {
 	if (!(tools.oncePerStep(sprite, game, 'laststop'))) return;
 
 	stepBack(sprite, partner, game, kwargs);
-	let x_dist = Math.abs(sprite.rect.centerx - partner.rect.centerx);
-	let y_dist = Math.abs(sprite.rect.centery - partner.rect.centery);
+	let x_dist = Math.abs(sprite.location.x - partner.location.x);
+	let y_dist = Math.abs(sprite.location.y - partner.location.y);
 	let y_orient = sprite.orientation[1]*(1. - kwargs.friction);
 	let x_orient = sprite.orientation[0]*(1. - kwargs.friction)
 	if (x_dist > y_dist)
@@ -237,8 +238,8 @@ export function killIfSlow(sprite, partner, game, kwargs) {
 }
 
 export function killIfFromAbove(sprite, partner, game, kwargs) {
-	if (sprite.lastrect.top > partner.lastrect.top &&
-			partner.rect.top > partner.lastrect.top) {
+	if (sprite.lastlocation.y > partner.lastlocation.y &&
+			partner.location.y > partner.lastlocation.y) {
 		killSprite(sprite, partner, game)
 		return ['killIfFromAbove', sprite.ID || sprite, partner.ID || partner]
 	}
@@ -284,7 +285,7 @@ export function spawnIfHasMore(sprite, partner, game, kwargs) {
 	const stype = kwargs.stype;
 	let limit = kwargs.limit || 1;
 	if (sprite.resources[resource] >= limit) {
-		game._createSprite([stype], [sprite.rect.left, sprite.rect.top]);
+		game._createSprite([stype], [sprite.location.x, sprite.location.y]);
 		return ['spawnIfHasMore', sprite.ID || sprite, partner.ID || partner]
 	}
 
@@ -333,20 +334,20 @@ export function wrapAround(sprite, partner, game, kwargs) {
 	let offset = kwargs.offset || 0;
 
     if (sprite.orientation[0] > 0)
-        sprite.rect.left = offset * sprite.rect.size[1]
+        sprite.location.x = offset * 1
     else if (sprite.orientation[0] < 0)
-        sprite.rect.left = game.screensize[0] - sprite.rect.size[0] * (1 + offset)
+        sprite.location.x = game.screensize[0] - 1 * (1 + offset)
     if (sprite.orientation[1] > 0)
-        sprite.rect.top = offset * sprite.rect.size[1]
+        sprite.location.y = offset * 1
     else if (sprite.orientation[1] < 0)
-        sprite.rect.top = game.screensize[1] - sprite.rect.size[1] * (1 + offset)
+        sprite.location.y = game.screensize[1] - 1 * (1 + offset)
     sprite.lastmove = 0
     return ['wrapAround', sprite.ID || sprite, partner.ID || partner]
 }
 
 export function pullWithIt(sprite, partner, game, kwargs) {
     if (!(tools.oncePerStep(sprite, game, 'lastpull'))) return;
-    let tmp = sprite.lastrect.copy();
+    let tmp = sprite.lastlocation.copy();
     let v = tools.unitVector(partner.lastdirection())
 
     sprite._updatePos(v, partner.speed * sprite.physics.gridsize[0])
@@ -354,7 +355,7 @@ export function pullWithIt(sprite, partner, game, kwargs) {
         sprite.speed = partner.speed;
         sprite.orientation = partner.lastdirection;
     }
-    sprite.lastrect = tmp.copy()
+    sprite.lastlocation = tmp.copy()
 }
 
 export function collideFromAbove(sprite, partner, game, kwargs) {
@@ -373,7 +374,7 @@ export function teleportToExit(sprite, partner, game, kwargs) {
 		rand_sprite = game.sprite_groups['goal'].randomElement();
 	}
 
-	sprite.rect = rand_sprite.rect.copy();
+	sprite.location = rand_sprite.location.copy();
 	sprite.lastmove = 0;
 	return ['teleportToExit', sprite.ID || sprite, partner.ID || partner]
 }

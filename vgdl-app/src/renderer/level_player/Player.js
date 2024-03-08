@@ -17,10 +17,8 @@ export default class Player extends Component{
                 expandParent: false
             },
             physics:{
-                default: 'arcade',
-                arcade: {
-                    gravity: {y: 0}
-                }
+                default: 'matter',
+                matter: {debug: true}
             },
             scene: [HumanPlayerScene]
         }

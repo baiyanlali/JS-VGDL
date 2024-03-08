@@ -47,7 +47,7 @@ BasicGame block_size=10
         monsterQuick > RandomNPC cooldown=2 cons=6 img=oryx/bat1
         monsterNormal > RandomNPC cooldown=4 cons=8 img=oryx/spider2
         monsterSlow > RandomNPC cooldown=8 cons=12 img=oryx/scorpion1
-      wall > Immovable autotiling=true img=oryx/wall3
+    wall > Immovable autotiling=true img=oryx/wall3
 
 
   LevelMapping

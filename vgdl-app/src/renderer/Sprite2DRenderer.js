@@ -13,11 +13,23 @@ class Sprite2DRenderer extends RendererBase {
         this.tileLocations = new Map();
     }
 
-    init(gridWidth, gridHeight, container) {
+    init(gridWidth, gridHeight, container, oncollision = (a, b)=> {}) {
         super.init(gridWidth, gridHeight, container);
-
         this.updateBackgroundTiling({ minx: 0, miny: 0, gridWidth, gridHeight });
+
+        this.scene.matter.world.on('collisionstart', this.handleCollision)
+
+        this.oncollision = oncollision
     }
+
+    handleCollision = (collision)=> {
+        collision.pairs.forEach(pair=>{
+            const bodyA = pair.bodyA.label
+            const bodyB = pair.bodyB.label
+
+            this.oncollision(bodyA, bodyB)
+        })
+    } 
 
     updateBackgroundTiling = (state) => {
         return
@@ -80,7 +92,7 @@ class Sprite2DRenderer extends RendererBase {
         return `${x},${y}`;
     };
 
-    addObject = (objectName, objectTemplateName, x, y, orientation) => {
+    addObject = (objectName, objectTemplateName, x, y, orientation, id) => {
 
         // console.log(`[Sprite2D Renderer] Add Sprite ${objectName}`)
 
@@ -97,10 +109,18 @@ class Sprite2DRenderer extends RendererBase {
             // Scale: ${this.renderConfig.TileSize * objectTemplate.scale}, ${this.renderConfig.TileSize * objectTemplate.scale}`)
 
 
-            sprite = this.scene.add.sprite(
+            sprite = this.scene.matter.add.sprite(
                 this.getCenteredX(x),
                 this.getCenteredY(y),
-                this.getTilingImage(objectTemplate, x, y)
+                this.getTilingImage(objectTemplate, x, y),
+                undefined,
+                {
+                    label: id,
+                    scale: {
+                        x: this.renderConfig.TileSize * objectTemplate.scale * 0.5,
+                        y: this.renderConfig.TileSize * objectTemplate.scale * 0.5
+                    }
+                }
             );
 
 
@@ -130,10 +150,18 @@ class Sprite2DRenderer extends RendererBase {
                 this.container.add(sprite);
             }
         } else {
-            sprite = this.scene.add.sprite(
+            sprite = this.scene.matter.add.sprite(
                 this.getCenteredX(x),
                 this.getCenteredY(y),
-                "unknown"
+                "unknown",
+                undefined,
+                {
+                    label: id,
+                    scale: {
+                        x: this.renderConfig.TileSize * objectTemplate.scale * 0.8,
+                        y: this.renderConfig.TileSize * objectTemplate.scale * 0.8
+                    }
+                }
             );
 
             sprite.setDisplaySize(

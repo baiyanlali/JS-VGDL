@@ -228,7 +228,7 @@ export class VGDLParser{
             if ('singleton' in args) {
                 if (args['singleton'] === true)
                     this.game.singletons.push(key)
-                args = tools.clone(args)
+                args = JSON.parse(JSON.stringify(args))
                 delete args['singleton']
             }
 
@@ -241,7 +241,7 @@ export class VGDLParser{
                 }
 
                 if (this.game.sprite_order.contains(key))
-                this.game.sprite_order.remove(key)
+                    this.game.sprite_order.remove(key)
                 this.game.sprite_order.push(key)
             } else {
                 this.parseSprites(s.children, sclass, args, stypes)

@@ -5,6 +5,7 @@ import {Avatar, MovingAvatar} from "./ontology/avatar.js";
 import {Termination} from "./ontology/termination.js";
 import {scoreChange, stochastic_effects} from "./ontology/effect.js";
 import {Resource} from "./ontology/resource";
+import { distance } from "./ontology/physics.js";
 
 const MAX_SPRITES = 10000
 
@@ -297,6 +298,7 @@ export class BasicGame{
 
         return obj_list;
     }
+
     getFullState = () => {
         const ias = this.ignoredattributes;
         const obs = {};
@@ -439,6 +441,55 @@ export class BasicGame{
             return value;
         }
         return r;
+    }
+
+
+    _effectHandling = ()=> {
+        if(this.collision_set.length === 0)
+            return
+        
+        const get_effect = (stypes1, stypes2) => {
+            const res = []
+            this.collision_eff.forEach(eff=>{
+                const class1 = eff[0]
+                const class2 = eff[1]
+                if(stypes1.includes(class1) && stypes2.includes(class2))
+                    res.push({reverse: false, effect: eff[2], kwargs: eff[3]})
+                else if(stypes1.includes(class2) && stypes2.includes(class1))
+                    res.push({reverse: true, effect: eff[2], kwargs: eff[3]})
+            })
+            return res
+        }
+
+        for (const collision of this.collision_set) {
+            const stypes1 = collision[0].stypes
+            const stypes2 = collision[1].stypes
+
+            const effects = get_effect(stypes1, stypes2)
+
+            if(effects.length === 0) continue
+
+            for (const effect_set of effects) {
+                let [sprite, partner] = [collision[0], collision[1]]
+                if(effect_set.reverse){
+                    [sprite, partner] = [collision[1], collision[0]]
+                }
+                const multi_effect = [[effect_set.effect, effect_set.kwargs]]
+                const kwargs = effect_set.kwargs
+                
+                if('scoreChange' in kwargs){
+                    multi_effect.push([scoreChange, kwargs['scoreChange']])
+                }
+
+                multi_effect.forEach(e=>{
+                    const [effect, args] = e
+                    effect(sprite, partner, this, args)
+                })
+
+            }
+        }
+        
+        this.collision_set = []
     }
 
     _eventHandling = () => {
@@ -640,7 +691,33 @@ export class BasicGame{
 
 
     updateTime = 1000
-    currentTime = 0 
+    currentTime = 0
+
+    collision_set = []
+
+    addCollisions = (a, b)=> {
+        return
+        this.collision_set.push([a, b])
+    }
+
+    updateCollision = ()=> {
+        //TODO: 使用最简单的方法实现，到非格子的方法可能会有问题
+        const allSprites = this._iterAll()
+
+        for (let i = 0; i < allSprites.length; i++) {
+            const sprite1 = allSprites[i];
+            for (let j = i + 1; j < allSprites.length; j++) {
+                const sprite2 = allSprites[j];
+                const dist = distance(sprite1, sprite2)
+                
+                if(dist < 0.1){
+                    this.collision_set.push([sprite1, sprite2])
+                }
+
+            }
+            
+        }
+    }
 
     update = (delta, now = false) => {
         if(!now){
@@ -658,16 +735,20 @@ export class BasicGame{
         }
         // console.log("[BasicGame] update2")
         // this._terminationHandling()
-        this._eventHandling()
-
+        
         this._clearAll()
         this._updateAll()
+
+        this.updateCollision()
+
+        this._effectHandling()
 
         for (const keycode of this.key_to_clean) {
             this.keystate[keycode] = false
         }
 
         this.key_to_clean = []
+        this.collision_set = []
 
     }
 
@@ -678,30 +759,6 @@ export class BasicGame{
 
         this.key_to_clean = []
 
-        let win = false;
-        let i = 0;
-
-        let lastKeyPress = [0, 0, 1];
-        let lastKeyPressTime = 0;
-
-        // let f = stypes
-        // m = re.search('[A-Za-z0-9+)\.py', f)?
-
-        // let name = m.group(1);
-        let gamelog = "";
-
-        // -------------- Game-play ----------------
-        // from ontology import Immovable, Passive, Resource, ResourcePack, RandomNPC, Chaser, AStarChaser, OrientedSprite, Missile
-        // from ontology import initializeDistribution, updateDistribution, updateOptions, sampleFromDistribution
-        // import things
-        let finalEventList = [];
-        let agentStatePrev = [];
-        let agentState = {};
-
-        // this.getAvatars()[0].resources.forEach((resource) => {
-        // 	agentState[resource[0]] = resource[1];
-        // })
-        let keyPressPrev = null;
 
         //Prep for Sprite Induction 
         let sprite_types = [Immovable
@@ -715,13 +772,6 @@ export class BasicGame{
             // Missile
         ];
         this.all_objects = this.getObjects(); // Save all objects, some which may be killed in game
-
-        // figure out keypress type
-
-        // disableContinuousKeyPress = Object.keys(this.all_objects).every((k) => {
-        // 	return this.all_objects[k]['sprite'].physicstype.__name__ == 'GridPhysics';
-        // });
-        // console.log(disableContinuousKeyPress)
 
 
         const objects = this.getObjects();
@@ -756,12 +806,6 @@ export class BasicGame{
 
         this.keystate = {};
         this.keywait = {};
-        // disableContinuousKeyPress = false;
-
-        // Main Game Loop
-        let pre_time = new Date().getTime();
-        let new_time = 0;
-        let mpf = 1000/this.frame_rate;
 
     }
 
