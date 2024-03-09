@@ -3,12 +3,16 @@ import HumanPlayerScene from "./HumanPlayerScene.js";
 import Phaser from "phaser";
 export default class Player extends Component{
 
+
+    constructor(props){
+        super(props)
+    }
+
     updateCanvasSize = ()=> {
         this.game.scale.resize(this.props.width, this.props.height)
     }
 
     componentDidMount() {
-        console.log("[Player] did mount")
         const config = {
             type: Phaser.AUTO,
             parent: this.divElement,
@@ -16,10 +20,10 @@ export default class Player extends Component{
             scale:{
                 expandParent: false
             },
-            physics:{
-                default: 'matter',
-                matter: {debug: true}
-            },
+            // physics:{
+            //     default: 'matter',
+            //     matter: {debug: true}
+            // },
             scene: [HumanPlayerScene]
         }
         this.game = new Phaser.Game(config)
@@ -33,10 +37,12 @@ export default class Player extends Component{
         })
     }
 
+    onGameEnd = (state)=>{
+
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.updateCanvasSize()
-
-        console.log("[Player] Did update")
     }
 
     render() {

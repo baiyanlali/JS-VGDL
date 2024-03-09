@@ -502,189 +502,6 @@ export class BasicGame{
         this.collision_set = []
     }
 
-    _eventHandling = () => {
-
-        this.effectList = [];
-
-        const push_effect = 'bounceForward';
-        const back_effect = 'stepBack';
-
-        // list of objects sets
-        let force_collisions = [];
-
-        // object sets
-        let new_collisions = {0: 0};
-        let collisions = {};
-
-        let new_effects = [];
-
-        // make a copy of the kill list
-        let dead = this.kill_list.slice();
-        let loop = 0 // Simply to prevent infinitely looping
-        while (Object.keys(new_collisions).length && loop < 7) {
-            loop ++;
-            if (loop > 5) {
-                console.log('resolving too many collisions');
-            }
-
-            new_collisions = {};
-            new_effects = [];
-
-            // update collision sprites
-            this.lastcollisions = this._getAllSpriteGroups();
-
-            this.collision_eff.forEach((eff) => {
-                let [class1, class2, effect, kwargs] = eff;
-
-                // Special cases
-                if (class2 === 'EOS') {
-                    let ss1 = this.lastcollisions[class1];
-                    ss1.forEach((s1) => {
-                        // if (!(new gamejs.Rect([0, 0], this.screensize).collideRect(s1.rect))) {
-                        //     let e = effect(s1, this.EOS, this, kwargs);
-                        //     if (e !== null) {
-                        //         this.effectList.push(e);
-                        //     }
-                        // }
-                    });
-
-                    return;
-                }
-
-                let sprite_array1 = this.lastcollisions[class1];
-                let sprite_array2 = this.lastcollisions[class2];
-
-
-
-                let score = 0;
-                if ('scoreChange' in kwargs) {
-                    kwargs = Object.assign({}, kwargs);
-                    kwargs.score = kwargs['scoreChange'];
-                    effect = this._multi_effect(effect, scoreChange)
-                    delete kwargs['scoreChange'];
-                }
-                let dim = null;
-                if ('dim' in kwargs) {
-                    kwargs = Object.assign({}, kwargs);
-                    dim = kwargs['dim'];
-                    delete kwargs['dim'];
-                }
-
-                sprite_array1.forEach(sprite1 => {
-                    let rects = sprite_array2.map(os => {return os.rect});
-                    return
-                    if (sprite1.rect.collidelistall(rects) === -1) return ;
-                    sprite1.rect.collidelistall(rects).forEach((ci) => {
-                        let sprite2 = sprite_array2[ci];
-                        if (sprite1 === sprite2
-                            || dead.contains(sprite1)
-                            || dead.contains(sprite2)
-                            || (sprite1 in collisions
-                                && collisions[sprite1].contains(sprite2))) {
-                            return;
-                        }
-
-                        // update new collision set
-                        if (sprite1 in new_collisions) {
-                            new_collisions[sprite1].push(sprite2)
-                        }
-                        else {
-                            new_collisions[sprite1] = [sprite2]
-                        }
-
-
-                        if (score > 0)
-                            this.score += score;
-                        this.bonus_score += score;
-
-                        if ('applyto' in kwargs) {
-                            let stype = kwargs['applyto'];
-
-                            let kwargs_use = clone(kwargs);
-                            delete kwargs_use['applyto'];
-                            let e;
-                            this.getSprites(stype).forEach((sC) => {
-                                e = effect(sC, sprite1, this, kwargs_use);
-                            });
-                            this.effectList.push(e);
-                            return;
-                        }
-
-
-                        if (dim) {
-                            let sprites = this.getSprites(class1);
-                            let spritesFiltered = sprites.filter((sprite) => {
-                                return sprite[dim] === sprite2[dim];
-                            });
-
-                            spritesFiltered.forEach((sC) => {
-                                let e;
-                                if (!(sprite1 in dead)) {
-                                    e = effect(sprite1, sC, this, kwargs);
-                                }
-                                this.effectList.push(e);
-                            });
-                        }
-
-                        if (effect.name === 'changeResource') {
-                            let resource = kwargs['resource'];
-                            let [sclass, args, stypes] = this.sprite_constr[resource];
-                            let resource_color = args['color'];
-                            new_effects.push(effect(sprite1, sprite2, resource_color, this, kwargs));
-                        } else if (effect.name === 'transformTo') {
-                            new_effects.push(effect(sprite1, sprite2,this, kwargs));
-                            let new_sprite = this.getSprites(kwargs['stype'])[-1]
-                            new_collisions[sprite1].push(new_sprite);
-                            dead.push(sprite1)
-
-                        } else if (effect.name === push_effect) {
-                            let contained = false;
-                            if (force_collisions.length) {
-                                force_collisions.forEach(collision_set => {
-                                    if (collision_set.contains(sprite2)) {
-                                        collision_set.push(sprite1)
-                                        contained = true;
-                                    }
-                                })
-                            }
-                            if (!(contained)) {
-                                force_collisions.push([sprite1, sprite2]);
-                            }
-                            new_effects.push(effect(sprite1, sprite2, this, kwargs));
-                        } else if (effect.name === back_effect) {
-                            let contained = false;
-
-                            if (force_collisions.length) {
-                                force_collisions.forEach(collision_set => {
-                                    if (collision_set.contains(sprite1)) {
-                                        collision_set.forEach(sprite => {
-                                            new_effects.push(effect(sprite, sprite2, this, kwargs));
-                                        })
-                                        contained = true;
-                                    }
-                                })
-                            }
-                            if (!(contained)) {
-                                new_effects.push(effect(sprite1, sprite2, this, kwargs));
-                            }
-                        } else {
-                            new_effects.push(effect(sprite1, sprite2, this, kwargs));
-                        }
-
-                    });
-                });
-            });
-            this.effectList = this.effectList.concat(new_effects);
-            Object.keys(new_collisions).forEach(collision_sprite => {
-                if (collision_sprite in collisions)
-                    collisions = collisions[collision_sprite].concat(new_collisions[collision_sprite])
-                else
-                    collisions[collision_sprite] = new_collisions[collision_sprite]
-            })
-        }
-        return this.effectList;
-    }
-
     run = (on_game_end) => {
         this.on_game_end = on_game_end;
         return this.startGame;
@@ -696,11 +513,11 @@ export class BasicGame{
 
     presskeyUp = (keyCode) => {
         this.key_to_clean.push(keyCode)
-        this.update(0, true)
+        // this.update(0, true)
     }
 
 
-    updateTime = 1000
+    updateTime = 1000/ 6
     currentTime = 0
 
     collision_set = []
@@ -742,14 +559,12 @@ export class BasicGame{
         }
         
 
-        // console.log(`[BasicGame] update paused: ${this.paused}, ended: ${this.ended}`)
-        // if(this.paused) return 'paused'
+        if(this.paused) return 'paused'
         if(this.ended){
-            this.on_game_end?.call()
+            this.on_game_end?.call(this.getFullState)
             return this.win
         }
-        // console.log("[BasicGame] update2")
-        // this._terminationHandling()
+        this._terminationHandling()
         
         this._clearAll()
         this._updateAll()
@@ -775,17 +590,7 @@ export class BasicGame{
         this.key_to_clean = []
 
 
-        //Prep for Sprite Induction 
-        let sprite_types = [Immovable
-            // Passive, 
-            // Resource, 
-            // ResourcePack, 
-            // RandomNPC, 
-            // Chaser, 
-            // AstarChaser, 
-            // OrintedSprite, 
-            // Missile
-        ];
+        let sprite_types = [Immovable];
         this.all_objects = this.getObjects(); // Save all objects, some which may be killed in game
 
 

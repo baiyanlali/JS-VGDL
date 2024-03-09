@@ -141,8 +141,13 @@ export default class HumanPlayerScene extends Phaser.Scene{
         }
       
         if(this.vgdl){
-          this.vgdl.startGame()
+          const start_game = this.vgdl.run(this.handle_game_end)
+          // start_game()
         }
+    }
+
+    handle_game_end = (state)=> {
+      
     }
 
     handlecollision = (a, b)=> {

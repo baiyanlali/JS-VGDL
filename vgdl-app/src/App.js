@@ -4,6 +4,8 @@ import {aliens_map, game} from './core/aliens';
 import Player from "./renderer/level_player/Player";
 import {Component} from "react";
 import Phaser from 'phaser';
+import VGDLEditor from './VGDLEditor';
+import { Container, Row, Col } from 'react-bootstrap';
 
 class App extends Component{
 
@@ -57,24 +59,45 @@ class App extends Component{
 
   render() {
     return (
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <p>
-              Edit <code>src/App.js</code> and save to reload.
-            </p>
-            <Player
-                rendererName={this.state.rendererName}
-                rendererConfig={this.state.rendererConfig}
-                selectedLevelId={this.state.selectedLevelId}
-                onTrajectoryComplete={this.onTrajectoryComplete}
-                width = {this.state.rendererConfig.TileSize * 32}
-                height = {this.state.rendererConfig.TileSize * 32}
-                vgdl = {this.game}
-            >
-            </Player>
-          </header>
-        </div>
+        <Container className="App">
+          <Row>
+            <Col name="Menu" md={4}>
+
+            </Col>
+
+            <Col name="Project Name" md={4}>
+              "VGDL Example"
+            </Col>
+
+            <Col name="Link" md={4}>
+
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <Player
+                    rendererName={this.state.rendererName}
+                    rendererConfig={this.state.rendererConfig}
+                    selectedLevelId={this.state.selectedLevelId}
+                    onTrajectoryComplete={this.onTrajectoryComplete}
+                    width = {this.state.rendererConfig.TileSize * 32}
+                    height = {this.state.rendererConfig.TileSize * 32}
+                    vgdl = {this.game}
+                />
+            </Col>
+            <Col md={6}>
+              <VGDLEditor/>
+            </Col>
+          </Row>
+
+          <Row>
+
+          </Row>
+
+              
+
+        </Container>
     );
   }
 

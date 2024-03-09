@@ -17,7 +17,7 @@ class Sprite2DRenderer extends RendererBase {
         super.init(gridWidth, gridHeight, container);
         this.updateBackgroundTiling({ minx: 0, miny: 0, gridWidth, gridHeight });
 
-        this.scene.matter.world.on('collisionstart', this.handleCollision)
+        // this.scene.matter.world.on('collisionstart', this.handleCollision)
 
         this.oncollision = oncollision
     }
@@ -109,7 +109,7 @@ class Sprite2DRenderer extends RendererBase {
             // Scale: ${this.renderConfig.TileSize * objectTemplate.scale}, ${this.renderConfig.TileSize * objectTemplate.scale}`)
 
 
-            sprite = this.scene.matter.add.sprite(
+            sprite = this.scene.add.sprite(
                 this.getCenteredX(x),
                 this.getCenteredY(y),
                 this.getTilingImage(objectTemplate, x, y),
@@ -150,7 +150,7 @@ class Sprite2DRenderer extends RendererBase {
                 this.container.add(sprite);
             }
         } else {
-            sprite = this.scene.matter.add.sprite(
+            sprite = this.scene.add.sprite(
                 this.getCenteredX(x),
                 this.getCenteredY(y),
                 "unknown",
