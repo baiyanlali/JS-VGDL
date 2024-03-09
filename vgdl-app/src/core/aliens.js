@@ -75,7 +75,7 @@ import {VGDLParser} from "./core.js"
 //     SpriteCounter stype=goal   win=True
 //     SpriteCounter stype=avatar win=False`
 
-const aliens_game = `
+export const aliens_game = `
 BasicGame block_size=5
     SpriteSet
         background > Immovable img=oryx/space1 hidden=True

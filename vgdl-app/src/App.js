@@ -1,11 +1,13 @@
-import logo from './logo.svg';
 import './App.css';
-import {aliens_map, game} from './core/aliens';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {aliens_map, game, aliens_game} from './core/aliens';
 import Player from "./renderer/level_player/Player";
 import {Component} from "react";
-import Phaser from 'phaser';
 import VGDLEditor from './VGDLEditor';
-import { Container, Row, Col } from 'react-bootstrap';
+import {Container, Row, Col} from 'react-bootstrap';
+import Nav from 'react-bootstrap/Nav'
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import { VGDLParser } from './core/core';
 
 class App extends Component{
 
@@ -29,8 +31,8 @@ class App extends Component{
         phaserWidth: 1000,
         phaserHeight: 120,
       },
-      gdyHash: 0,
-      gdyString: "",
+      vgdlString: aliens_game,
+      vgdlLevel: aliens_map,
       levelId: 0,
       rendererName: "",
       rendererConfig: {
@@ -53,8 +55,40 @@ class App extends Component{
       projectName: "",
     };
 
-    this.game = game
+    this.parser = new VGDLParser()
+    this.game = this.parser.parseGame(aliens_game)
     this.game.buildLevel(aliens_map)
+  }
+
+  updatePhaserCanvasSize = ()=> {
+    const width = this.playerContentElement.offsetWidth
+    this.setState(state=> {
+      return {
+        ...state, 
+        levelPlayer:{
+          phaserWidth: width,
+          phaserHeight: window.innerHeight * 6 / 9
+        }
+      }
+
+    })
+  }
+
+  async componentDidMount(){
+    window.addEventListener('resize', this.updatePhaserCanvasSize, false)
+    this.updatePhaserCanvasSize()
+  }
+
+  playLevel = (levelString) => {
+    this.game.buildLevel(levelString)
+  }
+
+  updateLevelString = (levelString)=> {
+    console.log("update level string")
+  }
+
+  updateGame = (vgdlString)=> {
+
   }
 
   render() {
@@ -62,7 +96,23 @@ class App extends Component{
         <Container className="App">
           <Row>
             <Col name="Menu" md={4}>
+              <Nav>
+                <Nav.Item>
+                  <a href="https://griddly.ai">
+                    <img
+                      alt="Griddly Bear"
+                      src="logo_ai_white.png"
+                      height="40"
+                    />
+                  </a>
+                </Nav.Item>
 
+                <NavDropdown title="New">
+                  <NavDropdown.Item>New Project</NavDropdown.Item>
+                  <NavDropdown.Item>Existing Project</NavDropdown.Item>
+                </NavDropdown>
+                
+              </Nav>
             </Col>
 
             <Col name="Project Name" md={4}>
@@ -76,18 +126,32 @@ class App extends Component{
 
           <Row>
             <Col md={6}>
-              <Player
+
+              <div
+                ref={(playerContentElement)=> {
+                  this.playerContentElement = playerContentElement
+                }}
+              >
+                <Player
                     rendererName={this.state.rendererName}
                     rendererConfig={this.state.rendererConfig}
                     selectedLevelId={this.state.selectedLevelId}
                     onTrajectoryComplete={this.onTrajectoryComplete}
-                    width = {this.state.rendererConfig.TileSize * 32}
-                    height = {this.state.rendererConfig.TileSize * 32}
+                    width = {this.state.levelPlayer.phaserWidth}
+                    height = {this.state.levelPlayer.phaserHeight}
                     vgdl = {this.game}
                 />
+
+              </div>
+              
             </Col>
             <Col md={6}>
-              <VGDLEditor/>
+              <VGDLEditor
+                gdyString = {this.state.vgdlString}
+                levelString = {this.state.vgdlLevel}
+                updateGame = {this.updateGame}
+                updateLevelString = {this.updateLevelString}
+              />
             </Col>
           </Row>
 

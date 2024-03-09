@@ -1,11 +1,15 @@
 import {Component} from "react";
 import HumanPlayerScene from "./HumanPlayerScene.js";
 import Phaser from "phaser";
+import { Row, Col, Button } from "react-bootstrap";
 export default class Player extends Component{
-
 
     constructor(props){
         super(props)
+
+        this.state = {
+            result: ""
+        }
     }
 
     updateCanvasSize = ()=> {
@@ -37,8 +41,14 @@ export default class Player extends Component{
         })
     }
 
-    onGameEnd = (state)=>{
-
+    onGameEnd = (result)=>{
+        console.log(`Reuslt: ${JSON.stringify(result)}`)
+        this.setState(state=> {
+            return{
+                ...state,
+                result: result.win
+            }
+        })
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -47,12 +57,26 @@ export default class Player extends Component{
 
     render() {
         return (
-            <div id="Player"
-                ref={(divElement)=> {
-                    this.divElement = divElement;
-                    }}
-                    >
-            </div>
+            <>
+            <Row>
+                <Col>
+                    <Button onClick={()=> {
+                        this.props.vgdl.startGame()
+                    }}>Play</Button>
+
+                    <Button>Stop</Button>
+                    <>{this.state.result}</>
+                </Col>
+                <div
+                    ref={(divElement)=> {
+                        this.divElement = divElement;
+                        }}
+                        >
+                </div>
+            </Row>
+            
+            </>
+            
         )
     }
 

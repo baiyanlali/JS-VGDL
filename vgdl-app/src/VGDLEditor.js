@@ -1,22 +1,80 @@
 import Editor from "@monaco-editor/react"
 import { Component } from "react";
-
+import { Nav } from "react-bootstrap";
 export default class VGDLEditor extends Component{
     constructor(props){
         super(props)
 
+        const editorModels = {
+            VGDL: {
+                name: "VGDL",
+                language: "text",
+                value: this.props.gdyString
+            },
+            Level: {
+                name: "Level",
+                language: "text",
+                value: this.props.levelString
+            }
+        }
+
         this.state = {
             fileName: "VGDL",
-            
+            editorModels
+        }
+
+        this.updateVGDL = this.props.updateVGDL
+        this.updateLevelString = this.props.updateLevelString
+    }
+
+    changeModel(fileName){
+        this.setState(state=> {
+            return {
+                ...state,
+                fileName
+            }
+        })
+
+    }
+
+    handleEditorDidMount = (editor, monaco) => {
+        if(editor){
+            this.editor = editor
+
+            this.editor.addCommand(
+                monaco.KeyMod.CtrlCmd| monaco.KeyCode.Key.F,
+                ()=> {
+                    console.log("press editor")
+                    if(this.state.fileName === "VGDL"){
+                        this.updateVGDL(editor.getValue())
+                    }else if(this.state.fileName === "Level"){
+                        this.updateLevelString(editor.getValue())
+                    }
+                }
+            )
         }
     }
 
     render(){
+        const file = this.state.editorModels[this.state.fileName]
         return (
             <>
+                <Nav variant="tabs" defaultActiveKey="VGDL">
+                    <Nav.Item>
+                        <Nav.Link key="VGDL" onClick={()=> this.changeModel("VGDL")}>VGDL</Nav.Link>
+                    </Nav.Item>
+
+                    <Nav.Item>
+                        <Nav.Link key="Level" onClick={()=> this.changeModel("Level")}>Level</Nav.Link>
+                    </Nav.Item>
+                </Nav>
                 <Editor
+                    path = {file.name}
+                    value = {file.value}
+                    language = {file.language}
                     theme="vs-dark"
                     height="70vh"
+                    handleEditorDidMount = {this.handleEditorDidMount}
                 />
             </>
         )

@@ -11,6 +11,10 @@ export default class HumanPlayerScene extends Phaser.Scene{
         this.rendererName = data.rendererName
         this.renderConfig = data.rendererConfig
         this.avatarObject = data.avatarObject
+        this.renderConfig = {
+          ...this.renderConfig,
+          TileSize: Math.min(this.game.scale.height/data.vgdl.height, this.game.scale.width/data.vgdl.width)
+        }
         this.grenderer = new Sprite2DRenderer(this, this.rendererName, this.renderConfig, this.avatarObject)
         this.vgdl = data.vgdl
         this.gridHeight = data.vgdl.height
@@ -81,7 +85,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
     for (const k in this.renderData.objects) {
           const id = this.renderData.objects[k].object.ID;
           if (!newObjectIds.includes(id)) {
-            this.renderData.objects[k].sprite.destroy();
+            this.renderData.objects[k].sprite?.destroy();
             delete this.renderData.objects[k];
           }
     }
@@ -119,10 +123,10 @@ export default class HumanPlayerScene extends Phaser.Scene{
       // console.log('[HumanPlayerScene] Handle Input')
       for (const key of [this.A, this.D, this.W, this.S, this.SPACE]) {
         if(Phaser.Input.Keyboard.JustDown(key)){
-            console.log(`[HumanPlayerScene] Press ${this.inputMap[key.keyCode]}`)
+            // console.log(`[HumanPlayerScene] Press ${this.inputMap[key.keyCode]}`)
             this.vgdl.presskey(this.inputMap[key.keyCode])
         }else if(Phaser.Input.Keyboard.JustUp(key)){
-            console.log(`[HumanPlayerScene] PressUp ${this.inputMap[key.keyCode]}`)
+            // console.log(`[HumanPlayerScene] PressUp ${this.inputMap[key.keyCode]}`)
             this.vgdl.presskeyUp(this.inputMap[key.keyCode])
         }
       }
