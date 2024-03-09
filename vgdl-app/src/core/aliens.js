@@ -1,38 +1,6 @@
-import {VGDLParser} from "./core.js"
 
 
-// const aliens_game =
-// `BasicGame
-//     SpriteSet
-//         base    > Immovable    color=WHITE
-//         avatar  > FlakAvatar   stype=sam
-//         missile > Missile
-//             sam  > orientation=UP    color=BLUE singleton=True
-//             bomb > orientation=DOWN  color=RED  speed=0.5
-//         alien   > Bomber       stype=bomb   prob=0.01  cooldown=3 speed=0.75
-//         portal  > SpawnPoint   stype=alien  cooldown=16   total=20
-//
-//     LevelMapping
-//         0 > base
-//         1 > portal
-//
-//     TerminationSet
-//         SpriteCounter      stype=avatar               limit=0 win=False
-//         MultiSpriteCounter stype1=portal stype2=alien limit=0 win=True
-//
-//     InteractionSet
-//         avatar  EOS  > stepBack
-//         alien   EOS  > turnAround
-//         missile EOS  > killSprite
-//         missile base > killSprite
-//         base missile > killSprite
-//         base   alien > killSprite
-//         avatar alien > killSprite
-//         avatar bomb  > killSprite
-//         alien  sam   > killSprite
-// `
-
-// const aliens_game = `
+// export const aliens_game = `
 // BasicGame block_size=10
 //   SpriteSet
 //     background > Immovable randomtiling=0.9 img=oryx/floor3 hidden=True
@@ -75,6 +43,17 @@ import {VGDLParser} from "./core.js"
 //     SpriteCounter stype=goal   win=True
 //     SpriteCounter stype=avatar win=False`
 
+// export const aliens_map = `
+// wwwwwwwwwwwww
+// wA.......w..w
+// w..w........w
+// w...w...w.+ww
+// www.w2..wwwww
+// w.......w.g.w
+// w.2.........w
+// w.....2.....w
+// wwwwwwwwwwwww`
+
 export const aliens_game = `
 BasicGame block_size=5
     SpriteSet
@@ -115,33 +94,8 @@ BasicGame block_size=5
         avatar bomb  > killSprite scoreChange=-1
         alien  sam   > killSprite scoreChange=2`
 
-// export const aliens_map = `
-// wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-// w                              w
-// w1                             w
-// w000                           w
-// w000                           w
-// w                              w
-// w                              w
-// w                              w
-// w                              w
-// w    000      000000     000   w
-// w   00000    00000000   00000  w
-// w   0   0    00    00   00000  w
-// w                A             w
-// wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-// `
 
-// export const aliens_map = `
-// wwwwwwwwwwwww
-// wA.......w..w
-// w..w........w
-// w...w...w.+ww
-// www.w2..wwwww
-// w.......w.g.w
-// w.2.........w
-// w.....2.....w
-// wwwwwwwwwwwww`
+
 
 export const aliens_map = `
 1.............................
@@ -156,4 +110,3 @@ export const aliens_map = `
 ...0...0....00....00...00000..
 ................A.............`
 
-export const game = new VGDLParser().parseGame(aliens_game)

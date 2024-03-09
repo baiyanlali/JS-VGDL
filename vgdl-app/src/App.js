@@ -14,6 +14,8 @@ class App extends Component{
   constructor() {
     super();
 
+
+
     this.state = {
       levelPlayer: {
         phaserWidth: 500,
@@ -53,11 +55,10 @@ class App extends Component{
         template: "",
       },
       projectName: "",
+      game: new VGDLParser().parseGame(aliens_game)
     };
 
-    this.parser = new VGDLParser()
-    this.game = this.parser.parseGame(aliens_game)
-    this.game.buildLevel(aliens_map)
+    this.state.game.buildLevel(aliens_map)
   }
 
   updatePhaserCanvasSize = ()=> {
@@ -80,14 +81,59 @@ class App extends Component{
   }
 
   playLevel = (levelString) => {
-    this.game.buildLevel(levelString)
+    this.state.game.buildLevel(levelString)
   }
 
   updateLevelString = (levelString)=> {
-    console.log("update level string")
+    if(levelString === this.state.vgdlLevel){
+      return
+    }
+    this.state.game.buildLevel(levelString)
+    this.setState(e=>{
+      return {
+        ...e,
+        vgdlLevel: levelString
+      }
+    })
   }
 
   updateGame = (vgdlString)=> {
+    if(vgdlString === this.state.vgdlString){
+      return
+    }
+    const new_game = new VGDLParser().parseGame(vgdlString)
+    // new_game.buildLevel(this.state.vgdlLevel)
+    this.setState(e=> {
+      return {
+        ...e,
+        game: new_game,
+        vgdlString: vgdlString
+      }
+    })
+  }
+
+  updateGameAndLevel = (vgdl, level) => {
+    if(vgdl === this.state.vgdlString && level === this.state.levelString){
+      return
+    }else if(vgdl === this.state.vgdlString && level !== this.state.levelString){
+      this.updateLevelString(level)
+      return
+    }else if(vgdl !== this.state.vgdlString && level === this.state.levelString){
+      this.updateGame(vgdl)
+      return
+    }
+
+    const new_game = new VGDLParser().parseGame(vgdl)
+    new_game.buildLevel(level)
+
+    this.setState(e=>{
+      return {
+        ...e,
+        game: new_game,
+        vgdlString: vgdl,
+        levelString: level
+      }
+    })
 
   }
 
@@ -136,10 +182,9 @@ class App extends Component{
                     rendererName={this.state.rendererName}
                     rendererConfig={this.state.rendererConfig}
                     selectedLevelId={this.state.selectedLevelId}
-                    onTrajectoryComplete={this.onTrajectoryComplete}
                     width = {this.state.levelPlayer.phaserWidth}
                     height = {this.state.levelPlayer.phaserHeight}
-                    vgdl = {this.game}
+                    vgdl = {this.state.game}
                 />
 
               </div>
@@ -149,8 +194,9 @@ class App extends Component{
               <VGDLEditor
                 gdyString = {this.state.vgdlString}
                 levelString = {this.state.vgdlLevel}
-                updateGame = {this.updateGame}
+                updateVGDL = {this.updateGame}
                 updateLevelString = {this.updateLevelString}
+                updateGameAndLevel = {this.updateGameAndLevel}
               />
             </Col>
           </Row>

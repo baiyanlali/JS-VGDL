@@ -7,7 +7,9 @@ export default class HumanPlayerScene extends Phaser.Scene{
     constructor() {
         super("HumanPlayerScene");
     }
+
     init = (data) => {
+        // console.log('[HumanPlayerScene] Init')
         this.rendererName = data.rendererName
         this.renderConfig = data.rendererConfig
         this.avatarObject = data.avatarObject
@@ -92,6 +94,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
 
     preload = ()=> {
+      // console.log('[HumanPlayerScene] Preload')
       if (this.grenderer) {
         const sprites = [...Object.keys(this.vgdl.sprite_constr)]
         
@@ -104,11 +107,12 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
 
     initInput = () => {
-        this.A = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
-        this.D = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
-        this.W = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W)
-        this.S = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S)
-        this.SPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+        this.A = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false)
+        this.D = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false)
+        this.W = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, false)
+        this.S = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false)
+        this.SPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, false)
+
 
         this.inputMap = {}
 
@@ -134,10 +138,10 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
     create = () => {
 
+      // console.log('[HumanPlayerScene] Create')
+
       this.initInput()
 
-      // this.game.input.keyboard.onKeyDown = k => {if(this.inputMap[k]) this.vgdl.presskey(this.inputMap[k])}
-      // this.game.input.keyboard.onKeyUp = k => {if(this.inputMap[k]) this.vgdl.pressKeyUp(this.inputMap[k])}
       
         if(this.grenderer){
             this.grenderer.init(this.gridWidth, this.gridHeight, undefined, this.handlecollision)

@@ -24,17 +24,13 @@ export default class Player extends Component{
             scale:{
                 expandParent: false
             },
-            // physics:{
-            //     default: 'matter',
-            //     matter: {debug: true}
-            // },
             scene: [HumanPlayerScene]
         }
         this.game = new Phaser.Game(config)
         
         this.updateCanvasSize()
 
-        this.game.scene.start("HumanPlayerScene", {
+        this.sceneManager = this.game.scene.start("HumanPlayerScene", {
             rendererConfig: this.props.rendererConfig,
             rendererName: this.props.rendererName,
             vgdl: this.props.vgdl,
@@ -53,6 +49,13 @@ export default class Player extends Component{
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.updateCanvasSize()
+        if(this.props.vgdl !== prevProps.vgdl){
+            this.game.scene.start("HumanPlayerScene", {
+                rendererConfig: this.props.rendererConfig,
+                rendererName: this.props.rendererName,
+                vgdl: this.props.vgdl,
+            })
+        }
     }
 
     render() {

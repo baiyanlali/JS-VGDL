@@ -84,7 +84,7 @@ export function triggerOnLading (sprite, partner, game, kwargs) {
 }
 
 export function stepBack (sprite, partner, game, kwargs) {
-	console.log(`[Step Back] ${sprite.name} last location: ${JSON.stringify(sprite.lastlocation)}`)
+	// console.log(`[Step Back] ${sprite.name} last location: ${JSON.stringify(sprite.lastlocation)}`)
 	sprite.location = {x: sprite.lastlocation.x, y: sprite.lastlocation.y};
 	return ['stepBack', sprite.ID || sprite, partner.ID || partner];
 }

@@ -37,19 +37,24 @@ export default class VGDLEditor extends Component{
 
     }
 
+    onChangeContent = (newvalue, e)=> {
+        const file = this.state.editorModels[this.state.fileName]
+        file.value = newvalue
+    }
+
     handleEditorDidMount = (editor, monaco) => {
         if(editor){
             this.editor = editor
 
             this.editor.addCommand(
-                monaco.KeyMod.CtrlCmd| monaco.KeyCode.Key.F,
+                monaco.KeyMod.CtrlCmd| monaco.KeyCode.KeyS,
                 ()=> {
-                    console.log("press editor")
-                    if(this.state.fileName === "VGDL"){
-                        this.updateVGDL(editor.getValue())
-                    }else if(this.state.fileName === "Level"){
-                        this.updateLevelString(editor.getValue())
-                    }
+                    // if(this.state.fileName === "VGDL"){
+                        this.props.updateGameAndLevel(this.state.editorModels.VGDL.value, this.state.editorModels.Level.value)
+                        // this.updateVGDL(this.state.editorModels.VGDL.value)
+                        // this.updateLevelString(this.state.editorModels.Level.value)
+                    // }else if(this.state.fileName === "Level"){
+                    // }
                 }
             )
         }
@@ -74,7 +79,8 @@ export default class VGDLEditor extends Component{
                     language = {file.language}
                     theme="vs-dark"
                     height="70vh"
-                    handleEditorDidMount = {this.handleEditorDidMount}
+                    onMount = {this.handleEditorDidMount}
+                    onChange={this.onChangeContent}
                 />
             </>
         )

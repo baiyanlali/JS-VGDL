@@ -60,7 +60,7 @@ export class SpriteCounter extends Termination{
 			//game.score = game.score.toFixed(1);
 			game.sprite_bonus_granted_on_timestep = game.time;
 		}
-		console.log(this.stype);
+		console.log("Termination Result:",this.stype, game.numSprites(this.stype), "/", this.limit, this.win);
 		return [true, this.win];
 	}
 	else

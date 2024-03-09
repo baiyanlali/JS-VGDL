@@ -251,11 +251,12 @@ export class BasicGame{
 
         const deleted = this.kill_list.filter((s) => {return s.stypes[key]}).length;
         if (key in this.sprite_groups) {
-            return this.sprite_groups[key].length-deleted;
+            //避免找父类情况
+            if(this.sprite_groups[key].length !== 0)
+                return this.sprite_groups[key].length-deleted;
         }
-        else{
-            return this._iterAll().filter(s => {return s.stypes.contains(key)}).length - deleted; // Should be __iter__ - deleted
-        }
+
+        return this._iterAll().filter(s => {return s.stypes.contains(key)}).length - deleted; // Should be __iter__ - deleted
 
     }
 
@@ -465,7 +466,7 @@ export class BasicGame{
             const stypes1 = collision[0].stypes
             const stypes2 = collision[1].stypes
 
-            let effects;
+            let effects = [];
             if(collision[1] === 'EOS'){
                 this.collision_eff.forEach(eff=>{
                     const class1 = eff[0]
