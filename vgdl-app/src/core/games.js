@@ -250,11 +250,11 @@ export class BasicGame{
     numSprites = (key) => {
 
         const deleted = this.kill_list.filter((s) => {return s.stypes[key]}).length;
-        if (key in this.sprite_groups) {
-            //避免找父类情况
-            if(this.sprite_groups[key].length !== 0)
-                return this.sprite_groups[key].length-deleted;
-        }
+        // if (key in this.sprite_groups) {
+        //     //避免找父类情况
+        //     if(this.sprite_groups[key].length !== 0)
+        //         return this.sprite_groups[key].length-deleted;
+        // }
 
         return this._iterAll().filter(s => {return s.stypes.contains(key)}).length - deleted; // Should be __iter__ - deleted
 

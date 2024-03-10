@@ -4,7 +4,8 @@ import {aliens_map, game, aliens_game} from './core/aliens';
 import Player from "./renderer/level_player/Player";
 import {Component} from "react";
 import VGDLEditor from './VGDLEditor';
-import {Container, Row, Col} from 'react-bootstrap';
+import {Container, Row, Col, Navbar, NavbarBrand, NavbarCollapse} from 'react-bootstrap';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { VGDLParser } from './core/core';
@@ -55,7 +56,8 @@ class App extends Component{
         template: "",
       },
       projectName: "",
-      game: new VGDLParser().parseGame(aliens_game)
+      game: new VGDLParser().parseGame(aliens_game),
+      theme: "dark"
     };
 
     this.state.game.buildLevel(aliens_map)
@@ -139,36 +141,40 @@ class App extends Component{
 
   render() {
     return (
+      <>
+        <Navbar collapseOnSelect expand={true} className="bg-body-tertiary" data-bs-theme={this.state.theme} >
+          <Container>
+
+          <Navbar.Brand>
+          <img
+              src="logo192.png"
+              height="40"
+          />
+          {' '}VGDL
+        </Navbar.Brand>
+
+          <NavbarCollapse>
+            <Nav className="me-auto">
+              <Nav.Link href="#features">Features</Nav.Link>
+              <NavDropdown title="Project">
+                <NavDropdown.Item>New Project</NavDropdown.Item>
+                <NavDropdown.Item>Existing Project</NavDropdown.Item>
+                <NavDropdown.Divider/>
+              </NavDropdown>
+
+              <NavDropdown title="Help">
+                <NavDropdown.Item>New Project</NavDropdown.Item>
+                <NavDropdown.Item>Existing Project</NavDropdown.Item>
+                <NavDropdown.Divider/>
+              </NavDropdown>
+            </Nav>
+          </NavbarCollapse>
+          </Container>
+
+        </Navbar>
+
         <Container className="App">
-          <Row>
-            <Col name="Menu" md={4}>
-              <Nav>
-                <Nav.Item>
-                  <a href="https://griddly.ai">
-                    <img
-                      alt="Griddly Bear"
-                      src="logo_ai_white.png"
-                      height="40"
-                    />
-                  </a>
-                </Nav.Item>
 
-                <NavDropdown title="New">
-                  <NavDropdown.Item>New Project</NavDropdown.Item>
-                  <NavDropdown.Item>Existing Project</NavDropdown.Item>
-                </NavDropdown>
-                
-              </Nav>
-            </Col>
-
-            <Col name="Project Name" md={4}>
-              "VGDL Example"
-            </Col>
-
-            <Col name="Link" md={4}>
-
-            </Col>
-          </Row>
 
           <Row>
             <Col md={6}>
@@ -208,6 +214,7 @@ class App extends Component{
               
 
         </Container>
+      </>
     );
   }
 
