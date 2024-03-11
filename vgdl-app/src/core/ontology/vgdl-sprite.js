@@ -23,7 +23,6 @@ export class VGDLSprite{
 	lastrect = null;
 	physicstype = GridPhysics;
 	speed = 0;
-	cooldown = 0;
 	ID = 0
 	direction = null;
 	color = '#8c148c';
@@ -177,6 +176,7 @@ export class Portal extends SpriteProducer{
 export class SpawnPoint extends SpriteProducer{
 	constructor(pos, size, args) {
 		args.color = args.color || BLACK
+		args.cooldown = args.cooldown || 1
 		super(pos, size, args)
 		if (args.prob !== undefined) {
 			this.prob = args.prob
@@ -186,20 +186,13 @@ export class SpawnPoint extends SpriteProducer{
 
 		this.is_stochastic = this.prob > 0 && this.prob < 1;
 
-		if (args.cooldown !== undefined) {
-			this.cooldown = args.cooldown;
-		} else {
-			this.cooldown = 1;
-		}
 		if (args.total !== undefined) this.total = args.total;
 
 		this.counter = 0;
 	}
 
 	update (game) {
-		// console.log(this.prob, this.cooldown)
 		const rnd = random.random()
-		// console.log(game.time, this.cooldown)
 		if (game.time % this.cooldown === 0 && rnd < this.prob) {
 			game._createSprite([this.stype], [this.location.x, this.location.y]);
 			this.counter ++;
@@ -402,6 +395,13 @@ export class Bomber extends Missile{
 		if(this.total && this.counter >= this.total){
 			killSprite(this, undefined, game)
 		}
+	}
+}
+
+export class Door extends Immovable{
+	constructor(pos, size, args) {
+		args.portal = args.portal || true
+		super(pos, size, args);
 	}
 }
 

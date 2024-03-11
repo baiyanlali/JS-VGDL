@@ -22,6 +22,8 @@ export default class HumanPlayerScene extends Phaser.Scene{
         this.gridHeight = data.vgdl.height
         this.gridWidth = data.vgdl.width
 
+        this.onGameEnd = data.onGameEnd
+
         this.renderData = {
           objects: {},
         }
@@ -155,7 +157,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
 
     handle_game_end = (state)=> {
-      
+        this.onGameEnd(state)
     }
 
     handlecollision = (a, b)=> {

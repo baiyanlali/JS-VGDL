@@ -130,6 +130,11 @@ export class BasicGame{
         this.paused = true
     }
 
+    resetLevel = ()=> {
+        this.reset()
+        this.buildLevel(this.level)
+    }
+
     buildLevel = (lstr) => {
         let lines = lstr.split('\n').map(l => {return l.trimEnd()}).filter(l => {return l.length > 0});
 		let lengths = lines.map((line) => line.length);
@@ -183,6 +188,8 @@ export class BasicGame{
 			if (stochastic_effects.indexOf(effect) !== -1)
 				this.is_stochastic = true;
 		});
+
+        this.level = lstr
     }
 
     randomizeAvatar = ()=> {
@@ -513,7 +520,7 @@ export class BasicGame{
     }
 
     presskeyUp = (keyCode) => {
-        this.key_to_clean.push(keyCode)
+        this.key_to_clean?.push(keyCode)
         // this.update(0, true)
     }
 
@@ -562,9 +569,13 @@ export class BasicGame{
 
         if(this.paused) return 'paused'
         if(this.ended){
-            this.on_game_end?.call(this.getFullState)
+            this.paused = true
+            this.on_game_end(this.getFullState())
             return this.win
         }
+
+        this.time ++
+
         this._terminationHandling()
         
         this._clearAll()
@@ -609,7 +620,6 @@ export class BasicGame{
         // This should actually be in a game loop function, or something.
 
 
-        this.time = 0;
 
         // this._clearAll();
 

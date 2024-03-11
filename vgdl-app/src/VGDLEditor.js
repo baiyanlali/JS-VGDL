@@ -65,7 +65,7 @@ export default class VGDLEditor extends Component{
         return (
             <>
                 <Tabs
-                    activeKey="VGDL"
+                    activeKey={file}
                     onSelect={(k) => {
                         console.log(k)
                         this.changeModel(k)
