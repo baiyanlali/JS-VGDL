@@ -78,6 +78,7 @@ class App extends Component{
   }
 
   async componentDidMount(){
+    document.body.className = 'bg-dark'
     window.addEventListener('resize', this.updatePhaserCanvasSize, false)
     this.updatePhaserCanvasSize()
   }
@@ -143,7 +144,6 @@ class App extends Component{
     return (
       <>
         <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary" data-bs-theme={this.state.theme} >
-          <Container>
 
           <Navbar.Brand>
           <img
@@ -170,14 +170,12 @@ class App extends Component{
               </NavDropdown>
             </Nav>
           </NavbarCollapse>
-          </Container>
 
         </Navbar>
 
 
-        <Container className="App">
+        <Container fluid style={{ marginTop: '20px', textAlign: 'center'}}>
 
-          <Row md={1}></Row>
           <Row md={10}>
             <Col md={6}>
 
@@ -207,10 +205,6 @@ class App extends Component{
                 updateGameAndLevel = {this.updateGameAndLevel}
               />
             </Col>
-          </Row>
-
-          <Row>
-
           </Row>
 
               
