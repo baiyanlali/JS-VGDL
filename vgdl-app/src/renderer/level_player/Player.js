@@ -1,7 +1,7 @@
 import {Component} from "react";
 import HumanPlayerScene from "./HumanPlayerScene.js";
 import Phaser from "phaser";
-import { Row, Col, Button } from "react-bootstrap";
+import {Row, Col, Button, ButtonGroup, Card} from "react-bootstrap";
 export default class Player extends Component{
 
     constructor(props){
@@ -62,14 +62,12 @@ export default class Player extends Component{
         return (
             <>
             <Row>
-                <Col>
-                    <Button onClick={()=> {
-                        this.props.vgdl.startGame()
-                    }}>Play</Button>
+                <ButtonGroup aria-label="Basic example">
+                  <Button variant="secondary" onClick={this.props.vgdl.startGame}>Play</Button>
+                  <Button variant="secondary">Stop</Button>
+                  <Button variant="secondary">Reset</Button>
+                </ButtonGroup>
 
-                    <Button>Stop</Button>
-                    <>{this.state.result}</>
-                </Col>
                 <div
                     ref={(divElement)=> {
                         this.divElement = divElement;
@@ -77,7 +75,6 @@ export default class Player extends Component{
                         >
                 </div>
             </Row>
-            
             </>
             
         )

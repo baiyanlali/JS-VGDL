@@ -174,10 +174,11 @@ class App extends Component{
 
         </Navbar>
 
+
         <Container className="App">
 
-
-          <Row>
+          <Row md={1}></Row>
+          <Row md={10}>
             <Col md={6}>
 
               <div

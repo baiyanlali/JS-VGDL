@@ -1,6 +1,6 @@
 import Editor from "@monaco-editor/react"
 import { Component } from "react";
-import { Nav } from "react-bootstrap";
+import {Card, Nav, Tab, Tabs} from "react-bootstrap";
 export default class VGDLEditor extends Component{
     constructor(props){
         super(props)
@@ -64,15 +64,26 @@ export default class VGDLEditor extends Component{
         const file = this.state.editorModels[this.state.fileName]
         return (
             <>
-                <Nav variant="tabs" defaultActiveKey="VGDL">
-                    <Nav.Item>
-                        <Nav.Link key="VGDL" onClick={()=> this.changeModel("VGDL")}>VGDL</Nav.Link>
-                    </Nav.Item>
+                <Tabs
+                    activeKey="VGDL"
+                    onSelect={(k) => {
+                        console.log(k)
+                        this.changeModel(k)
+                    }}
+                    className="mb-3">
+                    <Tab eventKey="VGDL" title="VGDL"/>
+                    <Tab eventKey="Level" title="Level"/>
+                </Tabs>
 
-                    <Nav.Item>
-                        <Nav.Link key="Level" onClick={()=> this.changeModel("Level")}>Level</Nav.Link>
-                    </Nav.Item>
-                </Nav>
+                {/*<Nav variant="tabs" defaultActiveKey="VGDL">*/}
+                {/*    <Nav.Item>*/}
+                {/*        <Nav.Link key="VGDL" onClick={()=> this.changeModel("VGDL")}>VGDL</Nav.Link>*/}
+                {/*    </Nav.Item>*/}
+
+                {/*    <Nav.Item>*/}
+                {/*        <Nav.Link key="Level" onClick={()=> this.changeModel("Level")}>Level</Nav.Link>*/}
+                {/*    </Nav.Item>*/}
+                {/*</Nav>*/}
                 <Editor
                     path = {file.name}
                     value = {file.value}
