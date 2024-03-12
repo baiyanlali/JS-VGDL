@@ -88,7 +88,7 @@ export default class Player extends Component {
             <>
                 <Row>
                     <ButtonGroup aria-label="Basic example">
-                        <Button variant="secondary" onClick={this.props.vgdl.startGame}
+                        <Button variant="secondary" onClick={this.startGame}
                                 disabled={this.state.result !== ""}>Play</Button>
                         <Button variant="secondary">{
                             state

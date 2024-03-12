@@ -82,7 +82,7 @@ export class BasicGame{
     ignoredattributes = ['stypes',
         'name',
         'lastmove',
-        'color',
+        // 'color',
         'lastrect',
         'resources',
         'physicstype',
@@ -104,7 +104,6 @@ export class BasicGame{
         'only_active',
         'airsteering',
         'strength',
-        'gamejs'
     ];
 
     constructor(args) {
@@ -319,9 +318,9 @@ export class BasicGame{
 
         for (const key in this.sprite_groups) {
             if (!(this.sprite_groups.hasOwnProperty(key))) continue;
-            let ss = {};
+            const ss = {};
             this.getSprites(key).forEach((s) => {
-                let attrs = {};
+                const attrs = {};
                 Object.keys(s).forEach((a) => {
                     let val = s[a];
                     if (ias.indexOf(a) === -1) {
@@ -525,7 +524,7 @@ export class BasicGame{
     }
 
 
-    updateTime = 1000/ 6
+    updateTime = 1000/ 10
     currentTime = 0
 
     collision_set = []

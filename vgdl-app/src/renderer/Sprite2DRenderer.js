@@ -3,6 +3,7 @@
 
 import { random } from "../core/tools";
 import RendererBase from "./RendererBase";
+import Phaser from "phaser"
 
 class Sprite2DRenderer extends RendererBase {
     constructor(scene, rendererName, renderConfig, avatarObject, centerObjects) {
@@ -129,6 +130,18 @@ class Sprite2DRenderer extends RendererBase {
                 this.renderConfig.TileSize * objectTemplate.scale
             );
             //sprite.setOrigin(0, 0);
+
+            console.log(objectTemplate.color, typeof(objectTemplate.color), typeof(objectTemplate.color) === 'string'? Phaser.Display.Color.HexStringToColor(objectTemplate.color):Phaser.Display.Color.GetColor(
+                objectTemplate.color.r * 255,
+                objectTemplate.color.g * 255,
+                objectTemplate.color.b * 255
+            ))
+
+            sprite.tint = typeof(objectTemplate.color) === 'string'? Phaser.Display.Color.HexStringToColor(objectTemplate.color):Phaser.Display.Color.GetColor(
+                objectTemplate.color.r * 255,
+                objectTemplate.color.g * 255,
+                objectTemplate.color.b * 255
+            )
             
             // sprite.setTint(typeof(objectTemplate.color) === 'string'?
             //     Phaser.Display.Color.HexStringToColor(objectTemplate.color):
@@ -228,6 +241,10 @@ class Sprite2DRenderer extends RendererBase {
         const unknown_object_shape = {}
 
         objects.forEach((object) => {
+
+
+            console.log(object, object.name, object.color)
+
             const objectTemplate = {
                 name: object.name,
                 id: object.name,

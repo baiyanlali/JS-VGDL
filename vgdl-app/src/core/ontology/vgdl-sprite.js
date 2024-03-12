@@ -13,7 +13,6 @@ export class VGDLSprite{
 	only_active = false;
 	is_avatar = false;
 	is_stochastic =false;
-	color = null;
 	cooldown = 0;
 	mass = 1;
 	physicstype = null;
@@ -42,7 +41,7 @@ export class VGDLSprite{
 		this.cooldown = args.cooldown || this.cooldown;
 		this.ID = new_id();
 		this.direction = null;
-		this.color = args.color || this.color || '#8c148c';
+		this.color = args.color || this.color;
 		this.image = args.image;
 
 			// iterate over kwargs
@@ -226,12 +225,12 @@ export class OrientedSprite extends VGDLSprite{
 	}
 
 	_draw (game) {
-		super._draw(this, game);
-		if (this.draw_arrow) {
-			//TODO: Draw OrientedSprite
-			const col = (this.color[0], 255 - this.color[1], this.color[2]);
-			// this.gamejs.draw.polygon(game.screen, col, triPoints(this.rect, unitVector(this.orientation)))
-		}
+		// super._draw(this, game);
+		// if (this.draw_arrow) {
+		// 	//TODO: Draw OrientedSprite
+		// 	const col = (this.color[0], 255 - this.color[1], this.color[2]);
+		// 	// this.gamejs.draw.polygon(game.screen, col, triPoints(this.rect, unitVector(this.orientation)))
+		// }
 }
 }
 
