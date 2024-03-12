@@ -192,7 +192,7 @@ export class BasicGame{
 
         this.level = lstr
 
-        console.log(this.sprite_order)
+        // console.log(this.sprite_order)
     }
 
     randomizeAvatar = ()=> {

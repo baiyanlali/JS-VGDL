@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "VGDL Playground",
+  "name": "VGDL: An IDE for LLM and PCG",
   "icons": [
     {
       "src": "favicon.ico",
