@@ -180,6 +180,10 @@ class App extends Component {
                                 <NavDropdown.Item>New Project</NavDropdown.Item>
                                 <NavDropdown.Item>Existing Project</NavDropdown.Item>
                                 <NavDropdown.Divider/>
+                                <NavDropdown title="Haha" drop="end">
+                                    <NavDropdown.Item>New Project</NavDropdown.Item>
+                                    <NavDropdown.Item>Existing Project</NavDropdown.Item>
+                                </NavDropdown>
                             </NavDropdown>
 
                             <NavDropdown title="Help">
