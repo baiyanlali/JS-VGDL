@@ -4,7 +4,7 @@ import Player from "./renderer/level_player/Player";
 import {Component} from "react";
 import VGDLEditor from './VGDLEditor';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Container, Row, Col, Navbar, NavbarBrand, NavbarCollapse} from 'react-bootstrap';
+import {Container, Row, Col, Navbar, NavbarBrand, NavbarCollapse, Card} from 'react-bootstrap';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown';
@@ -56,7 +56,8 @@ class App extends Component {
             },
             projectName: "",
             game: new VGDLParser().parseGame(aliens_game),
-            theme: "dark"
+            theme: "dark",
+            activeWindow: null
         };
 
         this.state.game.buildLevel(aliens_map)
@@ -140,6 +141,24 @@ class App extends Component {
 
     }
 
+    onElementFocus = (element) => {
+        this.setState(e=> {
+            return {
+                ...e,
+                activeWindow: element
+            }
+        })
+    }
+
+    onElementUnFocus = (element) => {
+        this.setState(e=> {
+            return {
+                ...e,
+                activeWindow: null
+            }
+        })
+    }
+
     render() {
         return (
             <>
@@ -178,6 +197,8 @@ class App extends Component {
 
                     <Row md={10}>
                         <Col md={6}>
+                            <Card body data-bs-theme={this.state.theme}
+                                  border={this.state.activeWindow === this.playerElement?"primary":"dark"}>
 
                             <div
                                 ref={(playerContentElement) => {
@@ -185,25 +206,40 @@ class App extends Component {
                                 }}
                             >
                                 <Player
+                                    ref={e=> {
+                                        this.playerElement = e
+                                    }}
                                     rendererName={this.state.rendererName}
                                     rendererConfig={this.state.rendererConfig}
                                     selectedLevelId={this.state.selectedLevelId}
                                     width={this.state.levelPlayer.phaserWidth}
                                     height={this.state.levelPlayer.phaserHeight}
                                     vgdl={this.state.game}
+                                    active={this.state.activeWindow === this.playerElement}
+                                    onFocus={this.onElementFocus}
+                                    onBlur = {this.onElementUnFocus}
                                 />
 
                             </div>
 
+                        </Card>
+
+
                         </Col>
                         <Col md={6}>
-                            <VGDLEditor
-                                gdyString={this.state.vgdlString}
-                                levelString={this.state.vgdlLevel}
-                                updateVGDL={this.updateGame}
-                                updateLevelString={this.updateLevelString}
-                                updateGameAndLevel={this.updateGameAndLevel}
-                            />
+                                <VGDLEditor ref={e=> {
+                                    this.editorElement = e
+                                }}
+                                    gdyString={this.state.vgdlString}
+                                    levelString={this.state.vgdlLevel}
+                                    updateVGDL={this.updateGame}
+                                    updateLevelString={this.updateLevelString}
+                                    updateGameAndLevel={this.updateGameAndLevel}
+                                    theme={this.state.theme}
+                                    active = {this.state.activeWindow === this.editorElement}
+                                    onFocus = {this.onElementFocus}
+                                    onBlur = {this.onElementUnFocus}
+                                />
                         </Col>
                     </Row>
 

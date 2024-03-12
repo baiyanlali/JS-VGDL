@@ -24,6 +24,9 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
         this.onGameEnd = data.onGameEnd
 
+        this.onFocus = data.onFocus
+        this.onBlur = data.onBlur
+
         this.renderData = {
           objects: {},
         }
@@ -142,16 +145,33 @@ export default class HumanPlayerScene extends Phaser.Scene{
         this.inputMap[this.W.keyCode] = "UP"
         this.inputMap[this.S.keyCode] = "DOWN"
         this.inputMap[this.SPACE.keyCode] = "SPACE"
+
+        this.input.on(Phaser.Input.Events.POINTER_DOWN_OUTSIDE, () => {
+            if(this.input.keyboard.enabled){
+                this.input.keyboard.enabled = false
+                this.onBlur()
+            }
+        });
+
+        this.input.on(Phaser.Input.Events.POINTER_DOWN,  async () => {
+            console.log("pointer down")
+            document.activeElement.blur()
+            //这里是为了避免react使用虚拟dom替换真实dom时blur掉的是游戏本身
+            await this.sleep(1)
+            this.input.keyboard.enabled = true
+            this.onFocus()
+        });
+    }
+
+    sleep = async (ms)=> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     handleInput = () =>{
-      // console.log('[HumanPlayerScene] Handle Input')
       for (const key of [this.A, this.D, this.W, this.S, this.SPACE]) {
         if(Phaser.Input.Keyboard.JustDown(key)){
-            // console.log(`[HumanPlayerScene] Press ${this.inputMap[key.keyCode]}`)
             this.vgdl.presskey(this.inputMap[key.keyCode])
         }else if(Phaser.Input.Keyboard.JustUp(key)){
-            // console.log(`[HumanPlayerScene] PressUp ${this.inputMap[key.keyCode]}`)
             this.vgdl.presskeyUp(this.inputMap[key.keyCode])
         }
       }
@@ -159,7 +179,6 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
     create = () => {
 
-      // console.log('[HumanPlayerScene] Create')
 
       this.initInput()
 
@@ -171,7 +190,6 @@ export default class HumanPlayerScene extends Phaser.Scene{
       
         if(this.vgdl){
           const start_game = this.vgdl.run(this.handle_game_end)
-          // start_game()
         }
     }
 
@@ -185,11 +203,9 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
 
     update = (time, delta)=> {
-      // console.log("[HumanPlayerScene] Update")
-      
+
       if(this.vgdl){
         this.handleInput()
-        // console.log("[HumanPlayerScene] Update")
         this.vgdl.update(delta)
       }
 

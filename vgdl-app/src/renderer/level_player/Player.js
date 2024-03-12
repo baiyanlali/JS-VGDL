@@ -31,13 +31,30 @@ export default class Player extends Component {
 
         this.updateCanvasSize()
 
-        this.sceneManager = this.game.scene.start("HumanPlayerScene", {
+        this.sceneManager = this.game.scene.start("HumanPlayerScene", this.getSceneData())
+
+    }
+
+    onFocus = () => {
+        this.props.onFocus(this)
+    }
+
+    onBlur = ()=> {
+        this.props.onBlur()
+    }
+
+    getSceneData = () => {
+        return {
             rendererConfig: this.props.rendererConfig,
             rendererName: this.props.rendererName,
             vgdl: this.props.vgdl,
-            onGameEnd: this.onGameEnd
-        })
+            onGameEnd: this.onGameEnd,
+            onFocus: this.onFocus,
+            onBlur: this.onBlur,
+        }
     }
+
+
 
     onGameEnd = (result) => {
         console.trace(`Reuslt: ${JSON.stringify(result.win)}`)
@@ -52,16 +69,18 @@ export default class Player extends Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.updateCanvasSize()
         if (this.props.vgdl !== prevProps.vgdl) {
-            this.game.scene.start("HumanPlayerScene", {
-                rendererConfig: this.props.rendererConfig,
-                rendererName: this.props.rendererName,
-                vgdl: this.props.vgdl,
-                onGameEnd: this.onGameEnd
-            })
+            this.game.scene.start("HumanPlayerScene", this.getSceneData())
         }
+        // console.log()
+        if(this.game.scene.scenes.length >= 1) {
+            console.log("active", this.props.active)
+            this.game.scene.scenes[0]['active'] = this.props.active
+        }
+        // this.game.scene.scenes[0].active = this.props.active
     }
 
     resetLevel=()=> {
+        this.props.onFocus(this)
         this.props.vgdl.resetLevel()
         this.setState(e=>
         {
@@ -70,6 +89,7 @@ export default class Player extends Component {
     }
 
     startGame = ()=> {
+        this.props.onFocus(this)
         this.props.vgdl.startGame()
         this.setState(e=>
         {
@@ -91,7 +111,7 @@ export default class Player extends Component {
                     <ButtonGroup aria-label="Basic example">
                         <Button variant="secondary" onClick={this.startGame}
                                 disabled={this.state.result !== ""}>Play</Button>
-                        <Button variant="secondary">{
+                        <Button variant="secondary" onClick={() => this.props.onFocus(this)}>{
                             state
                         }</Button>
                         <Button variant="secondary" onClick={this.resetLevel}>Reset</Button>
@@ -101,6 +121,7 @@ export default class Player extends Component {
                         ref={(divElement) => {
                             this.divElement = divElement;
                         }}
+                        onFocus={() => { this.props.onFocus(this)}}
                     >
                     </div>
                 </Row>
