@@ -51,7 +51,15 @@ export default class HumanPlayerScene extends Phaser.Scene{
         this.grenderer.beginUpdate(state.objects)
 
         state.objects.forEach((object) => {
+
+          if((object.hidden && object.hidden === true) || (object.invisible && object.invisible === true)){
+            return
+          }
+
             const objectTemplateName = object.name;
+
+
+
             if (object.ID in this.renderData.objects) {
                 const currentObjectData = this.renderData.objects[object.ID];
                 this.grenderer.updateObject(
