@@ -56,6 +56,7 @@ export default class Player extends Component {
                 rendererConfig: this.props.rendererConfig,
                 rendererName: this.props.rendererName,
                 vgdl: this.props.vgdl,
+                onGameEnd: this.onGameEnd
             })
         }
     }

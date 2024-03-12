@@ -205,9 +205,20 @@ export class VGDLParser{
                 const [pair, edef] = i.content.split('>').map(s=>s.trim())
                 const [eclass, args] = this.parseArgs(edef);
 
-                this.game.collision_eff.push(
-                    pair.split(' ').map(s=>s.trim()).filter(s=>s).concat([eclass, args])
-                )
+
+                //支持object为多个的情况，测试环境为surround
+                const pairs = pair.split(' ').map(s=>s.trim()).filter(s=>s)
+
+                const subject = pairs[0]
+
+                for (let pair_idx = 1; pair_idx < pairs.length; pair_idx++) {
+                    const object = pairs[pair_idx];
+                    this.game.collision_eff.push([subject, object, eclass, args])
+                }
+
+                // this.game.collision_eff.push(
+                //     pair.split(' ').map(s=>s.trim()).filter(s=>s).concat([eclass, args])
+                // )
 
                 console.debug(`Adding Collision ${pair} has effect: ${edef}`)
             }

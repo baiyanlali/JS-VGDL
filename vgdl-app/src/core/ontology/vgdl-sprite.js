@@ -76,7 +76,7 @@ export class VGDLSprite{
 		if (speed === null)
 			speed = this.speed;
 
-		if (this.cooldown > this.lastmove || Math.abs(orientation[0]) + Math.abs(orientation[1]) !== 0) {
+		if (this.cooldown <= this.lastmove && Math.abs(orientation[0]) + Math.abs(orientation[1]) !== 0) {
 			this.lastlocation = {x: this.location.x, y: this.location.y}
 			this.location = {
 				x: this.location.x + orientation[0] * speed,
@@ -148,7 +148,7 @@ export class Flicker extends VGDLSprite{
 	}
 
 	update (game) {
-		this.update(game)
+		super.update(game)
 		if (this._age > this.limit)
 			killSprite(this, null, game);
 
