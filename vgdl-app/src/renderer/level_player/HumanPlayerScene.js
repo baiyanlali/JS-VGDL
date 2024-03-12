@@ -106,7 +106,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
     preload = ()=> {
       // console.log('[HumanPlayerScene] Preload')
       if (this.grenderer) {
-        const sprites = [...Object.keys(this.vgdl.sprite_constr)]
+        // const sprites = [...Object.keys(this.vgdl.sprite_constr)]
 
           const objects = []
         // const objects = sprites.map(s=>{

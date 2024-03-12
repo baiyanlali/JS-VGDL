@@ -164,7 +164,7 @@ class Sprite2DRenderer extends RendererBase {
             } else if (this.renderConfig.RotateAvatarImage) {
                 sprite.setRotation(this.getOrientationAngleRads(orientation));
             }
-            // sprite.setDepth(objectTemplate.zIdx);
+            sprite.setDepth(objectTemplate.zIdx);
 
             if (this.container) {
                 this.container.add(sprite);
@@ -235,7 +235,7 @@ class Sprite2DRenderer extends RendererBase {
         } else if (this.renderConfig.RotateAvatarImage) {
             sprite.setRotation(this.getOrientationAngleRads(orientation));
         }
-        // sprite.setDepth(objectTemplate.zIdx);
+        sprite.setDepth(objectTemplate.zIdx);
     };
 
     loadTemplates = (objects) => {

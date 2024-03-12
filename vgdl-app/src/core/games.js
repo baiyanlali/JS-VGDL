@@ -163,7 +163,9 @@ export class BasicGame{
 			}
 			else {
 				this.sprite_groups[res_type] = []
+                this.sprite_constr[res_type][1]['Z'] = this.sprite_order.indexOf(res_type)
 			}
+
 		};
 
 		// create sprites
@@ -189,6 +191,8 @@ export class BasicGame{
 		});
 
         this.level = lstr
+
+        console.log(this.sprite_order)
     }
 
     randomizeAvatar = ()=> {
@@ -319,6 +323,7 @@ export class BasicGame{
         for (const key in this.sprite_groups) {
             if (!(this.sprite_groups.hasOwnProperty(key))) continue;
             const ss = {};
+            const order = this.sprite_order.indexOf(key)
             this.getSprites(key).forEach((s) => {
                 const attrs = {};
                 Object.keys(s).forEach((a) => {
@@ -326,6 +331,7 @@ export class BasicGame{
                     if (ias.indexOf(a) === -1) {
                         attrs[a] = val;
                     }
+                    attrs["Z"] = order
                 });
                 if (s.resources) {
                     attrs['resources'] = s.resources; // Should be object
