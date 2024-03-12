@@ -131,13 +131,20 @@ class Sprite2DRenderer extends RendererBase {
             );
             //sprite.setOrigin(0, 0);
 
-            console.log(objectTemplate.color, typeof(objectTemplate.color), typeof(objectTemplate.color) === 'string'? Phaser.Display.Color.HexStringToColor(objectTemplate.color):Phaser.Display.Color.GetColor(
-                objectTemplate.color.r * 255,
-                objectTemplate.color.g * 255,
-                objectTemplate.color.b * 255
-            ))
+            // console.log(objectTemplate.color, typeof(objectTemplate.color), typeof(objectTemplate.color) === 'string'? Phaser.Display.Color.HexStringToColor(objectTemplate.color):Phaser.Display.Color.GetColor(
+            //     objectTemplate.color.r * 255,
+            //     objectTemplate.color.g * 255,
+            //     objectTemplate.color.b * 255
+            // ))
 
-            sprite.tint = typeof(objectTemplate.color) === 'string'? Phaser.Display.Color.HexStringToColor(objectTemplate.color):Phaser.Display.Color.GetColor(
+            // console.log(Phaser.Display.Color.HexStringToColor("#e61c1c").color)
+            // sprite.setTint(Phaser.Display.Color.HexStringToColor("#e61c1c").color)
+            // sprite.tint = 0xe61c1c
+            // sprite.tint = Phaser.Display.Color.HexStringToColor("#e61c1c")
+
+            sprite.tint = typeof(objectTemplate.color) === 'string'? Phaser.Display.Color.HexStringToColor(objectTemplate.color).color
+                :
+                Phaser.Display.Color.GetColor(
                 objectTemplate.color.r * 255,
                 objectTemplate.color.g * 255,
                 objectTemplate.color.b * 255
@@ -243,14 +250,12 @@ class Sprite2DRenderer extends RendererBase {
         objects.forEach((object) => {
 
 
-            console.log(object, object.name, object.color)
-
             const objectTemplate = {
                 name: object.name,
                 id: object.name,
                 internal: !!object.Internal,
                 tilingMode: "NONE",
-                scale: object.shrinkfactor === 0 ? 1.0 : object.shrinkfactor,
+                scale: !object.shrinkfactor ? 1.0 : object.shrinkfactor,
                 color: object.color ?? { r: 1, g: 1, b: 1 },
                 zIdx: object.Z || 0,
             };

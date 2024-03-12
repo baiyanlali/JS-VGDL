@@ -24,7 +24,7 @@ export class VGDLSprite{
 	speed = 0;
 	ID = 0
 	direction = null;
-	color = '#8c148c';
+	color = '#ffffff';
 	orientation = [0,0]
 	location = {x:0, y:0}
 
@@ -125,7 +125,7 @@ export class EOS extends VGDLSprite{
 
 export class Immovable extends VGDLSprite{
 	constructor(pos, size, args) {
-		args.color = args.color || GRAY;
+		// args.color = args.color || GRAY;
 		super(pos, size, args)
 		this.is_static = args.is_static || true;
 	}
@@ -133,7 +133,7 @@ export class Immovable extends VGDLSprite{
 
 export class Passive extends VGDLSprite{
 	constructor(pos, size, args) {
-		args.color = args.color || RED;
+		// args.color = args.color || RED;
 		super(pos, size, args)
 	}
 }
@@ -141,7 +141,7 @@ export class Passive extends VGDLSprite{
 
 export class Flicker extends VGDLSprite{
 	constructor(pos, size, args) {
-		args.color = args.color || RED;
+		// args.color = args.color || RED;
 		super(pos, size, args)
 		this._age = 0;
 		this.limit = args.limit || 1;
@@ -167,14 +167,14 @@ export class Portal extends SpriteProducer{
 	constructor(pos, size, args) {
 		super(pos, size, args)
 		this.is_static = true
-		this.color = BLUE;
+		// this.color = BLUE;
 	}
 }
 
 
 export class SpawnPoint extends SpriteProducer{
 	constructor(pos, size, args) {
-		args.color = args.color || BLACK
+		// args.color = args.color || BLACK
 		args.cooldown = args.cooldown || 1
 		super(pos, size, args)
 		if (args.prob !== undefined) {
@@ -239,7 +239,7 @@ export class Conveyer extends OrientedSprite{
 	constructor(pos, size, args) {
 		super(pos, size, args);
 		this.is_static = true;
-		this.color = BLUE;
+		// this.color = BLUE;
 		this.strength = 1;
 		this.draw_arrow = true;
 	}
@@ -250,7 +250,7 @@ export class Missile extends OrientedSprite{
 	constructor(pos, size, args) {
 		super(pos, size, args);
 		this.speed = 1;
-		this.color = PURPLE;
+		// this.color = PURPLE;
 	}
 }
 
@@ -259,7 +259,7 @@ export class Switch extends OrientedSprite{
 	constructor(pos, size, args) {
 		super(pos, size, args);
 		this.speed = 1;
-		this.color = PURPLE;
+		// this.color = PURPLE;
 	}
 }
 
@@ -359,7 +359,7 @@ export class EraticMissile extends Missile{
 export class Bomber extends Missile{
 	constructor(pos, size, args) {
 		// Missile
-		args.color = args.color || ORANGE;
+		// args.color = args.color || ORANGE;
 		args.is_static = args.is_static || false;
 		super(pos, size, args);
 

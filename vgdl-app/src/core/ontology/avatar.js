@@ -32,7 +32,7 @@ export class Avatar extends VGDLSprite {
 
 export class MovingAvatar extends VGDLSprite{
     constructor(pos, size, args) {
-        args.color = args.color || WHITE
+        // args.color = args.color || WHITE
         super(pos, size, args);
         this.actions = this.declare_possible_actions()
         this.speed = 1
@@ -109,7 +109,7 @@ export class VerticalAvatar extends MovingAvatar{
 
 export class FlakAvatar extends HorizontalAvatar{
     constructor(pos, size, args) {
-        args.color = args.color || GREEN;
+        // args.color = args.color || GREEN;
         super(pos, size, args);
     }
 

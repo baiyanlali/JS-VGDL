@@ -99,10 +99,21 @@ export default class HumanPlayerScene extends Phaser.Scene{
       // console.log('[HumanPlayerScene] Preload')
       if (this.grenderer) {
         const sprites = [...Object.keys(this.vgdl.sprite_constr)]
-        
-        const objects = sprites.map(s=>{
-            return {name: s, shrinkfactor: 1.0, img: this.vgdl.sprite_constr[s][1]['img']}
-        })
+
+          const objects = []
+        // const objects = sprites.map(s=>{
+        //     return {name: s, shrinkfactor: 1.0, img: this.vgdl.sprite_constr[s][1]['img']}
+        // })
+
+          for (const spriteConstrKey in this.vgdl.sprite_constr) {
+              const object = {name: spriteConstrKey}
+              const [sclass, args, parents] = this.vgdl.sprite_constr[spriteConstrKey]
+              for (const argsKey in args) {
+                  object[argsKey] = args[argsKey]
+              }
+
+              objects.push(object)
+          }
         this.grenderer.loadTemplates(objects);
       }
     }
