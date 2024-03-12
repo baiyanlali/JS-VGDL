@@ -97,9 +97,9 @@ class Sprite2DRenderer extends RendererBase {
 
         // console.log(`[Sprite2D Renderer] Add Sprite ${objectName}`)
 
-        if (objectName === "background") {
-            return;
-        }
+        // if (objectName === "background") {
+        //     return;
+        // }
 
         const objectTemplate = this.objectTemplates[objectTemplateName];
 

@@ -68,6 +68,10 @@ export function transformTo (sprite, partner, game, kwargs) {
 			game.kill_list.push(sprite);
 		}
 
+		if(kwargs['killSecond'] && kwargs['killSecond'] === true){
+			game.kill_list.push(partner)
+		}
+
 		let args = {'stype': stype}
 		return ['transforrmTo', sprite.ID || sprite, partner.ID || partner];
 	} else {
@@ -90,7 +94,7 @@ export function stepBack (sprite, partner, game, kwargs) {
 }
 
 export function bounceForward(sprite, partner, game, kwargs) {
-	sprite.physics.activeMovement(sprite, tools.unitVector(partner.lastdirection()));
+	sprite.physics.activeMovement(sprite, tools.unitVector(partner.lastdirection()), partner.speed);
 	game._updateCollisionDict(sprite);
 	return ['bounceForward', sprite.ID || sprite, partner.ID || partner]
 
@@ -130,8 +134,13 @@ export function slipForward(sprite, partner, game, kwargs) {
 	return ['slipForward', sprite.ID || sprite, partner.ID || partner]
 }
 
-export function undoAll () {
-	return
+export function undoAll (sprite, partner, game, kwargs) {
+	const notStypeStr = kwargs['nontStype']??""
+	const notStype = notStypeStr.split(",").map(s=>s.trim())
+	game._iterAllExcept(notStype).forEach(s=>{
+		s.location = Object.copy(s.lastlocation)
+	})
+	return ['undoAll', sprite.ID || sprite, partner.ID || partner]
 }
 export function attractGaze(sprite, partner, game, kwargs) {
 	if (kwargs.prob > Math.random()) {

@@ -26,11 +26,12 @@ for (const x of [tools, Games, Sprite, Constants, Avatars, Termination, Conditio
 }
 
 export class Node{
-    constructor(content, indent, parent = null){
+    constructor(content, indent, parent = null, line=0){
         this.children = []
         this.content = content
         this.indent = indent
         this.parent = null
+        this.line = line
         if(parent)
             parent.insert(this)
     }
@@ -61,7 +62,8 @@ function indentTreeParser(s = '', tabsize = 8){
 
     const root = last
 
-    for (let line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
         if(line.includes("#")){
             line = line.split("#")[0]
         }
@@ -69,10 +71,23 @@ function indentTreeParser(s = '', tabsize = 8){
         const content = line.trim()
 
         if(content.length > 0){
-            const indent = line.length - line.trim().length
-            last = new Node(content, indent, last)
+            const indent = line.length - line.trimStart().length
+            last = new Node(content, indent, last, i)
         }
     }
+
+    // for (let line of lines) {
+    //     if(line.includes("#")){
+    //         line = line.split("#")[0]
+    //     }
+
+    //     const content = line.trim()
+
+    //     if(content.length > 0){
+    //         const indent = line.length - line.trimStart().length
+    //         last = new Node(content, indent, last)
+    //     }
+    // }
     return root
 }
 
@@ -132,7 +147,7 @@ export class VGDLParser{
                     this.parseCondition(c.children)
                     break
                 default:
-                    console.error(`Unknown content: ${c.content}`)
+                    console.error(`Unknown content: ${c.content} at line ${c.line}`)
                     break
             }
         }

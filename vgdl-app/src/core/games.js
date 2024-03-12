@@ -257,6 +257,20 @@ export class BasicGame{
         }, []);
     }
 
+    _iterAllExcept = (keys) => {
+        if (this.sprite_order[this.sprite_order.length-1] !== 'avatar') {
+            this.sprite_order.remove('avatar');
+            this.sprite_order.push('avatar');
+        }
+
+        return this.sprite_order.reduce((base, key) => {
+            if (key in keys) return base;
+            if (this.sprite_groups[key] === undefined)
+                return base;
+            return base.concat(this.sprite_groups[key]);
+        }, []);
+    }
+
     numSprites = (key) => {
 
         const deleted = this.kill_list.filter((s) => {return s.stypes[key]}).length;

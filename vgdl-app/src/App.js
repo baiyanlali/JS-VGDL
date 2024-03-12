@@ -120,10 +120,11 @@ class App extends Component {
         } else if (vgdl === this.state.vgdlString && level !== this.state.levelString) {
             this.updateLevelString(level)
             return
-        } else if (vgdl !== this.state.vgdlString && level === this.state.levelString) {
-            this.updateGame(vgdl)
-            return
         }
+        //  else if (vgdl !== this.state.vgdlString && level === this.state.levelString) {
+        //     this.updateGame(vgdl)
+        //     return
+        // }
 
         const new_game = new VGDLParser().parseGame(vgdl)
         new_game.buildLevel(level)
