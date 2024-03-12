@@ -21,8 +21,10 @@ export function getColor(sprite) {
 }
 
 export function scoreChange(sprite, partner, game, kwargs) {
-	game.score += kwargs.score || kwargs.value;
-	game.bonus_score += kwargs.score || kwargs.value;
+	// console.log(`Before Score Change: ${kwargs.score}/${game.score}`)
+	game.score += kwargs.score ?? kwargs.value;
+
+	// console.log(`Score Change: ${kwargs.score}/${game.score}`)
 
 	return ['scoreChange', sprite.ID || sprite, partner.ID || partner]
 }

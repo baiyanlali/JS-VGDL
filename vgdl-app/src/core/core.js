@@ -8,6 +8,7 @@ import * as Condition from "./ontology/conditional.js";
 import * as Effect from "./ontology/effect.js";
 import * as Physics from "./ontology/physics.js";
 import * as Resource from "./ontology/resource.js";
+import {scoreChange} from "./ontology/effect.js";
 
 
 
@@ -229,6 +230,9 @@ export class VGDLParser{
                 for (let pair_idx = 1; pair_idx < pairs.length; pair_idx++) {
                     const object = pairs[pair_idx];
                     this.game.collision_eff.push([subject, object, eclass, args])
+                    if(args['scoreChange']){
+                        this.game.collision_eff.push([subject, object, scoreChange, {score: args['scoreChange']}])
+                    }
                 }
 
                 // this.game.collision_eff.push(

@@ -73,7 +73,7 @@ export default class Player extends Component {
         }
         // console.log()
         if(this.game.scene.scenes.length >= 1) {
-            console.log("active", this.props.active)
+            // console.log("active", this.props.active)
             this.game.scene.scenes[0]['active'] = this.props.active
         }
         // this.game.scene.scenes[0].active = this.props.active

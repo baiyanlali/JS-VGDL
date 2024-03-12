@@ -106,30 +106,6 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
     }
 
-    preload = ()=> {
-      // console.log('[HumanPlayerScene] Preload')
-      if (this.grenderer) {
-        // const sprites = [...Object.keys(this.vgdl.sprite_constr)]
-
-          const objects = []
-        // const objects = sprites.map(s=>{
-        //     return {name: s, shrinkfactor: 1.0, img: this.vgdl.sprite_constr[s][1]['img']}
-        // })
-
-          for (const spriteConstrKey in this.vgdl.sprite_constr) {
-              const object = {name: spriteConstrKey}
-              const [sclass, args, parents] = this.vgdl.sprite_constr[spriteConstrKey]
-              for (const argsKey in args) {
-                  object[argsKey] = args[argsKey]
-              }
-
-              objects.push(object)
-          }
-        this.grenderer.loadTemplates(objects);
-      }
-    }
-
-
     initInput = () => {
         this.A = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false)
         this.D = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false)
@@ -163,6 +139,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
         });
     }
 
+
     sleep = async (ms)=> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -177,22 +154,6 @@ export default class HumanPlayerScene extends Phaser.Scene{
       }
     }
 
-    create = () => {
-
-
-      this.initInput()
-
-      
-        if(this.grenderer){
-            this.grenderer.init(this.gridWidth, this.gridHeight, undefined, this.handlecollision)
-            this.updateState(this.vgdl.getFullState())
-        }
-      
-        if(this.vgdl){
-          const start_game = this.vgdl.run(this.handle_game_end)
-        }
-    }
-
     handle_game_end = (state)=> {
         this.onGameEnd(state)
     }
@@ -202,11 +163,57 @@ export default class HumanPlayerScene extends Phaser.Scene{
           this.renderData.objects[b].object)
     }
 
+    handleGameInfo = ()=> {
+        this.scoreText.text = `Time: ${this.vgdl.time}`
+        this.scoreText.text = `Score: ${this.vgdl.score}`
+    }
+
+    preload = ()=> {
+        // console.log('[HumanPlayerScene] Preload')
+        if (this.grenderer) {
+            // const sprites = [...Object.keys(this.vgdl.sprite_constr)]
+
+            const objects = []
+            // const objects = sprites.map(s=>{
+            //     return {name: s, shrinkfactor: 1.0, img: this.vgdl.sprite_constr[s][1]['img']}
+            // })
+
+            for (const spriteConstrKey in this.vgdl.sprite_constr) {
+                const object = {name: spriteConstrKey}
+                const [sclass, args, parents] = this.vgdl.sprite_constr[spriteConstrKey]
+                for (const argsKey in args) {
+                    object[argsKey] = args[argsKey]
+                }
+
+                objects.push(object)
+            }
+            this.grenderer.loadTemplates(objects);
+        }
+    }
+
+    create = () => {
+
+        this.scoreText = this.add.text(0, 0, `Time: ${this.vgdl.time}`, { fontFamily: 'Arial', fontSize: 20, color: '#00ff00' });
+        this.scoreText = this.add.text(0, 20, `Score: ${this.vgdl.score}`, { fontFamily: 'Arial', fontSize: 20, color: '#00ff00' });
+        this.initInput()
+
+
+        if(this.grenderer){
+            this.grenderer.init(this.gridWidth, this.gridHeight, undefined, this.handlecollision)
+            this.updateState(this.vgdl.getFullState())
+        }
+
+        if(this.vgdl){
+            const start_game = this.vgdl.run(this.handle_game_end)
+        }
+    }
+
     update = (time, delta)=> {
 
       if(this.vgdl){
         this.handleInput()
         this.vgdl.update(delta)
+          this.handleGameInfo()
       }
 
       if(this.grenderer){

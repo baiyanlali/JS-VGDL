@@ -1,11 +1,11 @@
-import {clone, defaultDict, initializeDistribution} from "./tools.js";
+import {defaultDict, initializeDistribution} from "./tools.js";
 import {colorDict, DARKGRAY, GOLD} from "./ontology/constants.js";
-import {Immovable, EOS} from "./ontology/vgdl-sprite.js";
+import {EOS, Immovable} from "./ontology/vgdl-sprite.js";
 import {Avatar, MovingAvatar} from "./ontology/avatar.js";
 import {Termination} from "./ontology/termination.js";
 import {scoreChange, stochastic_effects} from "./ontology/effect.js";
 import {Resource} from "./ontology/resource";
-import { distance } from "./ontology/physics.js";
+import {distance} from "./ontology/physics.js";
 
 const MAX_SPRITES = 10000
 
@@ -302,7 +302,6 @@ export class BasicGame{
     }
 
     getObjects = () => {
-        //TODO: Change position
         const obj_list = {};
         const fs = this.getFullState();
         const obs = Object.copy(fs['objects_cur']);
@@ -313,8 +312,7 @@ export class BasicGame{
                     'row': [obj.location.y]};
                 const type_vector = {'color': colorDict[obj.color.toString()],
                     'row': [obj.location.y]};
-                const sprite = obj;
-                obj_list[obj.ID] = {'sprite': sprite,
+                obj_list[obj.ID] = {'sprite': obj,
                     'position': [obj.location.x, obj.location.y],
                     'features': features,
                     'type': type_vector};
@@ -513,10 +511,7 @@ export class BasicGame{
                 }
                 const multi_effect = [[effect_set.effect, effect_set.kwargs]]
                 const kwargs = effect_set.kwargs
-                
-                if('scoreChange' in kwargs){
-                    multi_effect.push([scoreChange, kwargs['scoreChange']])
-                }
+
 
                 multi_effect.forEach(e=>{
                     const [effect, args] = e
