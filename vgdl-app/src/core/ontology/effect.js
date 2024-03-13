@@ -491,8 +491,9 @@ export function subtractHealthPoints(sprite, partner, game, kwargs){
 export function transformToRandomChild(sprite, partner, game, kwargs){
 	const stype = kwargs.stype
 	if(stype) {
-		console.log(game.getSubTypes(stype))
+		console.log()
+		const types = Object.keys(game.getSubTypes(stype))
+		transformTo(sprite, partner, game, {stype: types.randomElement()});
 	}
-
 	return ['transformToRandomChild', sprite.ID || sprite, partner.ID || partner]
 }

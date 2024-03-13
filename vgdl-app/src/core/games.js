@@ -309,23 +309,22 @@ export class BasicGame{
     }
 
     getSubTypes = (key) => {
-        const getSub= (dict, key)=> {
-            if(dict.hasOwnProperty(key)){
-                return dict[key]
+          const getSub = (dict, key) => {
+            if (dict.hasOwnProperty(key)) {
+              return dict[key];
+            } else if (Object.keys(dict).length === 0) {
+              return null;
+            } else {
+              let result = null;
+              for (const child in dict) {
+                const a = getSub(dict[child], key);
+                if(a !== null)
+                    result = a;
+              }
+              return result;
             }
-            else if(Object.keys(dict).length==0){
-                return {}
-            }
-            else{
-                const result = {}
-                for (const child in dict) {
-                    const a = getSub(child, key)
-                    result = {...result, a}
-                }
-                return result
-            }
-        }
-        return this.getSubTypes(this.objectTypes, key)
+          };
+        return getSub(this.objectTypes, key);
     }
 
     getObjects = () => {
@@ -518,11 +517,11 @@ export class BasicGame{
             const stypes2 = collision[1].stypes
 
             let effects = [];
-            if(collision[1] === 'EOS'){
+            if(collision[1] === 'EOS' || collision[1] === 'eos'){
                 this.collision_eff.forEach(eff=>{
                     const class1 = eff[0]
                     const class2 = eff[1]
-                    if(stypes1.includes(class1) && class2 === 'EOS')
+                    if(stypes1.includes(class1) && (class2 === 'EOS' || class2 === 'eos'))
                         effects = [{reverse: false, effect: eff[2], kwargs: eff[3]}]
                 })
             }else{
@@ -577,8 +576,9 @@ export class BasicGame{
         for (let i = 0; i < allSprites.length; i++) {
             const sprite1 = allSprites[i];
 
-            if(sprite1.hidden === true)
-                continue
+            // Hidden 只是给observer使用的，对于游玩来说没有什么用
+            // if(sprite1.hidden === true)
+            //     continue
 
             if(sprite1.location.x < 0 || sprite1.location.x > this.width || sprite1.location.y < 0 || sprite1.location.y > this.height){
                 this.collision_set.push([sprite1, 'EOS'])

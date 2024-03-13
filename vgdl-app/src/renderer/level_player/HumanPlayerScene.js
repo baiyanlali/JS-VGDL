@@ -164,7 +164,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
     }
 
     handleGameInfo = ()=> {
-        this.scoreText.text = `Time: ${this.vgdl.time}`
+        this.timeText.text = `Time: ${this.vgdl.time}`
         this.scoreText.text = `Score: ${this.vgdl.score}`
     }
 
@@ -193,8 +193,11 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
     create = () => {
 
-        this.scoreText = this.add.text(0, 0, `Time: ${this.vgdl.time}`, { fontFamily: 'Arial', fontSize: 20, color: '#00ff00' });
+        this.timeText = this.add.text(0, 0, `Time: ${this.vgdl.time}`, { fontFamily: 'Arial', fontSize: 20, color: '#00ff00' });
+        this.timeText.setDepth(1000)
         this.scoreText = this.add.text(0, 20, `Score: ${this.vgdl.score}`, { fontFamily: 'Arial', fontSize: 20, color: '#00ff00' });
+        this.scoreText.setDepth(1001)
+
         this.initInput()
 
 
