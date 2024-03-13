@@ -6,22 +6,23 @@ export default class VGDLEditor extends Component {
     constructor(props) {
         super(props)
 
-        const editorModels = {
+        this.editorModels = {
             VGDL: {
                 name: "VGDL",
                 language: "text",
-                value: this.props.vgdlString
+                value: this.props.vgdlString,
             },
             Level: {
                 name: "Level",
                 language: "text",
-                value: this.props.levelString
+                value: this.props.levelString,
             }
         }
 
+        this.fileName = "VGDL"
+
         this.state = {
-            fileName: "VGDL",
-            editorModels
+            fileContent: this.props.vgdlString
         }
 
         this.updateVGDL = this.props.updateVGDL
@@ -29,18 +30,16 @@ export default class VGDLEditor extends Component {
     }
 
     changeModel(fileName) {
-        this.setState(state => {
-            return {
-                ...state,
-                fileName
-            }
-        })
+        console.log(fileName)
+        this.fileName = fileName
 
+        this.setState(e=>{
+            return {...e, fileContent: this.editorModels[this.fileName].value }
+        })
     }
 
     onChangeContent = (newvalue, e) => {
-        return
-        const file = this.state.editorModels[this.state.fileName]
+        const file = this.editorModels[this.fileName]
         file.value = newvalue
     }
 
@@ -51,10 +50,9 @@ export default class VGDLEditor extends Component {
             this.editor.addCommand(
                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
                 () => {
-                    this.props.updateGameAndLevel(this.state.editorModels.VGDL.value, this.state.editorModels.Level.value)
+                    this.props.updateGameAndLevel(this.editorModels.VGDL.value, this.editorModels.Level.value)
                 }
             )
-
             this.editor.onDidBlurEditorWidget(() => {
                 this.props.onBlur(this)
             })
@@ -64,34 +62,25 @@ export default class VGDLEditor extends Component {
         }
     }
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-        // console.log(nextProps)
-        const editorModels = {
-            VGDL: {
-                name: "VGDL",
-                language: "text",
-                value: nextProps.vgdlString
-            },
-            Level: {
-                name: "Level",
-                language: "text",
-                value: nextProps.levelString
-            }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(prevProps.vgdlString !== this.props.vgdlString){
+            this.editorModels['VGDL'].value = this.props.vgdlString
         }
-
-        return {
-            ...prevState,
-            editorModels,
-        };
+        if(prevProps.levelString !== this.props.levelString){
+            this.editorModels['Level'].value = this.props.levelString
+        }
+        if(this.editor){
+            this.editor.setValue(this.editorModels[this.fileName].value)
+        }
     }
 
 
 
+
     render() {
-        const file = this.state.editorModels[this.state.fileName]
+        const file = this.editorModels[this.fileName]
         return (
             <Card data-bs-theme={this.props.theme}
-                // border="primary"
                   border={this.props.active ? "primary" : "dark"}
             >
 
@@ -109,7 +98,7 @@ export default class VGDLEditor extends Component {
                 <Card.Body ref={editorElement => this.editorElement = editorElement}>
                     <Editor
                         path={file.name}
-                        value={file.value}
+                        value={this.state.fileContent}
                         language={file.language}
                         theme="vs-dark"
                         height="70vh"
