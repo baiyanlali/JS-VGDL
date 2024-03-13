@@ -279,3 +279,19 @@ export class OngoingShootAvatar extends ShootAvatar{
         super.update(game)
     }
 }
+
+export class MissileAvatar extends OrientedAvatar{
+    constructor(pos, size, args) {
+        super(pos, size, args);
+        this.speed = 1
+        this.is_oriented = true
+    }
+
+    update(game){
+        this.physics.activeMovement(this, this.orientation, this.speed)
+    }
+
+    declare_possible_actions(){
+        return []
+    }
+}
