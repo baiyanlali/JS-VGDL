@@ -57,7 +57,7 @@ export default class Player extends Component {
 
 
     onGameEnd = (result) => {
-        console.trace(`Reuslt: ${JSON.stringify(result.win)}`)
+        // console.trace(`Reuslt: ${JSON.stringify(result.win)}`)
         this.setState(state => {
             return {
                 ...state,

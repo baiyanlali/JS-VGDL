@@ -21,7 +21,7 @@ export const vectNorm = (vector) => {
  * @param vector
  */
 export const unitVector = (vector) => {
-    var norm = vectNorm(vector);
+    const norm = vectNorm(vector);
 
     if (norm > 0)
         return [vector[0]/norm, vector[1]/norm];

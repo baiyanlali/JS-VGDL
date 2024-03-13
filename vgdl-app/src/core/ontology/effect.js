@@ -1,7 +1,7 @@
 import {colorDict, DOWN} from "./constants.js";
 import {OrientedSprite} from "./vgdl-sprite.js";
 import * as tools from "../tools.js";
-import {oncePerStep, unitVector} from "../tools.js";
+import {oncePerStep, unitVector, vectNorm} from "../tools.js";
 import {Resource} from "./resource.js";
 import {ContinuousPhysics} from "./physics.js";
 
@@ -496,4 +496,33 @@ export function transformToRandomChild(sprite, partner, game, kwargs){
 		transformTo(sprite, partner, game, {stype: types.randomElement()});
 	}
 	return ['transformToRandomChild', sprite.ID || sprite, partner.ID || partner]
+}
+
+export function shieldFrom(sprite, partner, game, kwargs){
+	const stype = kwargs.stype
+	const ftype = kwargs.ftype
+	game.addShield(sprite.stype, stype, ftype)
+	return ['shieldFrom', sprite.ID || sprite, partner.ID || partner]
+}
+
+export function killIfFrontal(sprite, partner, game, kwargs){
+	const direction1 = unitVector(sprite.lastdirection())
+	const direction2 = unitVector(sprite.lastdirection())
+
+	const dirsum = [direction1[0]+direction2[0], direction1[1]+direction2[1]]
+
+	if(vectNorm(dirsum) === 0 || vectNorm(direction1) === 0){
+		killSprite(sprite, partner, game, kwargs)
+	}
+}
+
+export function killIfNotFrontal(sprite, partner, game, kwargs){
+	const direction1 = unitVector(sprite.lastdirection())
+	const direction2 = unitVector(sprite.lastdirection())
+
+	const dirsum = [direction1[0]+direction2[0], direction1[1]+direction2[1]]
+
+	if(vectNorm(dirsum) !== 0 || vectNorm(direction1) === 0){
+		killSprite(sprite, partner, game, kwargs)
+	}
 }

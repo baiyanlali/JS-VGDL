@@ -30,7 +30,7 @@ export default class VGDLEditor extends Component {
     }
 
     changeModel(fileName) {
-        console.log(fileName)
+        // console.log(fileName)
         this.fileName = fileName
 
         this.setState(e=>{

@@ -77,6 +77,7 @@ export class BasicGame{
     sprite_bonus_granted_on_timestep = -1; // to ensure you only grant bonus once per timestep (since you check _isDone() multiple times)
     timeout_bonus_granted_on_timestep = -1; // to ensure you only grant bonus once per timestep (since you check _isDone() multiple times)
 
+    shieldedEffects = {}
     paused = true
 
     objectTypes = {}
@@ -129,6 +130,7 @@ export class BasicGame{
         this.kill_list = []
         this.all_killed = []
         this.paused = true
+        this.shieldedEffects = {}
     }
 
     resetLevel = ()=> {
@@ -504,6 +506,13 @@ export class BasicGame{
             this.collision_eff.forEach(eff=>{
                 const class1 = eff[0]
                 const class2 = eff[1]
+                const eclass = eff[2]
+
+                if(this.shieldedEffects[class1] && this.shieldedEffects[class1].includes([class2, eclass.name])){
+                    console.log(`[GAMES] Check shield ${class1}, ${class2}, ${eclass.name}`)
+                    return
+                }
+
                 if(stypes1.includes(class1) && stypes2.includes(class2))
                     res.push({reverse: false, effect: eff[2], kwargs: eff[3]})
                 else if(stypes1.includes(class2) && stypes2.includes(class1))
@@ -553,6 +562,9 @@ export class BasicGame{
         // console.log(`Press Button: ${keyCode}`)
         this.keystate[keyCode] = true
         this.key_to_clean?.push(keyCode)
+        if(this.key_handler === "Pulse"){
+            this.update(0, true)
+        }
     }
 
     presskeyUp = (keyCode) => {
@@ -568,6 +580,14 @@ export class BasicGame{
 
     addCollisions = (a, b)=> {
         return
+    }
+
+    addShield = (a, stype, ftype)=> {
+        if(this.shieldedEffects[a[-1]]){
+            this.shieldedEffects[a[-1]].push([stype, ftype])
+        }else{
+            this.shieldedEffects[a[-1]]= [[stype, ftype]]
+        }
     }
 
     updateCollision = ()=> {
@@ -599,6 +619,9 @@ export class BasicGame{
     }
 
     update = (delta, now = false) => {
+        if(this.key_handler === "Pulse"){
+            if(!now)    return
+        }
         if(!now){
             this.currentTime += delta
             if(this.currentTime<this.updateTime)return
