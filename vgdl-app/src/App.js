@@ -44,6 +44,7 @@ class App extends Component {
             selectedLevelId: 0,
             trajectories: [],
             projects: {
+                "grid_physics": {}
             },
             newProject: {
                 name: "",
@@ -85,16 +86,13 @@ class App extends Component {
 
         const projects = {"grid_physics": {}}
         this.loadConfig().then((configs)=> {
-            configs.forEach(config=> {
-                const games = config['grid_physics']
+            // console.log(configs)
+            for (const game in configs['grid_physics']) {
+                // console.log(game, configs['grid_physics'][game])
+                projects['grid_physics'][game] = configs['grid_physics'][game]
+            }
 
-                for (const game_name in games) {
-                    const levels = games[game_name]
-
-                    projects['grid_physics'][game_name] = levels
-                }
-
-            })
+            // console.log(projects)
 
             this.setState(e=>{
                 return {
@@ -113,13 +111,16 @@ class App extends Component {
         if (levelString === this.state.vgdlLevel) {
             return
         }
+
         this.state.game.buildLevel(levelString)
+
         this.setState(e => {
             return {
                 ...e,
                 vgdlLevel: levelString
             }
         })
+
     }
 
     updateGame = (vgdlString) => {
@@ -127,7 +128,7 @@ class App extends Component {
             return
         }
         const new_game = new VGDLParser().parseGame(vgdlString)
-        // new_game.buildLevel(this.state.vgdlLevel)
+
         this.setState(e => {
             return {
                 ...e,
@@ -135,6 +136,8 @@ class App extends Component {
                 vgdlString: vgdlString
             }
         })
+        // new_game.buildLevel(this.state.vgdlLevel)
+
     }
 
 
@@ -146,20 +149,26 @@ class App extends Component {
             this.updateLevelString(level)
             return
         }
-        //  else if (vgdl !== this.state.vgdlString && level === this.state.levelString) {
-        //     this.updateGame(vgdl)
-        //     return
-        // }
+
+        this.setState(e => {
+            return {
+                ...e,
+                vgdlString: vgdl,
+                vgdlLevel: level
+            }
+        })
+
 
         const new_game = new VGDLParser().parseGame(vgdl)
         new_game.buildLevel(level)
 
+        console.log("update game and level")
         this.setState(e => {
             return {
                 ...e,
                 game: new_game,
                 vgdlString: vgdl,
-                levelString: level
+                vgdlLevel: level
             }
         })
 
@@ -183,7 +192,38 @@ class App extends Component {
         })
     }
 
+    loadGame = async (gameName, gameLevels, paths = "./games/gridphysics/") => {
+        // console.log("load ", gameName, `${paths}${gameName}.txt`, `${paths}${gameLevels[0]}`)
+        const gameFile = await (await fetch(`${paths}${gameName}.txt`)).text()
+        const gameLevel = await (await fetch(`${paths}${gameLevels[0]}`)).text()
+        // console.log(gameFile)
+        // console.log(gameLevel)
+        this.updateGameAndLevel(gameFile, gameLevel)
+    }
+
     render() {
+
+        const get_projects = ()=> {
+            const projects = this.state.projects
+
+            const games = Object.keys(projects['grid_physics'])
+
+            return (
+                <>
+                    <NavDropdown title="GridPhysics" drop="end">
+                    {
+                        games.map((game)=> {
+                            return <NavDropdown.Item
+                                key={game}
+                                onClick={() => this.loadGame(game, projects['grid_physics'][game])}>
+                                {game}</NavDropdown.Item>}
+                        )
+                    }
+                    </NavDropdown>
+                </>
+            )
+        }
+
         return (
             <>
                 <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary" data-bs-theme={this.state.theme}>
@@ -207,10 +247,9 @@ class App extends Component {
                                 <NavDropdown.Item>New Project</NavDropdown.Item>
                                 <NavDropdown.Item>Existing Project</NavDropdown.Item>
                                 <NavDropdown.Divider/>
-                                <NavDropdown title="Haha" drop="end">
-                                    <NavDropdown.Item>New Project</NavDropdown.Item>
-                                    <NavDropdown.Item>Existing Project</NavDropdown.Item>
-                                </NavDropdown>
+                                {
+                                    get_projects()
+                                }
                             </NavDropdown>
 
                             <NavDropdown title="Help">
@@ -261,7 +300,7 @@ class App extends Component {
                                 <VGDLEditor ref={e=> {
                                     this.editorElement = e
                                 }}
-                                    gdyString={this.state.vgdlString}
+                                    vgdlString={this.state.vgdlString}
                                     levelString={this.state.vgdlLevel}
                                     updateVGDL={this.updateGame}
                                     updateLevelString={this.updateLevelString}

@@ -401,3 +401,23 @@ export function cannotActivateSwitch(sprite, partner, game, kwargs) {
 
 }
 
+export function spawn(sprite, partner, game, kwargs) {
+	const stype = kwargs['stype']
+	game._createSprite([stype], [sprite.location.x, sprite.location.y]);
+}
+
+export function setSpeedForAll(sprite, partner, game, kwargs){
+	const value = kwargs['value'] ?? 1.0
+	const stype = kwargs['stype']
+	const sprites = game.getSprites(stype)
+	sprites.forEach(s=>s.speed = value)
+	return ['setSpeedForAll', sprite.ID || sprite, partner.ID || partner]
+}
+
+export function align(sprite, partner, game, kwargs){
+	const orient = kwargs['orient']
+	if(orient)
+		sprite.orient = Object.copy(orient)
+	sprite.location = Object.copy(partner.location)
+	return ['align', sprite.ID || sprite, partner.ID || partner]
+}

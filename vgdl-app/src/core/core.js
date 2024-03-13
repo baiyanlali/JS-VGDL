@@ -153,6 +153,7 @@ export class VGDLParser{
             }
         }
 
+
         const keys = []
         let colors = []
 
@@ -197,85 +198,101 @@ export class VGDLParser{
             if(c.content.indexOf('>') !== -1){
                 const [conditional, interaction] = c.content.split('>').map(s=>s.trim())
 
-                const [cclass, cargs] = this.parseArgs(conditional)
-                const [eclass, eargs] = this.parseArgs(conditional)
+                try{
+                    const [cclass, cargs] = this.parseArgs(conditional)
+                    const [eclass, eargs] = this.parseArgs(conditional)
 
-                console.debug(`Adding Condition ${conditional}  ${interaction}`)
+                    console.debug(`Adding Condition ${conditional}  ${interaction}`)
 
-                this.game.conditions.push([new cclass(cargs), [eclass, eargs]])
+                    this.game.conditions.push([new cclass(cargs), [eclass, eargs]])
+                }catch (e) {
+                    throw new Error(`Parse Condition Fail at Line ${c.line}: \n ${c.content} \n ${e.toString()}`)
+                }
+
             }
         })
     }
 
     parseTermination = (tnodes)=>{
         tnodes.forEach(t=>{
-            const [sclass, args] = this.parseArgs(t.content)
-            console.debug(`Adding Termination: ${sclass} ${args}`)
-            this.game.terminations.push(new sclass(args))
+            try{
+                const [sclass, args] = this.parseArgs(t.content)
+                console.debug(`Adding Termination: ${sclass} ${args}`)
+                this.game.terminations.push(new sclass(args))
+            }catch (e) {
+                throw new Error(`Parse Termination Fail at Line ${t.line}:\n ${t.content} \n ${e.toString()}`)
+            }
+
         })
     }
 
     parseInteraction = (inodes)=> {
         inodes.forEach(i=> {
             if(i.content.indexOf('>') !== -1){
-                const [pair, edef] = i.content.split('>').map(s=>s.trim())
-                const [eclass, args] = this.parseArgs(edef);
+                try{
+                    const [pair, edef] = i.content.split('>').map(s=>s.trim())
+                    const [eclass, args] = this.parseArgs(edef);
 
 
-                //支持object为多个的情况，测试环境为surround
-                const pairs = pair.split(' ').map(s=>s.trim()).filter(s=>s)
+                    //支持object为多个的情况，测试环境为surround
+                    const pairs = pair.split(' ').map(s=>s.trim()).filter(s=>s)
 
-                const subject = pairs[0]
+                    const subject = pairs[0]
 
-                for (let pair_idx = 1; pair_idx < pairs.length; pair_idx++) {
-                    const object = pairs[pair_idx];
-                    this.game.collision_eff.push([subject, object, eclass, args])
-                    if(args['scoreChange']){
-                        this.game.collision_eff.push([subject, object, scoreChange, {score: args['scoreChange']}])
+                    for (let pair_idx = 1; pair_idx < pairs.length; pair_idx++) {
+                        const object = pairs[pair_idx];
+                        this.game.collision_eff.push([subject, object, eclass, args])
+                        if(args['scoreChange']){
+                            this.game.collision_eff.push([subject, object, scoreChange, {score: args['scoreChange']}])
+                        }
                     }
+
+                    console.debug(`Adding Collision ${pair} has effect: ${edef}`)
+                }catch (e) {
+                    throw new Error(`Parse Interaction Fail at Line ${i.line}: \n ${i.content} \n ${e.toString()}`)
                 }
 
-                // this.game.collision_eff.push(
-                //     pair.split(' ').map(s=>s.trim()).filter(s=>s).concat([eclass, args])
-                // )
-
-                console.debug(`Adding Collision ${pair} has effect: ${edef}`)
             }
         })
     }
 
     parseSprites = (snodes, parentClass = null, parentargs = {}, parenttypes = [])=>{
         snodes.forEach(s => {
-            console.assert(s.content.indexOf('>') !== -1)
-            const [key, sdef] = s.content.split('>').map(s => s.trim())
-            let [sclass, args] = this.parseArgs(sdef, parentClass, Object.assign({}, parentargs))
+            try{
+                console.assert(s.content.indexOf('>') !== -1)
+                const [key, sdef] = s.content.split('>').map(s => s.trim())
+                let [sclass, args] = this.parseArgs(sdef, parentClass, Object.assign({}, parentargs))
 
-            if ('image' in args) {
-                this.images.push(args.image)
-            }
-
-            const stypes = parenttypes.concat(key);
-            if ('singleton' in args) {
-                if (args['singleton'] === true)
-                    this.game.singletons.push(key)
-                args = JSON.parse(JSON.stringify(args))
-                delete args['singleton']
-            }
-
-            if (s.children.length === 0) {
-                console.debug(`Defining: ${key} ${sclass} ${args} ${stypes}`)
-                this.game.sprite_constr[key] = [sclass, args, stypes]
-
-                if (args.color && !('color' in parentargs) && !(this.ignore_colors.contains(key))) {
-                    this.var_colors[key] = args.color
+                if ('image' in args) {
+                    this.images.push(args.image)
                 }
 
-                if (this.game.sprite_order.contains(key))
-                    this.game.sprite_order.remove(key)
-                this.game.sprite_order.push(key)
-            } else {
-                this.parseSprites(s.children, sclass, args, stypes)
+                const stypes = parenttypes.concat(key);
+                if ('singleton' in args) {
+                    if (args['singleton'] === true)
+                        this.game.singletons.push(key)
+                    args = JSON.parse(JSON.stringify(args))
+                    delete args['singleton']
+                }
+
+                if (s.children.length === 0) {
+                    console.debug(`Defining: ${key} ${sclass} ${args} ${stypes}`)
+                    this.game.sprite_constr[key] = [sclass, args, stypes]
+
+                    if (args.color && !('color' in parentargs) && !(this.ignore_colors.contains(key))) {
+                        this.var_colors[key] = args.color
+                    }
+
+                    if (this.game.sprite_order.contains(key))
+                        this.game.sprite_order.remove(key)
+                    this.game.sprite_order.push(key)
+                } else {
+                    this.parseSprites(s.children, sclass, args, stypes)
+                }
+            }catch (e) {
+                throw new Error(`Parse Interaction Fail at Line ${s.line}: \n ${s.content} \n ${e.toString()}`)
             }
+
         })
     }
 
