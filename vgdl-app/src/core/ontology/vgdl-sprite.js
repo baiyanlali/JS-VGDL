@@ -1,5 +1,4 @@
 import {clone, defaultDict, new_id, random, triPoints, unitVector} from "../tools.js";
-
 import {ContinuousPhysics, GridPhysics} from "./physics.js";
 import {BASEDIRS, BLACK, BLUE, GRAY, ORANGE, PURPLE, RED, RIGHT} from "./constants.js";
 import {killSprite} from "./effect";
@@ -27,13 +26,16 @@ export class VGDLSprite{
 	color = '#ffffff';
 	orientation = [0,0]
 	location = {x:0, y:0}
+	healthPoints = 1
+	limitHealthPoints = 1000
+	maxHealthPoints = 1
 
 	constructor(pos, size, args= {}) {
 		args = args ?? {}
 		this.name = args.key || null;
 		this.location = pos ? {x: pos[0], y: pos[1]} : this.location
 		this.size = size ?? this.size
-		this.lastlocation = {x: this.location.y, y: this.location.y}
+		this.lastlocation = {x: this.location.x, y: this.location.y}
 		this.physicstype = args.physicstype || this.physicstype || GridPhysics;
 		this.physics = new this.physicstype();
 		this.physics.gridsize = size;
@@ -43,6 +45,9 @@ export class VGDLSprite{
 		this.direction = null;
 		this.color = args.color || this.color;
 		this.image = args.image;
+		this.healthPoints = args.healthPoints || this.healthPoints
+		this.limitHealthPoints = args.limitHealthPoints || this.limitHealthPoints
+		this.maxHealthPoints = args.maxHealthPoints || this.healthPoints
 
 			// iterate over kwargs
 		// this.extend(args);
@@ -188,17 +193,21 @@ export class SpawnPoint extends SpriteProducer{
 		if (args.total !== undefined) this.total = args.total;
 
 		this.counter = 0;
+
+		this.stype = args.stype || null;
 	}
 
 	update (game) {
-		const rnd = random.random()
-		if (game.time % this.cooldown === 0 && rnd < this.prob) {
-			game._createSprite([this.stype], [this.location.x, this.location.y]);
-			this.counter ++;
-		}
+		if(this.stype) {
+			const rnd = random.random()
+			if (game.time % this.cooldown === 0 && rnd < this.prob) {
+				game._createSprite([this.stype], [this.location.x, this.location.y]);
+				this.counter++;
+			}
 
-		if (this.total && this.counter >= this.total) {
-			killSprite(this, undefined, game);
+			if (this.total && this.counter >= this.total) {
+				killSprite(this, undefined, game);
+			}
 		}
 	}
 }
@@ -380,13 +389,15 @@ export class Bomber extends Missile{
 		if (args.total !== undefined) this.total = args.total;
 
 		this.counter = 0;
+
+		this.stype = args.stype
 	}
 
 	update (game) {
 		super.update(game)
 		
 
-		if(game.time % this.cooldown === 0 && random.random() < this.prob){
+		if(this.stype && game.time % this.cooldown === 0 && random.random() < this.prob){
 			game._createSprite([this.stype], [this.location.x, this.location.y])
 			this.counter ++
 		}
@@ -401,6 +412,77 @@ export class Door extends Immovable{
 	constructor(pos, size, args) {
 		args.portal = args.portal || true
 		super(pos, size, args);
+	}
+}
+
+export class Chaser extends RandomNPC{
+	constructor(pos, size, args) {
+		args.portal = args.portal || true
+		super(pos, size, args);
+		this.stype = args.stype
+		this.fleeing = args.fleeing || false
+	}
+
+	_closestTargets(game){
+		let bestd = 1e100;
+		let res = [];
+		game.getSprites(this.stype).forEach(target => {
+			const d = this.physics.quickDistance(this, target);
+			if (d < bestd) {
+				bestd = d;
+				res = [target];
+			} else if (d === bestd) {
+				res.push(target);
+			}
+		});
+		return res;
+	}
+
+	_movesToward (game, target) {
+		const res = [];
+		let basedist = this.physics.quickDistance(this, target);
+		BASEDIRS.forEach(a => {
+			// console.log(a)
+			let r = { ...this.location }
+			r.x += a[0]
+			r.y += a[1]
+
+			const newdist = this.physics.quickDistance({location: r}, target);
+			// console.log(a, basedist,  newdist);
+			if (this.fleeing && basedist < newdist) {
+				res.push(a);
+			}
+			else if (!(this.fleeing) && basedist > newdist){
+				res.push(a);
+			}
+		});
+		return res;
+	}
+
+	update (game) {
+		let options = [];
+		const position_options = {};
+		this._closestTargets(game).forEach(target => {
+			options = options.concat(this._movesToward(game, target));
+		});
+		if (options.length === 0) {
+			options = BASEDIRS;
+		}
+		super.update(game)
+
+		this.physics.activeMovement(this, options.randomElement());
+	}
+}
+
+export class BomberRandomMissile extends SpawnPoint{
+	constructor(pos, size, args) {
+		super(pos, size, args);
+		this.stypeMissile = args.stypeMissile.split(',')
+	}
+
+	update(game) {
+		this.stype = this.stypeMissile.randomElement()
+		super.update(game);
 	}
 }
 

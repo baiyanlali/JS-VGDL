@@ -269,3 +269,13 @@ export class ShootAvatar extends OrientedAvatar{
     }
 }
 
+
+export class OngoingShootAvatar extends ShootAvatar{
+    constructor(pos, size, args) {
+        super(pos, size, args);
+    }
+
+    update(game){
+        super.update(game)
+    }
+}

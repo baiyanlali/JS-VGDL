@@ -55,7 +55,7 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
         state.objects.forEach((object) => {
 
-          if((object.hidden && object.hidden === true) || (object.invisible && object.invisible === true)){
+          if((object.invisible && object.invisible === true)){
             return
           }
 

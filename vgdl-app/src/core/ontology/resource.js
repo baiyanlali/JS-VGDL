@@ -1,9 +1,10 @@
-import {VGDLSprite} from "./vgdl-sprite.js";
+import {Passive, VGDLSprite} from "./vgdl-sprite.js";
 
-export class Resource {
+export class Resource extends VGDLSprite {
 	constructor(pos, size, args) {
+		args.limit = args.limit || 2
+		super(pos, size, args)
 		this.value = args.value || 1;
-		this.limit = args.limit || 2;
 		this.res_type = args.res_type || null;
 	}
 

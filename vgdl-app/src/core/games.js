@@ -5,7 +5,7 @@ import {Avatar, MovingAvatar} from "./ontology/avatar.js";
 import {Termination} from "./ontology/termination.js";
 import {scoreChange, stochastic_effects} from "./ontology/effect.js";
 import {Resource} from "./ontology/resource";
-import {distance} from "./ontology/physics.js";
+import {ContinuousPhysics, distance} from "./ontology/physics.js";
 
 const MAX_SPRITES = 10000
 
@@ -78,6 +78,8 @@ export class BasicGame{
     timeout_bonus_granted_on_timestep = -1; // to ensure you only grant bonus once per timestep (since you check _isDone() multiple times)
 
     paused = true
+
+    objectTypes = {}
 
     ignoredattributes = ['stypes',
         'name',
@@ -284,6 +286,11 @@ export class BasicGame{
 
     }
 
+    /**
+     * 
+     * @param {string} key sprite type
+     * @returns {list[Object]}
+     */
     getSprites = (key) => {
         if (this.sprite_groups[key] instanceof Array)
 			return this.sprite_groups[key].filter(s => {return this.kill_list.indexOf(s) === -1});
@@ -299,6 +306,26 @@ export class BasicGame{
                 res.concat(ss.filter(s=> this.kill_list.indexOf(s) === -1))
         }
         return res
+    }
+
+    getSubTypes = (key) => {
+        const getSub= (dict, key)=> {
+            if(dict.hasOwnProperty(key)){
+                return dict[key]
+            }
+            else if(Object.keys(dict).length==0){
+                return {}
+            }
+            else{
+                const result = {}
+                for (const child in dict) {
+                    const a = getSub(child, key)
+                    result = {...result, a}
+                }
+                return result
+            }
+        }
+        return this.getSubTypes(this.objectTypes, key)
     }
 
     getObjects = () => {
@@ -509,14 +536,8 @@ export class BasicGame{
                 if(effect_set.reverse){
                     [sprite, partner] = [collision[1], collision[0]]
                 }
-                const multi_effect = [[effect_set.effect, effect_set.kwargs]]
-                const kwargs = effect_set.kwargs
 
-
-                multi_effect.forEach(e=>{
-                    const [effect, args] = e
-                    effect(sprite, partner, this, args)
-                })
+                effect_set.effect(sprite, partner, this, effect_set.kwargs)
 
             }
         }
@@ -531,6 +552,7 @@ export class BasicGame{
 
     presskey = (keyCode)=> {
         this.keystate[keyCode] = true
+        this.key_to_clean?.push(keyCode)
     }
 
     presskeyUp = (keyCode) => {
@@ -546,7 +568,6 @@ export class BasicGame{
 
     addCollisions = (a, b)=> {
         return
-        this.collision_set.push([a, b])
     }
 
     updateCollision = ()=> {
@@ -556,6 +577,9 @@ export class BasicGame{
         for (let i = 0; i < allSprites.length; i++) {
             const sprite1 = allSprites[i];
 
+            if(sprite1.hidden === true)
+                continue
+
             if(sprite1.location.x < 0 || sprite1.location.x > this.width || sprite1.location.y < 0 || sprite1.location.y > this.height){
                 this.collision_set.push([sprite1, 'EOS'])
             }
@@ -564,7 +588,7 @@ export class BasicGame{
                 const sprite2 = allSprites[j];
                 const dist = distance(sprite1, sprite2)
                 
-                if(dist < 0.1){
+                if(dist <= 0.99){
                     this.collision_set.push([sprite1, sprite2])
                 }
 

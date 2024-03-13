@@ -1,4 +1,6 @@
 import * as tools from "./tools.js";
+import * as Resource from "./ontology/resource.js";
+
 import * as Games from "./games.js";
 import * as Sprite from "./ontology/vgdl-sprite.js";
 import * as Constants from "./ontology/constants.js";
@@ -7,8 +9,7 @@ import * as Termination from "./ontology/termination.js";
 import * as Condition from "./ontology/conditional.js";
 import * as Effect from "./ontology/effect.js";
 import * as Physics from "./ontology/physics.js";
-import * as Resource from "./ontology/resource.js";
-import {scoreChange} from "./ontology/effect.js";
+import {killSprite, scoreChange} from "./ontology/effect.js";
 
 
 
@@ -245,6 +246,10 @@ export class VGDLParser{
                         if(args['scoreChange']){
                             this.game.collision_eff.push([subject, object, scoreChange, {score: args['scoreChange']}])
                         }
+
+                        if(args['killSecond']){
+                            this.game.collision_eff.push([object, subject, killSprite, {score: args['killSecond']}])
+                        }
                     }
 
                     console.debug(`Adding Collision ${pair} has effect: ${edef}`)
@@ -286,11 +291,33 @@ export class VGDLParser{
                     if (this.game.sprite_order.contains(key))
                         this.game.sprite_order.remove(key)
                     this.game.sprite_order.push(key)
+
+                    let dict = this.game.objectTypes
+
+                    for (const parent of stypes) {
+                        if(parent === key){
+                            break
+                        }
+                        dict = dict[parent]
+                    }
+                    dict[key] = {}
                 } else {
+
+                    let dict = this.game.objectTypes
+
+                    for (const parent of stypes) {
+                        if(parent === key){
+                            break
+                        }
+                        dict = dict[parent]
+                    }
+                    dict[key] = {}
+
                     this.parseSprites(s.children, sclass, args, stypes)
                 }
+                
             }catch (e) {
-                throw new Error(`Parse Interaction Fail at Line ${s.line}: \n ${s.content} \n ${e.toString()}`)
+                throw new Error(`Parse Sprite Fail at Line ${s.line}: \n ${s.content} \n ${e.toString()}`)
             }
 
         })

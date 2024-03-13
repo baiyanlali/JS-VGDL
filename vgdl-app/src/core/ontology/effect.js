@@ -46,16 +46,16 @@ export function cloneSprite (sprite, partner, game, kwargs) {
 }
 
 export function transformTo (sprite, partner, game, kwargs) {
-	let hasID = partner.ID in sprite.transformedBy;
-	let validTime;
-	if (hasID) {
-		if (game.time > sprite.transformedBy[partner.ID] + 3) {
-			validTime = true;
-		} else {
-			validTime = false;
-		}
-	}
-	if (!(hasID) || validTime) {
+	// let hasID = partner.ID in sprite.transformedBy;
+	// let validTime;
+	// if (hasID) {
+	// 	if (game.time > sprite.transformedBy[partner.ID] + 3) {
+	// 		validTime = true;
+	// 	} else {
+	// 		validTime = false;
+	// 	}
+	// }
+	// if (!(hasID) || validTime) {
 		//(sprite.transformedBy.has(partner.ID)) {
 		//sprite.transformedBy.add(partner.ID);
 		sprite.transformedBy[partner.ID] = game.time;
@@ -70,15 +70,31 @@ export function transformTo (sprite, partner, game, kwargs) {
 			game.kill_list.push(sprite);
 		}
 
-		if(kwargs['killSecond'] && kwargs['killSecond'] === true){
-			game.kill_list.push(partner)
-		}
+		// if(kwargs['killSecond'] && kwargs['killSecond'] === true){
+		// 	game.kill_list.push(partner)
+		// }
 
 		let args = {'stype': stype}
 		return ['transforrmTo', sprite.ID || sprite, partner.ID || partner];
-	} else {
-		return;
-	}
+	// } else {
+	// 	return;
+	// }
+}
+
+export function transformToAll (sprite, partner, game, kwargs) {
+
+	//(sprite.transformedBy.has(partner.ID)) {
+	//sprite.transformedBy.add(partner.ID);
+	sprite.transformedBy[partner.ID] = game.time;
+	let stype = kwargs.stype;
+	const sprites = game.getSprites(stype)
+
+	sprites.forEach(s=> {
+		transformTo(s, partner, game, {stype: kwargs.stypeTo})
+	})
+
+	return ['transforrmToAll', sprite.ID || sprite, partner.ID || partner];
+
 }
 
 export function transformToOnLanding (sprite, partner, game, kwargs) {
@@ -282,12 +298,16 @@ export function collectResource(sprite, partner, game, kwargs) {
 	return ['collectResource', sprite.ID || sprite, partner.ID || partner]
 }
 
-export function changeResource(sprite, partner, resourceColor, game, kwargs) {
+export function changeResource(sprite, partner, game, kwargs) {
 	let resource = kwargs.resource;
 	let value = kwargs.value || 1;
 	let sprite_resource = sprite.resources[resource] || 0;
 	let resource_limit = game.resources_limits[resource] || Infinity;
 	sprite.resources[resource] = Math.max(-1, Math.min(sprite_resource + value, resource_limit))
+
+	if(kwargs.killResource){
+		killSprite(partner, undefined, game, {})
+	}
 	return ['changeResource', sprite.ID || sprite, partner.ID || partner]
 }
 
@@ -391,7 +411,7 @@ export function teleportToExit(sprite, partner, game, kwargs) {
 }
 
 export const stochastic_effects = [teleportToExit, windGust, slipForward, attractGaze, flipDirection];
-export const kill_effects = [killSprite, killIfSlow, transformTo, killIfOtherHasLess, killIfOtherHasMore, killIfHasMore, killIfHasLess, killIfFromAbove, killIfAlive];
+export const kill_effects = [killSprite, killIfSlow, transformTo, transformToAll, killIfOtherHasLess, killIfOtherHasMore, killIfHasMore, killIfHasLess, killIfFromAbove, killIfAlive];
 
 export function canActivateSwitch(sprite, partner, game, kwargs) {
 
@@ -420,4 +440,59 @@ export function align(sprite, partner, game, kwargs){
 		sprite.orient = Object.copy(orient)
 	sprite.location = Object.copy(partner.location)
 	return ['align', sprite.ID || sprite, partner.ID || partner]
+}
+
+export function addHealthPoints(sprite, partner, game, kwargs){
+	const value = kwargs.value
+	if(sprite.healthPoints + value < sprite.limitHealthPoints){
+		sprite.healthPoints += value
+		sprite.healthPoints = Math.min(sprite.healthPoints, sprite.maxHealthPoints)
+	}
+	return ['addHealthPoints', sprite.ID || sprite, partner.ID || partner]
+}
+
+export function addHealthPointsToMax(sprite, partner, game, kwargs){
+	const value = kwargs.value
+	if(sprite.healthPoints + value < sprite.limitHealthPoints) {
+		sprite.healthPoints += value;
+	} else {
+		sprite.healthPoints = sprite.limitHealthPoints;
+	}
+
+	if (sprite.healthPoints > sprite.maxHealthPoints)
+		sprite.maxHealthPoints = sprite.healthPoints;
+
+	return ['addHealthPointsToMax', sprite.ID || sprite, partner.ID || partner]
+}
+
+export function subtractHealthPoints(sprite, partner, game, kwargs){
+	const value = kwargs.value || 0
+	const stype = kwargs.stype
+	const limit = kwargs.limit || 0
+	if(stype){
+		const sprites = game.getSprites(stype)
+		sprites.forEach(s=> {
+			s.healthPoints -= value
+			if(s.healthPoints<=limit){
+				killSprite(s, partner, game, kwargs)
+			}
+		})
+	}else{
+		sprite.healthPoints -= value
+		if(sprite.healthPoints<=limit){
+			killSprite(sprite, partner, game, kwargs)
+		}
+	}
+
+
+	return ['subtractHealthPoints', sprite.ID || sprite, partner.ID || partner]
+}
+
+export function transformToRandomChild(sprite, partner, game, kwargs){
+	const stype = kwargs.stype
+	if(stype) {
+		console.log(game.getSubTypes(stype))
+	}
+
+	return ['transformToRandomChild', sprite.ID || sprite, partner.ID || partner]
 }

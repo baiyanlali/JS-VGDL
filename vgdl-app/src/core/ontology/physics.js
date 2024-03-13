@@ -1,6 +1,12 @@
 export const distance = (r1, r2) => {
-	return (Math.sqrt(Math.pow(r1.location.x - r2.location.x, 2)) + Math.sqrt(Math.pow(r1.location.y - r2.location.y, 2)));
+	return (Math.sqrt(Math.pow(r1.location.x - r2.location.x, 2) + Math.sqrt(Math.pow(r1.location.y - r2.location.y, 2))));
 }
+
+
+export const quickDistance = (r1, r2) => {
+	return (Math.pow(r1.location.x - r2.location.x, 2)) + Math.pow(r1.location.y - r2.location.y, 2);
+}
+
 export class GridPhysics{
 
 	passiveMovement = (sprite) => {
@@ -40,9 +46,9 @@ export class GridPhysics{
 
 	}
 
-	distance = (r1, r2) => {
-		return (Math.sqrt(Math.pow(r1.location.x - r2.location.x, 2)) + Math.sqrt(Math.pow(r1.location.y - r2.location.y, 2)));
-	}
+	distance = distance
+
+	quickDistance = quickDistance
 
 }
 
@@ -69,9 +75,7 @@ export class ContinuousPhysics  extends  GridPhysics{
 
 	}
 
-	distance = (r1, r2) => {
-		return (Math.sqrt(Math.pow(r1.top - r2.top, 2)) + Math.sqrt(Math.pow(r1.left - r2.left, 2)));
-	}
+
 }
 
 export class NoFrictionPhysics extends ContinuousPhysics{
