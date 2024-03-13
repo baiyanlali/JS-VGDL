@@ -186,21 +186,8 @@ export function reverseDirection(sprite, partner, game, kwargs) {
 
 }
 
-export function reverseFlowIfActivated(sprite, partner, game, kwargs) {
 
-}
 
-export function trigger(sprite, partner, game, kwargs) {
-
-}
-
-export function detrigger(sprite, partner, game, kwargs) {
-
-}
-
-export function flipDirection(sprite, partner, game, kwargs) {
-
-}
 
 export function bounceDirection(sprite, partner, game, kwargs) {
 	let friction = kwargs.friction || 0;
@@ -357,9 +344,6 @@ export function killIfOtherHasMore(sprite, partner, game, kwargs) {
 	}
 }
 
-export function killIfOtherHasLess(sprite, partner, game, kwargs) {
-
-}
 
 export function wrapAround(sprite, partner, game, kwargs) {
 	let offset = kwargs.offset || 0;
@@ -389,14 +373,6 @@ export function pullWithIt(sprite, partner, game, kwargs) {
     sprite.lastlocation = tmp.copy()
 }
 
-export function collideFromAbove(sprite, partner, game, kwargs) {
-
-}
-
-export function killSpriteOnLanding(sprite, partner, game, kwargs) {
-
-}
-
 export function teleportToExit(sprite, partner, game, kwargs) {
 	let rand_sprite;
 	try {
@@ -410,16 +386,8 @@ export function teleportToExit(sprite, partner, game, kwargs) {
 	return ['teleportToExit', sprite.ID || sprite, partner.ID || partner]
 }
 
-export const stochastic_effects = [teleportToExit, windGust, slipForward, attractGaze, flipDirection];
-export const kill_effects = [killSprite, killIfSlow, transformTo, transformToAll, killIfOtherHasLess, killIfOtherHasMore, killIfHasMore, killIfHasLess, killIfFromAbove, killIfAlive];
-
-export function canActivateSwitch(sprite, partner, game, kwargs) {
-
-}
-
-export function cannotActivateSwitch(sprite, partner, game, kwargs) {
-
-}
+export const stochastic_effects = [teleportToExit, windGust, slipForward, attractGaze];
+export const kill_effects = [killSprite, killIfSlow, transformTo, transformToAll, killIfOtherHasMore, killIfHasMore, killIfHasLess, killIfFromAbove, killIfAlive];
 
 export function spawn(sprite, partner, game, kwargs) {
 	const stype = kwargs['stype']
