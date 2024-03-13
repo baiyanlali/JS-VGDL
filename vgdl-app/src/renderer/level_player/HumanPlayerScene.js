@@ -122,8 +122,11 @@ export default class HumanPlayerScene extends Phaser.Scene{
         this.inputMap[this.S.keyCode] = "DOWN"
         this.inputMap[this.SPACE.keyCode] = "SPACE"
 
-        this.input.on(Phaser.Input.Events.POINTER_DOWN_OUTSIDE, () => {
+        this.input.on(Phaser.Input.Events.POINTER_DOWN_OUTSIDE, (e) => {
+            if(e.downElement.innerText === "Play" || e.downElement.innerText === "Reset")
+                return
             if(this.input.keyboard.enabled){
+                console.log("outside", e)
                 this.input.keyboard.enabled = false
                 this.onBlur()
             }

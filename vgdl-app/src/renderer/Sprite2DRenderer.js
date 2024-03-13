@@ -4,6 +4,7 @@
 import { random } from "../core/tools";
 import RendererBase from "./RendererBase";
 import Phaser from "phaser"
+import {BLUE, GREEN, RED, WHITE, YELLOW} from "../core/ontology/constants";
 
 class Sprite2DRenderer extends RendererBase {
     constructor(scene, rendererName, renderConfig, avatarObject, centerObjects) {
@@ -245,7 +246,14 @@ class Sprite2DRenderer extends RendererBase {
             this.loadImage("__background__", this.renderConfig.BackgroundTile);
         }
 
-        const unknown_object_shape = {}
+
+        const choosable_shape = ['circle', 'triangle', 'square', "pentagon", "hexagon"]
+        const choosable_color = [RED, BLUE, WHITE, GREEN, YELLOW]
+
+        const combinations = choosable_shape.reduce((acc, shape) => {
+            const shapeCombinations = choosable_color.map(color => ([ shape, color ]));
+            return acc.concat(shapeCombinations);
+        }, []);
 
         objects.forEach((object) => {
 
@@ -268,14 +276,14 @@ class Sprite2DRenderer extends RendererBase {
                 this.loadImage(objectTemplate.id, object.img);
             }else{
                 //if not
-                if(unknown_object_shape.hasOwnProperty(objectTemplate.id)){
 
-                }else{
-                    const shape = random.choice(['circle', 'triangle', 'square', "pentagon", "hexagon"])
-                    // console.info(`[Sprite2D Renderer] Add sprite ${objectTemplate.name} ${shape}`)
-                    unknown_object_shape[objectTemplate.id] = shape
-                    this.loadImage(objectTemplate.id, this.getShapeImage(shape));
-                }
+                // const shape = random.choice(['circle', 'triangle', 'square', "pentagon", "hexagon"])
+                const [shape, color] = random.choice(combinations)
+                combinations.splice(combinations.indexOf([shape, color]))
+                objectTemplate.color = color
+                // console.info(`[Sprite2D Renderer] Add sprite ${objectTemplate.name} ${shape}`)
+                this.loadImage(objectTemplate.id, this.getShapeImage(shape));
+
             }
 
             this.objectTemplates[objectTemplate.id] = objectTemplate;

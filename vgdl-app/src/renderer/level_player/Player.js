@@ -91,6 +91,8 @@ export default class Player extends Component {
     startGame = ()=> {
         this.props.onFocus(this)
         this.props.vgdl.startGame()
+        console.log("enable")
+        this.game.input.keyboard.enabled = true
         this.setState(e=>
         {
             return {...e, result: "Running..."}

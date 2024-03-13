@@ -550,6 +550,7 @@ export class BasicGame{
     }
 
     presskey = (keyCode)=> {
+        // console.log(`Press Button: ${keyCode}`)
         this.keystate[keyCode] = true
         this.key_to_clean?.push(keyCode)
     }
