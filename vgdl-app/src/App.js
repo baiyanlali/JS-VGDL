@@ -1,11 +1,10 @@
 import './App.css';
-import {aliens_map, game, aliens_game} from './core/aliens';
+import {aliens_game, aliens_map} from './core/aliens';
 import Player from "./renderer/level_player/Player";
 import {Component} from "react";
 import VGDLEditor from './VGDLEditor';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Container, Row, Col, Navbar, NavbarBrand, NavbarCollapse, Card} from 'react-bootstrap';
-import DropdownButton from 'react-bootstrap/DropdownButton';
+import {Card, Col, Container, Navbar, NavbarCollapse, Row} from 'react-bootstrap';
 import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import {VGDLParser} from './core/core';
@@ -45,9 +44,6 @@ class App extends Component {
             selectedLevelId: 0,
             trajectories: [],
             projects: {
-                names: [],
-                templates: {},
-                blankTemplate: "",
             },
             newProject: {
                 name: "",
@@ -57,7 +53,7 @@ class App extends Component {
             projectName: "",
             game: new VGDLParser().parseGame(aliens_game),
             theme: "dark",
-            activeWindow: null
+            activeWindow: null,
         };
 
         this.state.game.buildLevel(aliens_map)
@@ -77,10 +73,36 @@ class App extends Component {
         })
     }
 
+    loadConfig = async () => {
+        const res = await fetch("config/config.json")
+        return await res.json()
+    }
+
     async componentDidMount() {
         document.body.className = 'bg-dark'
         window.addEventListener('resize', this.updatePhaserCanvasSize, false)
         this.updatePhaserCanvasSize()
+
+        const projects = {"grid_physics": {}}
+        this.loadConfig().then((configs)=> {
+            configs.forEach(config=> {
+                const games = config['grid_physics']
+
+                for (const game_name in games) {
+                    const levels = games[game_name]
+
+                    projects['grid_physics'][game_name] = levels
+                }
+
+            })
+
+            this.setState(e=>{
+                return {
+                    ...e,
+                    projects
+                }
+            })
+        })
     }
 
     playLevel = (levelString) => {
@@ -114,6 +136,8 @@ class App extends Component {
             }
         })
     }
+
+
 
     updateGameAndLevel = (vgdl, level) => {
         if (vgdl === this.state.vgdlString && level === this.state.levelString) {
@@ -177,6 +201,9 @@ class App extends Component {
                         <Nav className="me-auto">
                             <Nav.Link href="#features">Features</Nav.Link>
                             <NavDropdown title="Project">
+                                {
+                                    
+                                }
                                 <NavDropdown.Item>New Project</NavDropdown.Item>
                                 <NavDropdown.Item>Existing Project</NavDropdown.Item>
                                 <NavDropdown.Divider/>
