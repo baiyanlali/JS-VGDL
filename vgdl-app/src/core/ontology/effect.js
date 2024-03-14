@@ -58,6 +58,7 @@ export function transformTo (sprite, partner, game, kwargs) {
 	// if (!(hasID) || validTime) {
 		//(sprite.transformedBy.has(partner.ID)) {
 		//sprite.transformedBy.add(partner.ID);
+		
 		sprite.transformedBy[partner.ID] = game.time;
 		let stype = kwargs.stype;
 
@@ -68,7 +69,7 @@ export function transformTo (sprite, partner, game, kwargs) {
 				newones[0].orientation = sprite.orientation;
 			newones[0].transformedBy = sprite.transformedBy;
 			newones[0].lastlocation = {...sprite.lastlocation}
-			game.kill_list.push(sprite);
+			killSprite(sprite, partner, game, kwargs);
 		}
 
 		// if(kwargs['killSecond'] && kwargs['killSecond'] === true){

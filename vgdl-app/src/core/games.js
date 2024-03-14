@@ -254,7 +254,7 @@ export class BasicGame{
         return s;
     }
 
-    _iterAll = () => {
+    _iterAll = (ignoreKilled=false) => {
         if (this.sprite_order[this.sprite_order.length-1] !== 'avatar') {
             this.sprite_order.remove('avatar');
             this.sprite_order.push('avatar');
@@ -262,6 +262,9 @@ export class BasicGame{
         return this.sprite_order.reduce((base, key) => {
             if (this.sprite_groups[key] === undefined)
                 return base;
+            if(ignoreKilled){
+                return base.concat(this.sprite_groups[key].filter(s=> !this.kill_list.includes(s)))
+            }
             return base.concat(this.sprite_groups[key]);
         }, []);
     }
@@ -604,7 +607,7 @@ export class BasicGame{
 
     updateCollision = ()=> {
         //TODO: 使用最简单的方法实现，到非格子的方法可能会有问题
-        const allSprites = this._iterAll()
+        const allSprites = this._iterAll(true)
 
         for (let i = 0; i < allSprites.length; i++) {
             const sprite1 = allSprites[i];

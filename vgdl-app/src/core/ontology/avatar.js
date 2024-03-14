@@ -8,7 +8,7 @@ const ActionMapping = {
     "DOWN": DOWN,
     "LEFT": LEFT,
     "RIGHT": RIGHT,
-    "SPACE": 0
+    "SPACE": 42
 }
 
 export class Avatar extends VGDLSprite {
@@ -247,7 +247,7 @@ export class ShootAvatar extends OrientedAvatar{
 
         for (let i = 0; i < this.stype.length; i++) {
             if (this._hasAmmo(i)) {
-            this._shoot(game, i);
+                this._shoot(game, i);
             }
         }
 
@@ -282,10 +282,27 @@ export class ShootAvatar extends OrientedAvatar{
 export class OngoingShootAvatar extends ShootAvatar{
     constructor(pos, size, args) {
         super(pos, size, args);
+        this.speed = 1
+        this.is_oriented = true
+        this.orientation = [0, 0]
     }
 
     update(game){
-        super.update(game)
+        this.lastmove ++
+        const action = this._readAction(game)
+
+        // this.physics.passiveMovement(this)
+
+        if(action === null || action === 42){
+            this._shoot(game, 0)
+        }else{
+            this.physics.activeMovement(this, action, this.speed)
+        }
+
+        const d = this.lastdirection();
+        if (d[0] !== 0 || d[1] !== 0) {
+            this.orientation = d;
+        }
     }
 }
 
