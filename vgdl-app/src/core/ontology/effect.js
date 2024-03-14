@@ -149,10 +149,11 @@ export function undoAll (sprite, partner, game, kwargs) {
 	const notStypeStr = kwargs['nontStype']??""
 	const notStype = notStypeStr.split(",").map(s=>s.trim())
 	game._iterAllExcept(notStype).forEach(s=>{
-		s.location = Object.copy(s.lastlocation)
+		s.location = {...s.lastlocation}
 	})
 	return ['undoAll', sprite.ID || sprite, partner.ID || partner]
 }
+
 export function attractGaze(sprite, partner, game, kwargs) {
 	if (kwargs.prob > Math.random()) {
 		sprite.orientation = partner.orientation;
@@ -306,6 +307,17 @@ export function spawnIfHasMore(sprite, partner, game, kwargs) {
 	if (sprite.resources[resource] >= limit) {
 		game._createSprite([stype], [sprite.location.x, sprite.location.y]);
 		return ['spawnIfHasMore', sprite.ID || sprite, partner.ID || partner]
+	}
+
+}
+
+export function spawnIfHasLess(sprite, partner, game, kwargs) {
+	const resource = kwargs.resource;
+	const stype = kwargs.stype;
+	let limit = kwargs.limit || 1;
+	if (sprite.resources[resource] < limit) {
+		game._createSprite([stype], [sprite.location.x, sprite.location.y]);
+		return ['spawnIfHasLess', sprite.ID || sprite, partner.ID || partner]
 	}
 
 }

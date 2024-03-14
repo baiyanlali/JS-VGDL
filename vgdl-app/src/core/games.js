@@ -501,61 +501,68 @@ export class BasicGame{
         return r;
     }
 
+    get_effect = (stypes1, stypes2) => {
+        const res = []
+        this.collision_eff.forEach(eff=>{
+            const class1 = eff[0]
+            const class2 = eff[1]
+            const eclass = eff[2]
+
+            if(this.shieldedEffects[class1] && this.shieldedEffects[class1].includes([class2, eclass.name])){
+                console.log(`[GAMES] Check shield ${class1}, ${class2}, ${eclass.name}`)
+                return
+            }
+
+            if(stypes1.includes(class1) && stypes2.includes(class2))
+                res.push({reverse: false, effect: eff[2], kwargs: eff[3]})
+            else if(stypes1.includes(class2) && stypes2.includes(class1))
+                res.push({reverse: true, effect: eff[2], kwargs: eff[3]})
+        })
+        return res
+    }
+
 
     _effectHandling = ()=> {
-        if(this.collision_set.length === 0)
-            return
-        
-        const get_effect = (stypes1, stypes2) => {
-            const res = []
-            this.collision_eff.forEach(eff=>{
-                const class1 = eff[0]
-                const class2 = eff[1]
-                const eclass = eff[2]
 
-                if(this.shieldedEffects[class1] && this.shieldedEffects[class1].includes([class2, eclass.name])){
-                    console.log(`[GAMES] Check shield ${class1}, ${class2}, ${eclass.name}`)
-                    return
+        //最多处理碰撞7次
+        for (let iter_time = 0; iter_time < 7; iter_time++) {
+
+            this.updateCollision()
+
+            if(this.collision_set.length === 0)
+                return
+            
+            for (const collision of this.collision_set) {
+                const stypes1 = collision[0].stypes
+                const stypes2 = collision[1].stypes
+
+                let effects = [];
+                if(collision[1] === 'EOS' || collision[1] === 'eos'){
+                    this.collision_eff.forEach(eff=>{
+                        const class1 = eff[0]
+                        const class2 = eff[1]
+                        if(stypes1.includes(class1) && (class2 === 'EOS' || class2 === 'eos'))
+                            effects = [{reverse: false, effect: eff[2], kwargs: eff[3]}]
+                    })
+                }else{
+                    effects = this.get_effect(stypes1, stypes2)
                 }
 
-                if(stypes1.includes(class1) && stypes2.includes(class2))
-                    res.push({reverse: false, effect: eff[2], kwargs: eff[3]})
-                else if(stypes1.includes(class2) && stypes2.includes(class1))
-                    res.push({reverse: true, effect: eff[2], kwargs: eff[3]})
-            })
-            return res
-        }
+                if(effects.length === 0) continue
 
-        for (const collision of this.collision_set) {
-            const stypes1 = collision[0].stypes
-            const stypes2 = collision[1].stypes
+                for (const effect_set of effects) {
+                    let [sprite, partner] = [collision[0], collision[1]]
+                    if(effect_set.reverse){
+                        [sprite, partner] = [collision[1], collision[0]]
+                    }
 
-            let effects = [];
-            if(collision[1] === 'EOS' || collision[1] === 'eos'){
-                this.collision_eff.forEach(eff=>{
-                    const class1 = eff[0]
-                    const class2 = eff[1]
-                    if(stypes1.includes(class1) && (class2 === 'EOS' || class2 === 'eos'))
-                        effects = [{reverse: false, effect: eff[2], kwargs: eff[3]}]
-                })
-            }else{
-                effects = get_effect(stypes1, stypes2)
-            }
+                    effect_set.effect(sprite, partner, this, effect_set.kwargs)
 
-            if(effects.length === 0) continue
-
-            for (const effect_set of effects) {
-                let [sprite, partner] = [collision[0], collision[1]]
-                if(effect_set.reverse){
-                    [sprite, partner] = [collision[1], collision[0]]
                 }
-
-                effect_set.effect(sprite, partner, this, effect_set.kwargs)
-
             }
+            
+            this.collision_set = []
         }
-        
-        this.collision_set = []
     }
 
     run = (on_game_end) => {
@@ -648,7 +655,6 @@ export class BasicGame{
         this._clearAll()
         this._updateAll()
 
-        this.updateCollision()
 
         this._effectHandling()
 

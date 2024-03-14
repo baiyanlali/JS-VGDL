@@ -237,7 +237,7 @@ class App extends Component {
                         />
                         {' '}{this.state.gameName}
                     </Navbar.Brand>
-                    
+
 
                     <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                     <NavbarCollapse id="basic-navbar-nav">
