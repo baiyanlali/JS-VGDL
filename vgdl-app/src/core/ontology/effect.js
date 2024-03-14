@@ -61,11 +61,12 @@ export function transformTo (sprite, partner, game, kwargs) {
 		
 		sprite.transformedBy[partner.ID] = game.time;
 		let stype = kwargs.stype;
+		const forceOrientation = kwargs.forceOrientation
 
 		let newones = game._createSprite([stype], [sprite.location.x, sprite.location.y]);
 
 		if (newones.length > 0) {
-			if ((sprite instanceof OrientedSprite) && (newones[0] instanceof OrientedSprite))
+			if (forceOrientation || (sprite instanceof OrientedSprite) && (newones[0] instanceof OrientedSprite) && vectNorm(newones[0].orientation) === 0)
 				newones[0].orientation = sprite.orientation;
 			newones[0].transformedBy = sprite.transformedBy;
 			newones[0].lastlocation = {...sprite.lastlocation}

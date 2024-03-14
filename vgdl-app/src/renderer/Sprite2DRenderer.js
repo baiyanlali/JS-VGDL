@@ -317,9 +317,10 @@ class Sprite2DRenderer extends RendererBase {
                 zIdx: object.Z || 0,
             };
             if(object.img){
-                if(object.autotiling === true || object.randomtiling === true){
+                if(object.autotiling === true || object.randomtiling === true || object.frameRate){
                     //非常trick的解决broken的方法
-                    object.img = `${object.img}_0`
+                    if(!object.img.includes("_"))
+                        object.img = `${object.img}_0`
                 }
                 if(object.img.indexOf('.png') === -1){
                     object.img = `${object.img}.png`
