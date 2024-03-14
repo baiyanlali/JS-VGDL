@@ -34,6 +34,7 @@ class App extends Component {
             },
             vgdlString: aliens_game,
             vgdlLevel: aliens_map,
+            gameName: "Aliens",
             levelId: 0,
             rendererName: "",
             rendererConfig: {
@@ -142,7 +143,7 @@ class App extends Component {
 
 
 
-    updateGameAndLevel = (vgdl, level) => {
+    updateGameAndLevel = (vgdl, level, gameName = null) => {
         if (vgdl === this.state.vgdlString && level === this.state.levelString) {
             return
         } else if (vgdl === this.state.vgdlString && level !== this.state.levelString) {
@@ -154,7 +155,8 @@ class App extends Component {
             return {
                 ...e,
                 vgdlString: vgdl,
-                vgdlLevel: level
+                vgdlLevel: level,
+                gameName: gameName ?? this.state.gameName
             }
         })
 
@@ -198,7 +200,7 @@ class App extends Component {
         const gameLevel = await (await fetch(`${paths}${gameLevels[0]}`)).text()
         // console.log(gameFile)
         // console.log(gameLevel)
-        this.updateGameAndLevel(gameFile, gameLevel)
+        this.updateGameAndLevel(gameFile, gameLevel, gameName)
     }
 
     render() {
@@ -233,8 +235,9 @@ class App extends Component {
                             src="logo192.png"
                             height="40"
                         />
-                        {' '}VGDL
+                        {' '}{this.state.gameName}
                     </Navbar.Brand>
+                    
 
                     <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                     <NavbarCollapse id="basic-navbar-nav">
@@ -258,7 +261,11 @@ class App extends Component {
                                 <NavDropdown.Divider/>
                             </NavDropdown>
                         </Nav>
+
+
                     </NavbarCollapse>
+
+
 
                 </Navbar>
 
