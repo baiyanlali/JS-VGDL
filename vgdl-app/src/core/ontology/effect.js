@@ -66,7 +66,8 @@ export function transformTo (sprite, partner, game, kwargs) {
 		if (newones.length > 0) {
 			if ((sprite instanceof OrientedSprite) && (newones[0] instanceof OrientedSprite))
 				newones[0].orientation = sprite.orientation;
-				newones[0].transformedBy = sprite.transformedBy;
+			newones[0].transformedBy = sprite.transformedBy;
+			newones[0].lastlocation = {...sprite.lastlocation}
 			game.kill_list.push(sprite);
 		}
 
@@ -74,8 +75,7 @@ export function transformTo (sprite, partner, game, kwargs) {
 		// 	game.kill_list.push(partner)
 		// }
 
-		let args = {'stype': stype}
-		return ['transforrmTo', sprite.ID || sprite, partner.ID || partner];
+		return ['transformTo', sprite.ID || sprite, partner.ID || partner];
 	// } else {
 	// 	return;
 	// }
@@ -97,13 +97,6 @@ export function transformToAll (sprite, partner, game, kwargs) {
 
 }
 
-export function transformToOnLanding (sprite, partner, game, kwargs) {
-	let stype = kwargs.stype;
-}
-
-export function triggerOnLading (sprite, partner, game, kwargs) {
-	let strigger = kwargs.strigger;
-}
 
 export function stepBack (sprite, partner, game, kwargs) {
 	// console.log(`[Step Back] ${sprite.name} last location: ${JSON.stringify(sprite.lastlocation)}`)
@@ -119,7 +112,7 @@ export function bounceForward(sprite, partner, game, kwargs) {
 }
 
 export function conveySprite(sprite, partner, game, kwargs) {
-	let sprite_lastlocation = sprite.lastlocation.copy();
+	let sprite_lastlocation = {...sprite.lastlocation};
 	let vect = tools.unitVector(partner.orientation);
 	sprite.physics.activeMovement(sprite, vect, partner.strength);
 	sprite.lastlocation = sprite_lastlocation;
@@ -130,7 +123,7 @@ export function conveySprite(sprite, partner, game, kwargs) {
 export function windGust(sprite, partner, game, kwargs) {
 	let s = partner.strength-[0, 1, -1].randomElement();
 	if (s !== 0) {
-		let sprite_lastlocation = sprite.lastlocation.copy();
+		let sprite_lastlocation = {...sprite.lastlocation};
 		let vect = tools.unitVector(partner.orientation);
 		sprite.physics.activeMovement(sprite, vect, s);
 		sprite.lastlocation = sprite_lastlocation;
@@ -142,7 +135,7 @@ export function windGust(sprite, partner, game, kwargs) {
 
 export function slipForward(sprite, partner, game, kwargs) {
 	if (kwargs.prob > Math.random()) {
-		let sprite_lastlocation = sprite.lastlocation.copy();
+		let sprite_lastlocation = {...sprite.lastlocation};
 		let vect = tools.unitVector(partner.orientation);
 		sprite.physics.activeMovement(sprite, vect, 1);
 		sprite.lastlocation = sprite_lastlocation;
@@ -185,6 +178,7 @@ export function reverseDirection(sprite, partner, game, kwargs) {
 	return ['reverseDirection', sprite.ID || sprite, partner.ID || partner]
 
 }
+
 
 
 
@@ -272,6 +266,14 @@ export function killBoth(sprite, partner, game, kwargs) {
 		killSprite(partner, sprite, game);
 		return ['killBoth', sprite.ID || sprite, partner.ID || partner]
 	}
+}
+
+export function killAll(sprite, partner, game, kwargs) {
+	const stype = kwargs.stype
+	const sprites = game.getSprites(stype)
+	sprites.forEach(s=>{
+		killSprite(s, partner, game, kwargs)
+	})
 }
 
 
@@ -362,7 +364,7 @@ export function wrapAround(sprite, partner, game, kwargs) {
 
 export function pullWithIt(sprite, partner, game, kwargs) {
     if (!(tools.oncePerStep(sprite, game, 'lastpull'))) return;
-    let tmp = sprite.lastlocation.copy();
+    let tmp = {...sprite.lastlocation};
     let v = tools.unitVector(partner.lastdirection())
 
     sprite._updatePos(v, partner.speed * sprite.physics.gridsize[0])
@@ -370,10 +372,8 @@ export function pullWithIt(sprite, partner, game, kwargs) {
         sprite.speed = partner.speed;
         sprite.orientation = partner.lastdirection;
     }
-    sprite.lastlocation = tmp.copy()
+    sprite.lastlocation = {...tmp}
 }
-
-
 
 export function teleportToExit(sprite, partner, game, kwargs) {
 	let rand_sprite;
@@ -383,15 +383,13 @@ export function teleportToExit(sprite, partner, game, kwargs) {
 		rand_sprite = game.sprite_groups['goal'].randomElement();
 	}
 
-	sprite.location = rand_sprite.location.copy();
+	sprite.location = {...rand_sprite.location};
 	sprite.lastmove = 0;
 	return ['teleportToExit', sprite.ID || sprite, partner.ID || partner]
 }
 
-export const stochastic_effects = [teleportToExit, windGust, slipForward, attractGaze, flipDirection];
-export const kill_effects = [killSprite, killIfSlow, transformTo, transformToAll, killIfOtherHasLess, killIfOtherHasMore, killIfHasMore, killIfHasLess, killIfFromAbove, killIfAlive];
-
-
+export const stochastic_effects = [teleportToExit, windGust, slipForward, attractGaze];
+export const kill_effects = [killSprite, killIfSlow, transformTo, transformToAll, killIfOtherHasMore, killIfHasMore, killIfHasLess, killIfFromAbove, killIfAlive];
 
 export function spawn(sprite, partner, game, kwargs) {
 	const stype = kwargs['stype']
@@ -473,7 +471,7 @@ export function transformToRandomChild(sprite, partner, game, kwargs){
 export function shieldFrom(sprite, partner, game, kwargs){
 	const stype = kwargs.stype
 	const ftype = kwargs.ftype
-	game.addShield(sprite.stype, stype, ftype)
+	game.addShield(sprite.stypes, stype, ftype)
 	return ['shieldFrom', sprite.ID || sprite, partner.ID || partner]
 }
 

@@ -583,7 +583,7 @@ export class BasicGame{
     }
 
     addShield = (a, stype, ftype)=> {
-        if(this.shieldedEffects[a[-1]]){
+        if(this.shieldedEffects[a[a.length-1]]){
             this.shieldedEffects[a[-1]].push([stype, ftype])
         }else{
             this.shieldedEffects[a[-1]]= [[stype, ftype]]

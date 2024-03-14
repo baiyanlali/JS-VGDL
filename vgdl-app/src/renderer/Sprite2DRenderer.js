@@ -261,13 +261,16 @@ class Sprite2DRenderer extends RendererBase {
             const objectTemplate = {
                 name: object.name,
                 id: object.name,
-                internal: !!object.Internal,
-                tilingMode: "NONE",
+                tilingMode: object.autotiling ? "AutoTiling": object.randomtiling? "RandomTiling": "None",
                 scale: !object.shrinkfactor ? 1.0 : object.shrinkfactor,
                 color: object.color ?? { r: 1, g: 1, b: 1 },
                 zIdx: object.Z || 0,
             };
             if(object.img){
+                if(object.autotiling === true || object.randomtiling === true){
+                    //非常trick的解决broken的方法
+                    object.img = `${object.img}_0`
+                }
                 if(object.img.indexOf('.png') === -1){
                     object.img = `${object.img}.png`
                 }
