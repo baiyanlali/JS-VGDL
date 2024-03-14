@@ -198,6 +198,7 @@ export class SpawnPoint extends SpriteProducer{
 	}
 
 	update (game) {
+		super.update(game)
 		if(this.stype) {
 			const rnd = random.random()
 			if (game.time % this.cooldown === 0 && rnd < this.prob) {
@@ -520,6 +521,136 @@ export class AStarChaser extends RandomNPC{
 	}
 }
 
+export class AlternateChaser extends RandomNPC {
+
+	constructor(pos, size, args) {
+		super(pos, size, args);
+		this.fleeing = false
+		this.targets = []
+		this.actions = []
+
+		this.stypes1 = args.stype1.split(',')
+		this.stypes2 = args.stype2.split(',')
+	}
+
+	closestTargets(game, randomTarget){
+		this.targets = []
+
+		let best_dist = 10e20
+
+		let num_chasing = 0
+
+		this.stypes1.forEach(s=>{
+			num_chasing += game.getSprites(s).length
+		})
+
+		let num_fleeing = 0
+
+		this.stypes2.forEach(s=>{
+			num_fleeing += game.getSprites(s).length
+		})
+
+		let target = null
+
+		if(num_chasing > num_fleeing){
+			target = this.stypes1.randomElement()
+			this.fleeing = false
+		}else if(num_chasing < num_fleeing){
+			target = this.stypes2.randomElement()
+			this.fleeing = true
+		}
+
+		if(target === null) return
+
+		const sprites = game.getSprites(target)
+
+		for (const sprite of sprites) {
+			if(randomTarget){
+				if(random.random() < this.prob){
+					this.targets.push(sprite)
+				}
+			}else{
+				const distance = this.physics.quickDistance(this, sprite)
+
+				if(distance < best_dist){
+					best_dist = distance
+					this.targets = [sprite]
+				}else if(distance === best_dist){
+					this.targets.push(sprite)
+				}
+			}
+		}
+	}
+
+	movesToward(target){
+		const distance = this.physics.quickDistance(this, target)
+
+		for (const dir of BASEDIRS) {
+			const new_pos = {...this.location}
+			new_pos.x += dir[0]
+			new_pos.y += dir[1]
+			const new_dist = this.physics.quickDistance(this, {location: new_pos})
+
+			if(this.fleeing && new_dist>distance){
+				this.actions.push(dir)
+			}else if(!this.fleeing && new_dist<distance){
+				this.actions.push(dir)
+			}
+		}
+	}
+
+	update(game) {
+		this.lastmove ++
+		this.actions = []
+
+		this.physics.passiveMovement(this)
+
+		this.closestTargets(game, false)
+
+		for (const target of this.targets) {
+			this.movesToward(target)
+		}
+
+		let action = [0, 0]
+
+		if (this.actions.length === 0){
+			action = BASEDIRS.randomElement()
+		}else{
+			action = this.actions.randomElement()
+		}
+		this.physics.activeMovement(this, action, this.speed)
+	}
+}
+
+export class PathAltChaser extends AlternateChaser {
+
+	constructor(pos, size, args) {
+		super(pos, size, args);
+		this.lastTarget = null
+	}
+
+	update(game) {
+		this.physics.passiveMovement(this)
+
+		let action = [0, 0]
+
+		if(this.lastTarget === null || this.physics.quickDistance(this, this.lastTarget) < 1){
+			this.closestTargets(game, false)
+		}else{
+			this.targets.push(this.lastTarget)
+		}
+
+		if(!this.fleeing && this.targets.length > 0){
+			this.lastTarget = this.targets[0]
+
+		}else{
+
+		}
+
+
+		this.physics.activeMovement(this, action, this.speed)
+	}
+}
 
 //
 // function AStarChaser(gamejs, pos, size, args) {

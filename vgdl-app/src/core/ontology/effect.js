@@ -497,39 +497,3 @@ export function killIfNotFrontal(sprite, partner, game, kwargs){
 	}
 }
 
-
-export function reverseFlowIfActivated(sprite, partner, game, kwargs) {
-
-}
-
-export function trigger(sprite, partner, game, kwargs) {
-
-}
-
-export function detrigger(sprite, partner, game, kwargs) {
-
-}
-
-export function flipDirection(sprite, partner, game, kwargs) {
-
-}
-
-export function canActivateSwitch(sprite, partner, game, kwargs) {
-
-}
-
-export function cannotActivateSwitch(sprite, partner, game, kwargs) {
-
-}
-
-export function collideFromAbove(sprite, partner, game, kwargs) {
-
-}
-
-export function killSpriteOnLanding(sprite, partner, game, kwargs) {
-
-}
-
-export function killIfOtherHasLess(sprite, partner, game, kwargs) {
-
-}

@@ -20,7 +20,7 @@ export class Avatar extends VGDLSprite {
     }
 
     update(game) {
-        super.update()
+        super.update(game)
     }
 
     declare_possible_actions () {
@@ -64,7 +64,7 @@ export class MovingAvatar extends VGDLSprite{
     update (game) {
         super.update(game)
         const action = this._readAction(game);
-        if (action != null && action !== undefined)
+        if (action !== null && action !== undefined)
             this.physics.activeMovement(this, action, this.speed);
     }
 
@@ -81,6 +81,7 @@ export class HorizontalAvatar extends MovingAvatar{
     }
 
     update (game) {
+        super.update(game)
         const action = this._readAction(game);
         if (action === RIGHT || action === LEFT) {
             this.physics.activeMovement(this, action);
@@ -100,6 +101,7 @@ export class VerticalAvatar extends MovingAvatar{
     }
 
     update (game) {
+        super.update(game)
         const action = this._readAction(game);
         if (action === UP || action === DOWN) {
             this.physics.activeMovement(this, action);
@@ -141,6 +143,7 @@ export class OrientedAvatar extends MovingAvatar{
     }
 
     update (game) {
+        this.lastmove ++
         const tmp = this.orientation.slice();
         this.orientation = [0, 0];
         const action = this._readAction(game);
@@ -168,6 +171,7 @@ export class RotatingAvatar extends OrientedAvatar{
     }
 
     update (game) {
+        this.lastmove ++
         const actions = this._readMultiActions(game);
         if (UP in actions)
             this.speed = 1;
@@ -175,12 +179,12 @@ export class RotatingAvatar extends OrientedAvatar{
             this.speed = -1;
         if (LEFT in actions){
             const i = BASEDIRS.indexOf(this.orientation);
-            this.oriientation = BASEDIRS[(i + 1) % BASEDIRS.length];
+            this.orientation = BASEDIRS[(i + 1) % BASEDIRS.length];
         } else if (RIGHT in actions) {
             const i = BASEDIRS.indexOf(this.orientation);
             this.orientation = BASEDIRS[(i - 1) % BASEDIRS.length];
         }
-        super.update(game)
+        this.physics.passiveMovement(this)
         this.speed = 0;
     }
 }
@@ -193,6 +197,7 @@ export class RotatingFlippingAvatar extends RotatingAvatar{
     }
 
     update (game) {
+        this.lastmove ++
         let actions = this._readMultiActions(game)
         if (actions.length > 0 && this.noiseLevel > 0) {
             // pick a random one instead
@@ -213,7 +218,7 @@ export class RotatingFlippingAvatar extends RotatingAvatar{
             const i = BASEDIRS.index(this.orientation)
             this.orientation = BASEDIRS[(i - 1) % BASEDIRS.length]
         }
-        super.update(game)
+        this.physics.passiveMovement(this)
         this.speed = 0
     }
 
@@ -232,16 +237,15 @@ export class NoisyRotatingFlippingAvatar extends RotatingFlippingAvatar{
 export class ShootAvatar extends OrientedAvatar{
     constructor(pos, size, args) {
         super(pos, size, args);
-        this.ammo = args.ammo.split(',');
-        this.stypes = args.stype.split(',');
-
+        this.ammo = args.ammo?.split(',');
+        this.stype = args.stype.split(',');
     }
 
     update (game) {
         // console.trace(`[Shoot Avatar] Update`)
         super.update(game);
 
-        for (let i = 0; i < this.stypes.length; i++) {
+        for (let i = 0; i < this.stype.length; i++) {
             if (this._hasAmmo(i)) {
             this._shoot(game, i);
             }
@@ -253,14 +257,14 @@ export class ShootAvatar extends OrientedAvatar{
         // console.log('resources', this.resources)
         if (!(this.ammo))
             return true;
-        if (this.ammo in this.resources)
-            return this.resources[this.ammo] > 0;
+        if (this.ammo[idx] in this.resources)
+            return this.resources[this.ammo[idx]] > 0;
         return false;
     }
     
     _reduceAmmo (idx) {
-        if (this.ammo && this.ammo in this.resources)
-            this.resources[this.ammo] --;
+        if (this.ammo && this.ammo[idx] && this.ammo[idx] in this.resources)
+            this.resources[this.ammo[idx]] --;
     }
     
     _shoot (game, idx) {

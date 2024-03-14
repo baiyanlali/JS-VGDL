@@ -199,6 +199,11 @@ export class BasicGame{
         // console.log(this.sprite_order)
     }
 
+
+    getPath = (start, end)=> {
+        
+    }
+
     randomizeAvatar = ()=> {
         if(this.getAvatars().length === 0)
             this._createSprite(['avatar'], [0, 0])
