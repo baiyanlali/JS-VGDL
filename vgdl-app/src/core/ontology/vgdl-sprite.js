@@ -420,7 +420,7 @@ export class Chaser extends RandomNPC{
 		args.portal = args.portal || true
 		super(pos, size, args);
 		this.stype = args.stype
-		this.fleeing = args.fleeing || false
+		this.fleeing = false
 	}
 
 	_closestTargets(game){
@@ -474,6 +474,17 @@ export class Chaser extends RandomNPC{
 	}
 }
 
+
+export class Fleeing extends Chaser{
+	constructor(pos, size, args) {
+		args.portal = args.portal || true
+		super(pos, size, args);
+		this.stype = args.stype
+		this.fleeing = true
+	}
+}
+
+
 export class BomberRandomMissile extends SpawnPoint{
 	constructor(pos, size, args) {
 		super(pos, size, args);
@@ -486,78 +497,30 @@ export class BomberRandomMissile extends SpawnPoint{
 	}
 }
 
+export class AStarChaser extends RandomNPC{
 
-//
-// function Chaser(gamejs, pos, size, args) {
-// 	this.stype = null;
-// 	this.fleeing = false;
-// 	RandomNPC.call(this, gamejs, pos, size, args);
-// }
-// Chaser.prototype = Object.create(RandomNPC.prototype);
-//
-// Chaser.prototype._closestTargets (game) {
-// 	var bestd = 1e100;
-// 	var res = [];
-// 	var that = this;
-// 	// console.log(this.stype);
-// 	// console.log(game.getSprites(this.stype).map(s => {return s.name}));
-// 	game.getSprites(this.stype).forEach(target => {
-// 		var d = that.physics.distance(that.rect, target.rect);
-// 		// console.log(d)
-// 		if (d < bestd) {
-// 			bestd = d;
-// 			res = [target];
-// 		} else if (d == bestd) {
-// 			res.push(target);
-// 		}
-// 	});
-// 	// console.log(res)
-// 	return res;
-// }
-//
-// Chaser.prototype._movesToward = function(game, target) {
-// 	var res = [];
-// 	var basedist = this.physics.distance(this.rect, target.rect);
-// 	var that = this;
-// 	BASEDIRS.forEach(a => {
-// 		// console.log(a)
-// 		var r = that.rect.copy();
-// 		r = r.move(a.map((v) => {return 2*v}));
-// 		var newdist = that.physics.distance(r, target.rect);
-// 		// console.log(a, basedist,  newdist);
-// 		if (that.fleeing && basedist < newdist) {
-// 			res.push(a);
-// 		}
-// 		if (!(that.fleeing) && basedist > newdist){
-// 			res.push(a);
-// 		}
-//
-// 	});
-// 	return res;
-// }
-//
-// Chaser.prototype.update (game) {
-// 	VGDLSprite.prototype.update.call(this, game);
-//
-// 	options = [];
-// 	position_options = {};
-// 	var that = this;
-// 	this._closestTargets(game).forEach(target => {
-// 		options = options.concat(that._movesToward(game, target));
-// 	});
-// 	if (options.length == 0) {
-// 		options = BASEDIRS;
-// 	}
-// 	this.physics.activeMovement(this, options.randomElement());
-// }
-//
-// function Fleeing(gamejs, pos, size, args) {
-// 	Chaser.call(this, gamejs, pos, size, args);
-// 	this.fleeing = true;
-// }
-// Fleeing.prototype = Object.create(Chaser.prototype);
-//
-//
+	constructor(pos, size, args) {
+		super(pos, size, args);
+	}
+
+	_movesToward = (game, target) => {
+		const res = [];
+		const basedist = this.physics.quickDistance(this.location, target.location);
+		BASEDIRS.forEach(a => {
+			let r = {...this.location};
+			r.x += a[0]
+			r.y += a[1]
+			const newdist = this.physics.quickDistance(r, target.location);
+			if (this.fleeing && basedist < newdist)
+				res.push(a);
+			if (!(this.fleeing && basedist > newdist))
+				res.push(a);
+		});
+		return res;
+	}
+}
+
+
 //
 // function AStarChaser(gamejs, pos, size, args) {
 // 	this.stype = null;
