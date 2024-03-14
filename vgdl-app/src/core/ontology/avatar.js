@@ -232,19 +232,24 @@ export class NoisyRotatingFlippingAvatar extends RotatingFlippingAvatar{
 export class ShootAvatar extends OrientedAvatar{
     constructor(pos, size, args) {
         super(pos, size, args);
-        this.ammo = args.ammo;
-        this.stype = args.stype;
+        this.ammo = args.ammo.split(',');
+        this.stypes = args.stype.split(',');
+
     }
 
     update (game) {
         // console.trace(`[Shoot Avatar] Update`)
         super.update(game);
-        if (this._hasAmmo()) {
-            this._shoot(game);
+
+        for (let i = 0; i < this.stypes.length; i++) {
+            if (this._hasAmmo(i)) {
+            this._shoot(game, i);
+            }
         }
+
     }
 
-    _hasAmmo (game) {
+    _hasAmmo (idx) {
         // console.log('resources', this.resources)
         if (!(this.ammo))
             return true;
@@ -253,15 +258,15 @@ export class ShootAvatar extends OrientedAvatar{
         return false;
     }
     
-    _reduceAmmo () {
+    _reduceAmmo (idx) {
         if (this.ammo && this.ammo in this.resources)
             this.resources[this.ammo] --;
     }
     
-    _shoot (game) {
+    _shoot (game, idx) {
         if (this.stype && game.keystate["SPACE"]) {
             const u = unitVector(this.orientation);
-            const newones = game._createSprite([this.stype], [this.location.x + u[0] , this.location.y + u[1]]);
+            const newones = game._createSprite([this.stype[idx]], [this.location.x + u[0] , this.location.y + u[1]]);
             if (newones.length > 0 && newones[0] instanceof OrientedSprite)
                 newones[0].orientation = unitVector(this.orientation);
             this._reduceAmmo();
