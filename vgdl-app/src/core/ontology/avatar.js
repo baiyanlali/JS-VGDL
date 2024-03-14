@@ -26,6 +26,24 @@ export class Avatar extends VGDLSprite {
     declare_possible_actions () {
         return []
     }
+
+    _readMultiActions (game) {
+        const res = [];
+
+        for (const action of this.declare_possible_actions()) {
+            if(game.keystate[action])
+                res.push(ActionMapping[action])
+        }
+        return res;
+    }
+
+    _readAction (game) {
+        const actions = this._readMultiActions(game);
+        if (actions.length)
+            return actions[0];
+        else
+            return null;
+    }
 }
 
 
@@ -64,7 +82,7 @@ export class MovingAvatar extends VGDLSprite{
     update (game) {
         super.update(game)
         const action = this._readAction(game);
-        if (action !== null && action !== undefined)
+        if (action !== null && action !== undefined && action !== ActionMapping.SPACE)
             this.physics.activeMovement(this, action, this.speed);
     }
 
@@ -82,10 +100,10 @@ export class HorizontalAvatar extends MovingAvatar{
 
     update (game) {
         super.update(game)
-        const action = this._readAction(game);
-        if (action === RIGHT || action === LEFT) {
-            this.physics.activeMovement(this, action);
-        }
+        // const action = this._readAction(game);
+        // if (action === RIGHT || action === LEFT) {
+        //     this.physics.activeMovement(this, action, this.speed);
+        // }
     }
 }
 
@@ -102,10 +120,10 @@ export class VerticalAvatar extends MovingAvatar{
 
     update (game) {
         super.update(game)
-        const action = this._readAction(game);
-        if (action === UP || action === DOWN) {
-            this.physics.activeMovement(this, action);
-        }
+        // const action = this._readAction(game);
+        // if (action === UP || action === DOWN) {
+        //     this.physics.activeMovement(this, action);
+        // }
     }
 }
 

@@ -241,7 +241,7 @@ export class OrientedSprite extends VGDLSprite{
 		// 	const col = (this.color[0], 255 - this.color[1], this.color[2]);
 		// 	// this.gamejs.draw.polygon(game.screen, col, triPoints(this.rect, unitVector(this.orientation)))
 		// }
-}
+	}
 }
 
 
@@ -258,8 +258,8 @@ export class Conveyer extends OrientedSprite{
 export class Missile extends OrientedSprite{
 
 	constructor(pos, size, args) {
+		args.speed ??= 1
 		super(pos, size, args);
-		this.speed = 1;
 		// this.color = PURPLE;
 	}
 }
