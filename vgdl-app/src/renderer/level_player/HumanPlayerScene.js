@@ -71,7 +71,8 @@ export default class HumanPlayerScene extends Phaser.Scene{
                   objectTemplateName,
                   object.location.x,
                   object.location.y,
-                  object.orientation
+                  object.orientation,
+                  object
                 );
 
                 this.renderData.objects[object.ID] = {
@@ -85,7 +86,8 @@ export default class HumanPlayerScene extends Phaser.Scene{
                   object.location.x,
                   object.location.y,
                   object.orientation,
-                  object.ID
+                  object.ID,
+                  object
                 );
 
                 // sprite.object_id = object.ID
@@ -206,7 +208,8 @@ export default class HumanPlayerScene extends Phaser.Scene{
 
         if(this.grenderer){
             this.grenderer.init(this.gridWidth, this.gridHeight, undefined, this.handlecollision)
-            this.updateState(this.vgdl.getFullState())
+            if(!this.vgdl.pause && !this.vgdl.ended)
+                this.updateState(this.vgdl.getFullState())
         }
 
         if(this.vgdl){

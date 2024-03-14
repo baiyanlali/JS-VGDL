@@ -26,9 +26,9 @@ export class VGDLSprite{
 	color = '#ffffff';
 	orientation = [0,0]
 	location = {x:0, y:0}
-	healthPoints = 1
+	healthPoints = -1
 	limitHealthPoints = 1000
-	maxHealthPoints = 1
+	maxHealthPoints = -1
 
 	constructor(pos, size, args= {}) {
 		args = args ?? {}

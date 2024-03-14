@@ -6,6 +6,44 @@ import RendererBase from "./RendererBase";
 import Phaser from "phaser"
 import {BLUE, GREEN, RED, WHITE, YELLOW} from "../core/ontology/constants";
 
+
+class HealthBar{
+    constructor(scene, config, sprite){
+        console.log("create health bar")
+        this.scene = scene
+        this.config = config
+        this.sprite = sprite
+
+        this.bgSprite = this.scene.add.graphics();
+        this.bgSprite.fillStyle(this.config.bg.color, 1.0);
+        this.bgSprite.setPosition(this.config.x - this.config.width/2, this.config.y - 10)
+        this.bgSprite.fillRect(0, 0, this.config.width, this.config.height);
+        this.bgSprite.setDepth(999)
+
+        this.barSprite = this.scene.add.graphics();
+        this.barSprite.fillStyle(this.config.bar.color, 1.0);
+        this.barSprite.setPosition(this.config.x - this.config.width/2, this.config.y - 10)
+        this.barSprite.fillRect(0, 0, this.config.width, this.config.height);
+        this.barSprite.setDepth(999)
+
+        this.sprite.on(Phaser.Core.Events.DESTROY, ()=>{
+            this.destroy()
+        })
+
+    }
+
+    setPercent = (percent) => {
+        // 更新前景血条的宽度
+        this.barSprite.setScale(percent, 1)
+    }
+
+    destroy = () => {
+        // 销毁血条的图形对象
+        this.bgSprite.destroy();
+        this.barSprite.destroy();
+    }
+}
+
 class Sprite2DRenderer extends RendererBase {
     constructor(scene, rendererName, renderConfig, avatarObject, centerObjects) {
         super(scene, rendererName, renderConfig, avatarObject, centerObjects);
@@ -24,14 +62,6 @@ class Sprite2DRenderer extends RendererBase {
         this.oncollision = oncollision
     }
 
-    handleCollision = (collision)=> {
-        collision.pairs.forEach(pair=>{
-            const bodyA = pair.bodyA.label
-            const bodyB = pair.bodyB.label
-
-            this.oncollision(bodyA, bodyB)
-        })
-    } 
 
     updateBackgroundTiling = (state) => {
         return
@@ -94,7 +124,7 @@ class Sprite2DRenderer extends RendererBase {
         return `${x},${y}`;
     };
 
-    addObject = (objectName, objectTemplateName, x, y, orientation, id) => {
+    addObject = (objectName, objectTemplateName, x, y, orientation, id, object) => {
 
         // console.log(`[Sprite2D Renderer] Add Sprite ${objectName}`)
 
@@ -124,6 +154,21 @@ class Sprite2DRenderer extends RendererBase {
                     }
                 }
             );
+
+            if(object.healthPoints > 0){
+                sprite.HealthBar = new HealthBar(this.scene, {
+                    width: this.renderConfig.TileSize * objectTemplate.scale,
+                    height: 10,
+                    x: sprite.x,
+                    y: sprite.y - 20, // 将血条放在精灵的上方
+                    bg: {
+                        color: 0x651828 // 背景颜色
+                    },
+                    bar: {
+                        color: 0x2ecc71 // 血条颜色
+                    }
+                }, sprite)
+            }
 
 
             sprite.setDisplaySize(
@@ -201,7 +246,8 @@ class Sprite2DRenderer extends RendererBase {
         objectTemplateName,
         x,
         y,
-        orientation
+        orientation,
+        object
     ) => {
 
         
@@ -220,6 +266,10 @@ class Sprite2DRenderer extends RendererBase {
             this.renderConfig.TileSize * objectTemplate.scale,
             this.renderConfig.TileSize * objectTemplate.scale
         );
+
+        if(sprite.HealthBar){
+            sprite.HealthBar.setPercent(object.healthPoints/object.maxHealthPoints)
+        }
 
         // sprite.setTint(
         //     typeof(objectTemplate.color) === 'string'?
