@@ -142,9 +142,11 @@ export class BasicGame{
         let lines = lstr.split('\n').map(l => {return l.trimEnd()}).filter(l => {return l.length > 0});
 		let lengths = lines.map((line) => line.length);
 
-		console.assert(Math.min.apply(null, lengths) === Math.max.apply(null, lengths), "Inconsistent line lengths");
+        
 
-		this.width = lengths[0];
+		// console.assert(Math.min.apply(null, lengths) === Math.max.apply(null, lengths), "Inconsistent line lengths");
+
+		this.width = Math.max(...lengths);
 		this.height = lines.length;
 
 		console.assert(this.width > 1 && this.height > 1, 'Level too small');
