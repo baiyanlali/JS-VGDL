@@ -8,7 +8,7 @@ import {Card, Col, Container, Navbar, NavbarCollapse, Row} from 'react-bootstrap
 import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import {VGDLParser} from './core/core';
-
+import Alert from 'react-bootstrap/Alert';
 class App extends Component {
 
     constructor() {
@@ -56,6 +56,10 @@ class App extends Component {
             game: new VGDLParser().parseGame(aliens_game),
             theme: "dark",
             activeWindow: null,
+            compileState: {
+                state: "secondary",
+                message: ""
+            }
         };
 
         this.state.game.buildLevel(aliens_map)
@@ -128,15 +132,32 @@ class App extends Component {
         if (vgdlString === this.state.vgdlString) {
             return
         }
-        const new_game = new VGDLParser().parseGame(vgdlString)
 
-        this.setState(e => {
-            return {
-                ...e,
-                game: new_game,
-                vgdlString: vgdlString
-            }
-        })
+        try{
+            const new_game = new VGDLParser().parseGame(vgdlString)
+
+            this.setState(e => {
+                return {
+                    ...e,
+                    game: new_game,
+                    vgdlString: vgdlString
+                }
+            })
+
+        }catch(e){
+            console.log("catch error")
+            this.setState(s=> {
+                return {
+                    ...s,
+                    compileState:{
+                        state: "danger",
+                        message: e
+                    }
+                }
+            })
+        }
+
+        
         // new_game.buildLevel(this.state.vgdlLevel)
 
     }
@@ -300,6 +321,10 @@ class App extends Component {
                             </div>
 
                         </Card>
+
+                        <Alert variant={this.state.compileState.state} dismissible>
+                            {this.state.compileState.message}
+                        </Alert>
 
 
                         </Col>
