@@ -317,11 +317,21 @@ class Sprite2DRenderer extends RendererBase {
                 zIdx: object.Z || 0,
             };
             if(object.img){
+                if(object.img === "background"){
+                    object.img = "oryx/backBiege"
+                }else if(object.img === "avatar"){
+                    object.img = "oryx/swordman1"
+                }else if(object.img === "goal"){
+                    object.img = "oryx/dooropen1"
+                }else if(object.img === "wall"){
+                    object.img = "oryx/wall1"
+                }
                 if(object.autotiling === true || object.randomtiling === true || object.frameRate){
                     //非常trick的解决broken的方法
                     if(!object.img.includes("_"))
                         object.img = `${object.img}_0`
                 }
+
                 if(object.img.indexOf('.png') === -1){
                     object.img = `${object.img}.png`
                 }
