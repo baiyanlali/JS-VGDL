@@ -57,6 +57,7 @@ class App extends Component {
             theme: "dark",
             activeWindow: null,
             compileState: {
+                hidden: true,
                 state: "secondary",
                 message: ""
             }
@@ -113,25 +114,43 @@ class App extends Component {
     }
 
     updateLevelString = (levelString) => {
-        if (levelString === this.state.vgdlLevel) {
-            return
-        }
+        // if (levelString === this.state.vgdlLevel) {
+        //     return
+        // }
 
         this.state.game.buildLevel(levelString)
 
         this.setState(e => {
             return {
                 ...e,
-                vgdlLevel: levelString
+                vgdlLevel: levelString,
+                compileState: {
+                    hidden: false,
+                    state: "success",
+                    message: "Update Level Success!"
+                }
             }
+        }, ()=> {
+            window.setTimeout(() => {
+                this.setState(e=> {
+                    return {
+                        ...e,
+                        compileState: {
+                            ...e.compileState,
+                            hidden: true
+                        }
+                    }
+
+                });
+              }, 2000)
         })
 
     }
 
     updateGame = (vgdlString) => {
-        if (vgdlString === this.state.vgdlString) {
-            return
-        }
+        // if (vgdlString === this.state.vgdlString) {
+        //     return
+        // }
 
         try{
             const new_game = new VGDLParser().parseGame(vgdlString)
@@ -140,9 +159,28 @@ class App extends Component {
                 return {
                     ...e,
                     game: new_game,
-                    vgdlString: vgdlString
+                    vgdlString: vgdlString,
+                    compileState: {
+                        hidden: false,
+                        state: "success",
+                        message: "Update Game Success!"
+                    }
                 }
-            })
+            },
+                ()=> {
+            window.setTimeout(() => {
+                this.setState(e=> {
+                    return {
+                        ...e,
+                        compileState: {
+                            ...e.compileState,
+                            hidden: true
+                        }
+                    }
+
+                });
+              }, 2000)
+        })
 
         }catch(e){
             console.log("catch error")
@@ -150,8 +188,9 @@ class App extends Component {
                 return {
                     ...s,
                     compileState:{
+                        hidden: false,
                         state: "danger",
-                        message: e
+                        message: e.message
                     }
                 }
             })
@@ -165,12 +204,12 @@ class App extends Component {
 
 
     updateGameAndLevel = (vgdl, level, gameName = null) => {
-        if (vgdl === this.state.vgdlString && level === this.state.levelString) {
-            return
-        } else if (vgdl === this.state.vgdlString && level !== this.state.levelString) {
-            this.updateLevelString(level)
-            return
-        }
+        // if (vgdl === this.state.vgdlString && level === this.state.levelString) {
+        //     return
+        // } else if (vgdl === this.state.vgdlString && level !== this.state.levelString) {
+        //     this.updateLevelString(level)
+        //     return
+        // }
 
         this.setState(e => {
             return {
@@ -181,19 +220,50 @@ class App extends Component {
             }
         })
 
+        try{
+            const new_game = new VGDLParser().parseGame(vgdl)
+            new_game.buildLevel(level)
 
-        const new_game = new VGDLParser().parseGame(vgdl)
-        new_game.buildLevel(level)
+            console.log("update game and level")
+            this.setState(e => {
+                return {
+                    ...e,
+                    game: new_game,
+                    vgdlString: vgdl,
+                    vgdlLevel: level,
+                    compileState: {
+                            hidden: false,
+                            state: "success",
+                            message: "Update Game&Level Success!"
+                    }
+                }
+            }, ()=> {
+            window.setTimeout(() => {
+                this.setState(e=> {
+                    return {
+                        ...e,
+                        compileState: {
+                            ...e.compileState,
+                            hidden: true
+                        }
+                    }
 
-        console.log("update game and level")
-        this.setState(e => {
-            return {
-                ...e,
-                game: new_game,
-                vgdlString: vgdl,
-                vgdlLevel: level
-            }
+                });
+              }, 2000)
         })
+        }catch (e) {
+            this.setState(s => {
+                return {
+                    ...s,
+                    compileState: {
+                            hidden: false,
+                            state: "danger",
+                            message: e.message
+                    }
+                }
+            })
+        }
+
 
     }
 
@@ -322,7 +392,7 @@ class App extends Component {
 
                         </Card>
 
-                        <Alert variant={this.state.compileState.state} dismissible>
+                        <Alert variant={this.state.compileState.state} dismissible hidden={this.state.compileState.hidden}>
                             {this.state.compileState.message}
                         </Alert>
 

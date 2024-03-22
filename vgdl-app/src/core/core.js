@@ -129,30 +129,34 @@ export class VGDLParser{
 
             }
         }
-
-        for (const c of root.children) {
-            switch (c.content) {
-                case "SpriteSet":
-                    this.parseSprites(c.children)
-                    // this.parseSprites(c.children)
-                    break
-                case "InteractionSet":
-                    this.parseInteraction(c.children)
-                    break
-                case "LevelMapping":
-                    this.parseLevel(c.children)
-                    break
-                case "TerminationSet":
-                    this.parseTermination(c.children)
-                    break
-                case "ConditionSet":
-                    this.parseCondition(c.children)
-                    break
-                default:
-                    console.error(`Unknown content: ${c.content} at line ${c.line}`)
-                    break
+        try {
+            for (const c of root.children) {
+                switch (c.content) {
+                    case "SpriteSet":
+                        this.parseSprites(c.children)
+                        // this.parseSprites(c.children)
+                        break
+                    case "InteractionSet":
+                        this.parseInteraction(c.children)
+                        break
+                    case "LevelMapping":
+                        this.parseLevel(c.children)
+                        break
+                    case "TerminationSet":
+                        this.parseTermination(c.children)
+                        break
+                    case "ConditionSet":
+                        this.parseCondition(c.children)
+                        break
+                    default:
+                        console.error(`Unknown content: ${c.content} at line ${c.line}`)
+                        break
+                }
             }
+        }catch (e) {
+            throw e
         }
+
 
 
         const keys = []
@@ -178,19 +182,26 @@ export class VGDLParser{
 
     parseLevel = (mnodes) => {
         mnodes.forEach((mnode) => {
-            const [c, val] = mnode.content.split('>').map((x) => {
-                return x.trim();
-            });
+            try {
+                if(mnode.content.indexOf('>')===-1){
+                    throw "No '>' symbol in level mapping"
+                }
+                const [c, val] = mnode.content.split('>').map((x) => {
+                    return x.trim();
+                });
 
-            console.assert(c.length === 1, "Only single character mappings allowed");
+                console.assert(c.length === 1, "Only single character mappings allowed");
 
-            const keys = val.split(' ').map((x) => {
-                return x.trim();
-            });
+                const keys = val.split(' ').map((x) => {
+                    return x.trim();
+                });
 
-            console.debug("Mapping", c, keys);
+                console.debug("Mapping", c, keys);
 
-            this.game.char_mapping[c] = keys;
+                this.game.char_mapping[c] = keys;
+            }catch (e) {
+                throw new Error(`Parse Level Mapping Fail at Line ${mnode.line}: \n ${mnode.content} \n ${e.toString()}`)
+            }
         });
     }
 

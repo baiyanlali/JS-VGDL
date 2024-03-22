@@ -128,14 +128,14 @@ export default class HumanPlayerScene extends Phaser.Scene{
             if(e.downElement.innerText === "Play" || e.downElement.innerText === "Reset")
                 return
             if(this.input.keyboard.enabled){
-                console.log("outside", e)
+                // console.log("outside", e)
                 this.input.keyboard.enabled = false
                 this.onBlur()
             }
         });
 
         this.input.on(Phaser.Input.Events.POINTER_DOWN,  async () => {
-            console.log("pointer down")
+            // console.log("pointer down")
             document.activeElement.blur()
             //这里是为了避免react使用虚拟dom替换真实dom时blur掉的是游戏本身
             await this.sleep(1)
