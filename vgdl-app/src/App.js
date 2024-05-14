@@ -9,6 +9,7 @@ import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import {VGDLParser} from './core/core';
 import Alert from 'react-bootstrap/Alert';
+import LLMs from "./LLMs";
 class App extends Component {
 
     constructor() {
@@ -294,6 +295,11 @@ class App extends Component {
         this.updateGameAndLevel(gameFile, gameLevel, gameName)
     }
 
+    onLLMGen = (level_json) => {
+        level_json = JSON.parse(level_json)
+        this.updateGameAndLevel(level_json.VGDL, level_json.Level)
+    }
+
     render() {
 
         const get_projects = ()=> {
@@ -399,6 +405,12 @@ class App extends Component {
 
                         </Col>
                         <Col md={6}>
+                            <Row>
+                                <LLMs
+                                    onLLMGen = {this.onLLMGen}
+                                />
+                            </Row>
+                            <Row>
                                 <VGDLEditor ref={e=> {
                                     this.editorElement = e
                                 }}
@@ -412,6 +424,8 @@ class App extends Component {
                                     onFocus = {this.onElementFocus}
                                     onBlur = {this.onElementUnFocus}
                                 />
+                            </Row>
+
                         </Col>
                     </Row>
 
