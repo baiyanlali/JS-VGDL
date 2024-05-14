@@ -10,6 +10,7 @@ import * as Condition from "./ontology/conditional.js";
 import * as Effect from "./ontology/effect.js";
 import * as Physics from "./ontology/physics.js";
 import {killSprite, scoreChange} from "./ontology/effect.js";
+import {BasicGame} from "./games.js";
 
 
 

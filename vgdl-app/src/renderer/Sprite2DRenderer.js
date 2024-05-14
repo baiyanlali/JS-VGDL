@@ -289,7 +289,18 @@ class Sprite2DRenderer extends RendererBase {
         sprite.setDepth(objectTemplate.zIdx);
     };
 
+
+
     loadTemplates = (objects) => {
+
+        const defaultMapping = {
+            avatar: ["triangle", YELLOW],
+            player: ["triangle", YELLOW],
+            MovingAvatar: ["triangle", YELLOW],
+            wall: ["square", WHITE],
+            goal: ["circle", RED],
+        }
+
         this.scene.load.baseURL = "sprites/";
 
         if ("BackgroundTile" in this.renderConfig) {
@@ -338,16 +349,22 @@ class Sprite2DRenderer extends RendererBase {
                 //if have image
                 // console.info(`[Sprite2D Renderer] Add sprite ${objectTemplate.name} ${object.img}`)
                 this.loadImage(objectTemplate.id, object.img);
-            }else{
+            }
+            else{
                 //if not
 
                 // const shape = random.choice(['circle', 'triangle', 'square', "pentagon", "hexagon"])
-                const [shape, color] = random.choice(combinations)
-                combinations.splice(combinations.indexOf([shape, color]))
-                objectTemplate.color = color
-                // console.info(`[Sprite2D Renderer] Add sprite ${objectTemplate.name} ${shape}`)
-                this.loadImage(objectTemplate.id, this.getShapeImage(shape));
-
+                if(defaultMapping.hasOwnProperty(object.name)){
+                    // console.log(defaultMapping[object.name])
+                    this.loadImage(objectTemplate.id, this.getShapeImage(defaultMapping[object.name][0]))
+                    objectTemplate.color = defaultMapping[object.name][1]
+                }else {
+                    const [shape, color] = random.choice(combinations)
+                    combinations.splice(combinations.indexOf([shape, color]))
+                    objectTemplate.color = color
+                    // console.info(`[Sprite2D Renderer] Add sprite ${objectTemplate.name} ${shape}`)
+                    this.loadImage(objectTemplate.id, this.getShapeImage(shape));
+                }
             }
 
             this.objectTemplates[objectTemplate.id] = objectTemplate;

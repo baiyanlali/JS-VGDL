@@ -40,6 +40,12 @@ export function killSprite (sprite, partner, game, kwargs) {
 	return ['killSprite', sprite.ID || sprite, partner ? (partner.ID || partner): null];
 }
 
+//正好与killsprite效果相反，专门为大预言模型设计
+export function removeSprite (sprite, partner, game, kwargs) {
+	game.kill_list.push(partner);
+	return ['removeSprite', sprite.ID || sprite, partner ? (partner.ID || partner): null];
+}
+
 export function cloneSprite (sprite, partner, game, kwargs) {
 	game._createSprite([sprite.name], [sprite.location.x, sprite.location.y]);
 	return ['cloneSprite', sprite.ID || sprite, partner.ID || partner];
