@@ -10,6 +10,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import {VGDLParser} from './core/core';
 import Alert from 'react-bootstrap/Alert';
 import LLMs from "./LLMs";
+import React from 'react';
 class App extends Component {
 
     constructor() {
@@ -370,33 +371,34 @@ class App extends Component {
                 <Container fluid style={{marginTop: '20px', textAlign: 'center'}}>
 
                     <Row md={10}>
-                        <Col md={6}>
+                        <Col md={6} >
                             <Card body data-bs-theme={this.state.theme}
                                   border={this.state.activeWindow === this.playerElement?"primary":"dark"}>
 
-                            <div
-                                ref={(playerContentElement) => {
-                                    this.playerContentElement = playerContentElement
-                                }}
-                            >
-                                <Player
-                                    ref={e=> {
-                                        this.playerElement = e
+                                <div
+                                    ref={(playerContentElement) => {
+                                        this.playerContentElement = playerContentElement
                                     }}
-                                    rendererName={this.state.rendererName}
-                                    rendererConfig={this.state.rendererConfig}
-                                    selectedLevelId={this.state.selectedLevelId}
-                                    width={this.state.levelPlayer.phaserWidth}
-                                    height={this.state.levelPlayer.phaserHeight}
-                                    vgdl={this.state.game}
-                                    active={this.state.activeWindow === this.playerElement}
-                                    onFocus={this.onElementFocus}
-                                    onBlur = {this.onElementUnFocus}
-                                />
+                                    
+                                >
+                                    <Player
+                                        ref={e=> {
+                                            this.playerElement = e
+                                        }}
+                                        rendererName={this.state.rendererName}
+                                        rendererConfig={this.state.rendererConfig}
+                                        selectedLevelId={this.state.selectedLevelId}
+                                        width={this.state.levelPlayer.phaserWidth}
+                                        height={this.state.levelPlayer.phaserHeight}
+                                        vgdl={this.state.game}
+                                        active={this.state.activeWindow === this.playerElement}
+                                        onFocus={this.onElementFocus}
+                                        onBlur = {this.onElementUnFocus}
+                                    />
 
-                            </div>
+                                </div>
 
-                        </Card>
+                            </Card>
 
                         <Alert variant={this.state.compileState.state} dismissible hidden={this.state.compileState.hidden}>
                             {this.state.compileState.message}
